@@ -11,7 +11,7 @@ struct Slot {
 struct Stack {
     uint256 amount;
     uint256 slot;
-    mapping(address => uint256) withdrawals; // to store until which slot the user have withdraw the tokens
+    mapping(address => uint256) withdrawals; // to store until which slot the user have withdrawn the tokens
 }
 
 /// @author sylar123abc
@@ -36,9 +36,10 @@ contract Stacking {
         cossToken.transferFrom(msg.sender, address(this), amount);
         uint slotId = slots.length - 1;
 
-        if (slots[slotId].time - block.timestamp >= 7 days) {
+        if (block.timestamp - slots[slotId].time >= 7 days) {
             slots.push().time = block.timestamp;
             stacked.push(stacked[slotId] + amount);
+            ++slotId;
         } else {
             stacked[slotId] += amount;
         }
@@ -57,6 +58,7 @@ contract Stacking {
      */
     function depositFees(uint amount, ERC20 token) external {
         slots[slots.length - 1].fees[address(token)] += amount;
+        // TODO: Define an event on fees deposit
     }
 
     /**
@@ -109,5 +111,59 @@ contract Stacking {
         }
         delete myStack[msg.sender];
         cossToken.transfer(msg.sender, toTransfer);
+    }
+
+    /**
+     * @dev Function to get the fees for a given token on a specific slot
+     * @param _index - The index of the slot being inspected
+     * @param _token - The token we want to get the fees for the slot
+     */
+    function getSlotFees(
+        uint _index,
+        address _token
+    ) external view returns (uint) {
+        return slots[_index].fees[_token];
+    }
+
+    /**
+     * @dev Function to get the slots length and the last slot time
+     * @return _length - The length of the slots array
+     * @return _time - The time of the last slot
+     */
+    function getLastSlot() external view returns (uint _length, uint _time) {
+        _length = slots.length;
+        _time = slots[_length - 1].time;
+    }
+
+    /**
+     * @dev Function to get the length of the senders stack list
+     */
+    function getMyStackLength() external view returns (uint) {
+        return myStack[msg.sender].length;
+    }
+
+    /**
+     * @dev Function to get the details of a stack entry
+     * @param _index - The index of the stack entry being inspected
+     * @return _amount - The amount of token stacked in this entry
+     * @return _slot - The slot of the stacking entry
+     */
+    function getMyStackDetails(
+        uint _index
+    ) external view returns (uint _amount, uint _slot) {
+        _amount = myStack[msg.sender][_index].amount;
+        _slot = myStack[msg.sender][_index].slot;
+    }
+
+    /**
+     * @dev Function to get the withdrawals for a given token on a stack entry
+     * @param _index - The index of the stack entry being inspected
+     * @param _token - The token we want to get the withdrawals for
+     */
+    function getMystackWithdrawals(
+        uint _index,
+        address _token
+    ) external view returns (uint) {
+        return myStack[msg.sender][_index].withdrawals[_token];
     }
 }
