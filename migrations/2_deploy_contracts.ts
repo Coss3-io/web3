@@ -9,10 +9,16 @@ module.exports = (artifacts: Truffle.Artifacts, web3: Web3) => {
     if (network.includes("Mainnet") || network.includes("Testnet")) return;
 
     (deployer as any).then(async () => {
-      const Test = artifacts.require("Test");
-      
-      await deployer.deploy(Test)
-      console.log("Deployed test contract : ", Test.address)
+      const Stacking = artifacts.require("Stacking");
+      const Coss = artifacts.require("Coss");
+      const Dummy = artifacts.require("DummyERC20");
+
+      await deployer.deploy(Dummy, "Dummy", "DMN");
+      await deployer.deploy(Coss);
+      await deployer.deploy(Stacking, Coss.address);
+      console.log("Deployed Stacking contract : ", Stacking.address);
+      console.log("Deployed Coss contract : ", Coss.address);
+      console.log("Deployed Dummy contract : ", Dummy.address);
 
       const config = require("../dev.config.js");
       try {

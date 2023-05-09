@@ -98,7 +98,7 @@ contract Stacking {
             tokens[i].transfer(msg.sender, toTransfer[i]);
         }
     }
-    
+
     /**
      * @dev Function used to withdraw all the stacked amount from the contract at once
      */
