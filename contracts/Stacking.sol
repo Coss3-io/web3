@@ -110,6 +110,7 @@ contract Stacking {
             toTransfer += myStack[msg.sender][i].amount;
         }
         delete myStack[msg.sender];
+        stacked[stacked.length - 1] -= toTransfer;
         cossToken.transfer(msg.sender, toTransfer);
     }
 

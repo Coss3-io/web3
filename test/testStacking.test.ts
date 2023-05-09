@@ -161,6 +161,49 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
     );
   });
 
+  it("Checks an intermediate fees deposit works between to slots", async () => {
+    const feesDeposit = new BigNumber("100e18");
+    const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
+    const existingFees = await stacking.getSlotFees(lastSlotId, coss.address);
+
+    await stacking.depositFees(feesDeposit.toFixed(), coss.address);
+    const slotFees = await stacking.getSlotFees(lastSlotId, coss.address);
+    const dummySlotFees = await stacking.getSlotFees(lastSlotId, dummy.address);
+
+    assert.equal(
+      slotFees.toString(),
+      feesDeposit.plus(existingFees.toString()).toFixed(),
+      "The amount of fees deposited should match the sent amount"
+    );
+
+    assert.equal(
+      dummySlotFees.toString(),
+      "0",
+      "No fees should be deposited for the ddummy token"
+    );
+  });
+
+  it("Checks an additional fees deposit increments the fees", async () => {
+    const feesDeposit = new BigNumber("100e18");
+    const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
+    const existingFees = await stacking.getSlotFees(lastSlotId, coss.address);
+
+    await stacking.depositFees(feesDeposit.toFixed(), coss.address);
+    const slotFees = await stacking.getSlotFees(lastSlotId, coss.address);
+
+    assert.equal(
+      slotFees.toString(),
+      feesDeposit.plus(existingFees.toString()).toFixed(),
+      "The amount of fees deposited should match the sent amount"
+    );
+
+    assert.notEqual(
+      existingFees.toString(),
+      "0",
+      "The existing fee should not be zero"
+    );
+  });
+
   it("Checks creating a new slot with existing stacked amount works well", async () => {
     const id = await utils.takeSnapshot();
     const depositAmount = new BigNumber("100000e18");
@@ -181,7 +224,81 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
     assert.equal(
       lastSlotId + 1,
       newLastSlotId,
-      "A new slot should be created after the new stack deposit");
+      "A new slot should be created after the new stack deposit"
+    );
     await utils.revertToSnapShot(Number(id));
+  });
+
+  it("Checks an additional fees deposit increments the fees", async () => {
+    const feesDeposit = new BigNumber("200e18");
+    const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
+    const existingFees = await stacking.getSlotFees(lastSlotId, coss.address);
+
+    await stacking.depositFees(feesDeposit.toFixed(), coss.address);
+    const slotFees = await stacking.getSlotFees(lastSlotId, coss.address);
+
+    assert.equal(
+      slotFees.toString(),
+      feesDeposit.plus(existingFees.toString()).toFixed(),
+      "The amount of fees deposited should match the sent amount"
+    );
+
+    assert.equal(
+      existingFees.toString(),
+      "0",
+      "The existing fees for the new slot should be zero"
+    );
+  });
+
+  it("Checks the stack withdrawal works", async () => {
+    const myBalances = await coss.balanceOf(accounts[0]);
+    const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
+    const stackingBalances = await coss.balanceOf(stacking.address);
+    const globalStackedAmount = await stacking.stacked(lastSlotId);
+    let stackAmount = new BigNumber(0);
+    const myStackLength = await stacking.getMyStackLength();
+
+    for (let i = 0; i < Number(myStackLength.toString()); ++i) {
+      stackAmount = stackAmount.plus(
+        (await stacking.getMyStackDetails(i))["0"].toString()
+      );
+    }
+    await stacking.withdrawStack();
+
+    const myBalancesAfter = await coss.balanceOf(accounts[0]);
+    const stackingBalancesAfter = await coss.balanceOf(stacking.address);
+    const globalStackedAmountAfter = await stacking.stacked(lastSlotId);
+
+    assert.equal(
+      myBalancesAfter.toString(),
+      stackAmount.plus(myBalances.toString()).toFixed(),
+      "The user balances should be incremented of the withdrawn amount"
+    );
+
+    assert.equal(
+      new BigNumber(globalStackedAmount.toString())
+        .minus(stackAmount)
+        .toFixed(),
+      globalStackedAmountAfter.toString(),
+      "The global stacked amount should be reduced after stack withdrawal"
+    );
+
+    assert.equal(
+      globalStackedAmountAfter.toString(),
+      "0",
+      "After the user withdraw no stacked amount should be into the contract"
+    );
+
+    assert.equal(
+      stackingBalancesAfter.toString(),
+      "0",
+      "After the user have withdrawn its tokens the stacking contract balance should be empty"
+    );
+
+    assert.equal(
+      new BigNumber(stackingBalances.toString()).minus(stackAmount).toFixed(),
+      stackingBalancesAfter.toString(),
+      "The stacking contract balances should be reduced by the withdrawal amount"
+    );
   });
 });
