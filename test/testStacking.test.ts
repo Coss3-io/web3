@@ -76,10 +76,11 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
     const time = Math.floor(Date.now() / 1000);
 
     await stacking.depositStack(depositAmount.toFixed());
+    const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
 
-    const slotTime = await stacking.slots(1);
+    const slotTime = await stacking.slots(lastSlotId);
     const stackingBalances = await coss.balanceOf(stacking.address);
-    const stackedAmount = await stacking.stacked(1);
+    const stackedAmount = await stacking.stacked(lastSlotId);
     const myStackLength = await stacking.getMyStackLength();
     const myStackDetails = await stacking.getMyStackDetails(0);
 
@@ -122,5 +123,65 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
 
     await utils.catchRevert(stacking.slots(2));
     await utils.catchRevert(stacking.stacked(2));
+  });
+
+  it("Checks stack depositing on existing slot works well", async () => {
+    const depositAmount = new BigNumber("500000e18");
+    const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
+    const stacked = await stacking.stacked(lastSlotId);
+
+    await stacking.depositStack(depositAmount.toFixed());
+
+    const stackedAmount = await stacking.stacked(lastSlotId);
+    const myStackLength = await stacking.getMyStackLength();
+    const myStackDetails = await stacking.getMyStackDetails(1);
+
+    assert.equal(
+      stackedAmount.toString(),
+      depositAmount.plus(stacked.toString()).toFixed(),
+      "The stacked amount should match the deposited amount"
+    );
+
+    assert.equal(
+      myStackLength.toString(),
+      "2",
+      "A new entry should de added into the myStack array"
+    );
+
+    assert.equal(
+      myStackDetails["0"].toString(),
+      depositAmount.toFixed(),
+      "The new stacked amount should be matching the deposited amount"
+    );
+
+    assert.equal(
+      myStackDetails["1"].toString(),
+      "1",
+      "The deposit should be added into the existing slot"
+    );
+  });
+
+  it("Checks creating a new slot with existing stacked amount works well", async () => {
+    const id = await utils.takeSnapshot();
+    const depositAmount = new BigNumber("100000e18");
+    const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
+    const stacked = await stacking.stacked(lastSlotId);
+    await utils.advanceTimeAndBlock(60 * 60 * 24 * 7 + 10);
+
+    await stacking.depositStack(depositAmount.toFixed());
+    const newLastSlotId =
+      Number((await stacking.getLastSlot())[0].toString()) - 1;
+    const newStackedAmount = await stacking.stacked(lastSlotId + 1);
+
+    assert.equal(
+      depositAmount.plus(stacked.toString()).toFixed(),
+      newStackedAmount.toString(),
+      "The new stacked amount should be incremented from the previous one"
+    );
+    assert.equal(
+      lastSlotId + 1,
+      newLastSlotId,
+      "A new slot should be created after the new stack deposit");
+    await utils.revertToSnapShot(Number(id));
   });
 });
