@@ -302,3 +302,171 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
     );
   });
 });
+
+contract("Test: stacking fees withdrawal", (accounts: Truffle.Accounts) => {
+  let stacking: StackingInstance;
+  let coss: CossInstance;
+  let dummy: DummyERC20Instance;
+
+  before(async () => {
+    stacking = await Stacking.deployed();
+    coss = await Coss.deployed();
+    dummy = await Dummy.deployed();
+    const depositAmount = new BigNumber("300000e18").toFixed();
+
+    await coss.transfer(accounts[1], depositAmount);
+    await coss.transfer(accounts[2], depositAmount);
+    await coss.transfer(accounts[3], depositAmount);
+
+    await coss.approve(stacking.address, new BigNumber("5e24").toFixed());
+    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
+      from: accounts[1],
+    });
+    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
+      from: accounts[2],
+    });
+    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
+      from: accounts[3],
+    });
+
+    await stacking.depositStack(depositAmount);
+    await stacking.depositStack(depositAmount, { from: accounts[1] });
+    await stacking.depositStack(depositAmount, { from: accounts[2] });
+  });
+
+  it("Checks an user that just deposited tokens can not take a cut of the fees", async () => {
+    const cossFees = new BigNumber("1000e18").toFixed();
+    const dummyFees = new BigNumber("900e18").toFixed();
+    await coss.transfer(stacking.address, cossFees);
+    await dummy.transfer(stacking.address, dummyFees);
+    await stacking.depositFees(cossFees, coss.address);
+    await stacking.depositFees(dummyFees, dummy.address);
+
+    const cossBalancesBefore = await coss.balanceOf(stacking.address);
+    const dummyBalancesBefore = await dummy.balanceOf(stacking.address);
+    await stacking.withdrawFees([coss.address, dummy.address]);
+
+    const cossBalancesAfter = await coss.balanceOf(stacking.address);
+    const dummyBalancesAfter = await dummy.balanceOf(stacking.address);
+    const withdrawalSlots = await stacking.getMystackWithdrawals(0, [
+      coss.address,
+      dummy.address,
+    ]);
+
+    assert.equal(
+      cossBalancesAfter.toString(),
+      cossBalancesBefore.toString(),
+      "The coss balances of the contract should not change has no fees should be sent"
+    );
+
+    assert.equal(
+      dummyBalancesAfter.toString(),
+      dummyBalancesBefore.toString(),
+      "The dummy balances of the contract should not change has no fees should be sent"
+    );
+
+    assert.equal(
+      withdrawalSlots[0].toString(),
+      "1",
+      "The coss withdrawal slot should be updated to one"
+    );
+    assert.equal(
+      withdrawalSlots[1].toString(),
+      "1",
+      "The dummy withdrawal slot should be updated to one"
+    );
+  });
+
+  it("Checks trying to withdraw on an empty slot does not give any fees", async () => {
+    await utils.advanceTimeAndBlock(60 * 60 * 24 * 7);
+    await stacking.depositStack(new BigNumber("1e18").toFixed(), {
+      from: accounts[3],
+    });
+    await stacking.withdrawStack({ from: accounts[3] });
+
+    const cossBalancesBefore = await coss.balanceOf(stacking.address);
+    await stacking.withdrawFees([coss.address]);
+    const cossBalancesAfter = await coss.balanceOf(stacking.address);
+
+    const withdrawalSlots = await stacking.getMystackWithdrawals(0, [
+      coss.address,
+      dummy.address,
+    ]);
+
+    assert.equal(
+      cossBalancesAfter.toString(),
+      cossBalancesBefore.toString(),
+      "The coss balances of the contract should not change has no fees should be sent"
+    );
+
+    assert.equal(
+      withdrawalSlots[0].toString(),
+      "2",
+      "The coss withdrawal slot should be updated to two"
+    );
+
+    assert.equal(
+      withdrawalSlots[1].toString(),
+      "1",
+      "The dummy withdrawal slot should still be one"
+    );
+  });
+
+  it("Checks trying to withdraw fees works, but not on an already withdrawn token", async () => {
+    const cossFees = new BigNumber("500e18").toFixed();
+    const dummyFees = new BigNumber("450e18").toFixed();
+    await stacking.depositFees(cossFees, coss.address);
+    await stacking.depositFees(dummyFees, dummy.address);
+    const cossBalancesBefore = await coss.balanceOf(stacking.address);
+    const dummyBalancesBefore = await dummy.balanceOf(stacking.address);
+    const depositorBalancesBefore = await dummy.balanceOf(accounts[0]);
+
+    await stacking.withdrawFees([coss.address, dummy.address]);
+
+    const cossBalancesAfter = await coss.balanceOf(stacking.address);
+    const dummyBalancesAfter = await dummy.balanceOf(stacking.address);
+    const depositorBalancesAfter = await dummy.balanceOf(accounts[0]);
+    const withdrawalSlots = await stacking.getMystackWithdrawals(0, [
+      coss.address,
+      dummy.address,
+    ]);
+
+    assert.equal(
+      cossBalancesAfter.toString(),
+      cossBalancesBefore.toString(),
+      "The coss balances of the contract should not change has no fees should be sent"
+    );
+
+    assert.equal(
+      dummyBalancesAfter.toString(),
+      new BigNumber(dummyBalancesBefore.toString())
+        .minus(new BigNumber(dummyFees).dividedToIntegerBy(3))
+        .toFixed(),
+      "The dummy balances of the contract should reduced after sending the fees"
+    );
+
+    assert.equal(
+      depositorBalancesAfter.toString(),
+      new BigNumber(depositorBalancesBefore.toString())
+        .plus(new BigNumber(dummyFees).dividedToIntegerBy(3))
+        .toFixed(),
+      "The depositor should get its dummy token back after the fees withdrawal"
+    );
+
+    assert.equal(
+      withdrawalSlots[0].toString(),
+      "2",
+      "The coss withdrawal slot should still be two"
+    );
+    assert.equal(
+      withdrawalSlots[1].toString(),
+      "2",
+      "The dummy withdrawal slot should be updated to two"
+    );
+  });
+
+  it("Checks a user can take a cut of his fees");
+  it("Checks fees withdrawal is not impacted by a user withdrawing stack");
+  it("Checks withdraw several tokens at once works");
+  it("Checks a user cannot withdraw already withdrawn slots");
+});

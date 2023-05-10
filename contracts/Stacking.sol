@@ -26,6 +26,7 @@ contract Stacking {
         cossToken = _cossToken;
         slots.push().time = block.timestamp - 7 days;
         stacked.push();
+        // TODO Check if we add our own stack entry here to do not loose the first round of fees
     }
 
     /**
@@ -56,7 +57,7 @@ contract Stacking {
      * @param amount - The amount to be deposited into the stacking contract
      * @param token - The token that is being deposited into the stacking contract
      */
-    function depositFees(uint amount, ERC20 token) external {
+    function depositFees(uint256 amount, ERC20 token) external {
         slots[slots.length - 1].fees[address(token)] += amount;
         // TODO: Define an event on fees deposit
     }
@@ -76,28 +77,29 @@ contract Stacking {
             stackedAmount = myStack[msg.sender][i].amount;
             startingSlot = myStack[msg.sender][i].slot;
 
-            for (uint j = 0; j < tokens.length - 1; ++j) {
-                uint withdrawSlot = myStack[msg.sender][i].withdrawals[
+            for (uint j = 0; j < tokens.length; ++j) {
+                uint tokenSlot = myStack[msg.sender][i].withdrawals[
                     address(tokens[j])
                 ];
 
                 myStack[msg.sender][i].withdrawals[address(tokens[j])] = slotId;
 
-                startingSlot = startingSlot < withdrawSlot
-                    ? withdrawSlot
-                    : startingSlot;
+                tokenSlot = startingSlot < tokenSlot ? tokenSlot : startingSlot;
 
-                for (uint k = 1; k < slotId - startingSlot; ++k) {
+                for (uint k = 1; k <= slotId - tokenSlot; ++k) {
                     // k is one because you start gathering the fees one slot after the deposit
+                    uint transferSlot = k + tokenSlot;
                     toTransfer[j] +=
-                        (slots[k].fees[address(tokens[j])] * stackedAmount) /
-                        stacked[k];
+                        (slots[transferSlot].fees[address(tokens[j])] *
+                            stackedAmount) /
+                        stacked[transferSlot];
                 }
             }
         }
 
         for (uint i = 0; i < tokens.length; ++i) {
-            tokens[i].transfer(msg.sender, toTransfer[i]);
+            if (toTransfer[i] > 0)
+                tokens[i].transfer(msg.sender, toTransfer[i]);
         }
     }
 
@@ -159,12 +161,20 @@ contract Stacking {
     /**
      * @dev Function to get the withdrawals for a given token on a stack entry
      * @param _index - The index of the stack entry being inspected
-     * @param _token - The token we want to get the withdrawals for
+     * @param _tokens - The list of tokens we want to get the withdrawals for
+     * @return uint[] - The slot associated to the withdrawal
      */
     function getMystackWithdrawals(
         uint _index,
-        address _token
-    ) external view returns (uint) {
-        return myStack[msg.sender][_index].withdrawals[_token];
+        address[] calldata _tokens
+    ) external view returns (uint[] memory) {
+        uint[] memory withdrawalSlots = new uint[](_tokens.length);
+
+        for (uint i = 0; i < _tokens.length; ++i) {
+            withdrawalSlots[i] = myStack[msg.sender][_index].withdrawals[
+                _tokens[i]
+            ];
+        }
+        return withdrawalSlots;
     }
 }
