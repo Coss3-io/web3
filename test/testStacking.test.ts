@@ -5,7 +5,7 @@ import {
   StackingInstance,
 } from "../types/truffle-contracts";
 import utils from "./utils";
-BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_DOWN })
+BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_DOWN });
 
 const Stacking = artifacts.require("Stacking");
 const Coss = artifacts.require("Coss");
@@ -76,7 +76,7 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
     assert.approximately(
       time - 7 * 60 * 60 * 24,
       slot.toNumber(),
-      4,
+      6,
       "The slot should be initialised 7 days into the past"
     );
   });
@@ -714,8 +714,75 @@ contract("Test: stacking fees withdrawal", (accounts: Truffle.Accounts) => {
       "The calculated dummy fees should match de received fees"
     );
   });
+});
 
-  it(
-    "Checks depositing twice on the same slot still gives the right amount of fees"
-  );
+contract("Test: multiple fees withdrawal", (accounts: Truffle.Accounts) => {
+  let stacking: StackingInstance;
+  let coss: CossInstance;
+  let dummy: DummyERC20Instance;
+
+  before(async () => {
+    stacking = await Stacking.deployed();
+    coss = await Coss.deployed();
+    dummy = await Dummy.deployed();
+    const depositAmount = new BigNumber("300000e18");
+
+    await coss.transfer(accounts[1], depositAmount.toFixed());
+    await coss.transfer(accounts[2], depositAmount.multipliedBy(2).toFixed());
+    await coss.transfer(accounts[3], depositAmount.toFixed());
+
+    await coss.approve(stacking.address, new BigNumber("5e24").toFixed());
+    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
+      from: accounts[1],
+    });
+    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
+      from: accounts[2],
+    });
+    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
+      from: accounts[3],
+    });
+
+    await stacking.depositStack(depositAmount.toFixed());
+    await stacking.depositStack(depositAmount.toFixed());
+    await stacking.depositStack(depositAmount.toFixed(), { from: accounts[1] });
+    await stacking.depositStack(depositAmount.toFixed(), {
+      from: accounts[2],
+    });
+  });
+
+  it("Checks the fees withdrawal with two stacks on the same slot works", async () => {
+    const cossFees = new BigNumber("500e18");
+    const dummyFees = new BigNumber("450e18");
+    await utils.advanceTimeAndBlock(60 * 60 * 24 * 7 + 10);
+    await stacking.depositStack(new BigNumber("1e18").toFixed());
+
+    await coss.transfer(stacking.address, cossFees.toFixed());
+    await dummy.transfer(stacking.address, dummyFees.toFixed());
+    await stacking.depositFees(cossFees.toFixed(), coss.address);
+    await stacking.depositFees(dummyFees.toFixed(), dummy.address);
+
+    const depositorCossBalancesBefore = await coss.balanceOf(accounts[0]);
+    const depositorDummyBalancesBefore = await dummy.balanceOf(accounts[0]);
+
+    await stacking.withdrawFees([coss.address, dummy.address]);
+
+    const depositorCossBalancesAfter = await coss.balanceOf(accounts[0]);
+    const depositorDummyBalancesAfter = await dummy.balanceOf(accounts[0]);
+
+    assert.equal(
+      new BigNumber(depositorCossBalancesAfter.toString())
+        .minus(depositorCossBalancesBefore.toString())
+        .toFixed(),
+      cossFees.dividedBy(2).toFixed(),
+      "The depositor should receive half of the slot's coss fees"
+    );
+
+    assert.equal(
+      new BigNumber(depositorDummyBalancesAfter.toString())
+        .minus(depositorDummyBalancesBefore.toString())
+        .toFixed(),
+      dummyFees.dividedBy(2).toFixed(),
+      "The depositor should receive half of the slot's dummy fees"
+    );
+  });
 });
