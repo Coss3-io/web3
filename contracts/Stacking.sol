@@ -18,6 +18,7 @@ struct Stack {
 /// @title The coss3.io stacking contract
 contract Stacking {
     uint256[] public stacked; // tracking the stacked amount over the slots
+    uint256[] public withdrawnStack;
     Slot[] public slots;
     mapping(address => Stack[]) private myStack; // The stacks entries for every users
     ERC20 public cossToken;
@@ -26,6 +27,7 @@ contract Stacking {
         cossToken = _cossToken;
         slots.push().time = block.timestamp - 7 days;
         stacked.push();
+        withdrawnStack.push();
         // TODO Check if we add our own stack entry here to do not loose the first round of fees
     }
 
@@ -39,7 +41,8 @@ contract Stacking {
 
         if (block.timestamp - slots[slotId].time >= 7 days) {
             slots.push().time = block.timestamp;
-            stacked.push(stacked[slotId] + amount);
+            stacked.push(stacked[slotId] + amount - withdrawnStack[slotId]);
+            withdrawnStack.push();
             ++slotId;
         } else {
             stacked[slotId] += amount;
@@ -92,7 +95,7 @@ contract Stacking {
                     toTransfer[j] +=
                         (slots[transferSlot].fees[address(tokens[j])] *
                             stackedAmount) /
-                        stacked[transferSlot];
+                        stacked[transferSlot - 1];
                 }
             }
         }
@@ -112,7 +115,7 @@ contract Stacking {
             toTransfer += myStack[msg.sender][i].amount;
         }
         delete myStack[msg.sender];
-        stacked[stacked.length - 1] -= toTransfer;
+        withdrawnStack[withdrawnStack.length - 1] += toTransfer;
         cossToken.transfer(msg.sender, toTransfer);
     }
 
