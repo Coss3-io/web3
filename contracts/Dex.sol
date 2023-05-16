@@ -40,7 +40,7 @@ struct TradeDetails {
 contract Dex {
     uint constant fees = 1e15;
     Stacking public stackingContract;
-    mapping(uint => uint) hashToFilledAmount;
+    mapping(uint => uint) public hashToFilledAmount;
 
     constructor(Stacking _stackingContract) {
         stackingContract = _stackingContract;

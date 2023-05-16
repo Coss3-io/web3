@@ -59,7 +59,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       baseToken: coss.address,
       quoteToken: dummy.address,
       owner: accounts[1],
-      expiry: String(Math.floor(Date.now() / 1000 + 3600)),
+      expiry: "9999999999999999",
       side: "1",
       replaceOrder: false,
     };
@@ -77,11 +77,12 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       { type: "uint8", value: order.side },
       { type: "bool", value: "" }
     )!;
+    const orderHash = web3.utils.sha3(encodedParameters)!;
 
     const tradeDetails = {
       baseToken: coss.address,
       quoteToken: dummy.address,
-      side: "1",
+      side: order.side,
       baseFee: false,
     };
 
@@ -110,6 +111,9 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       dummy.balanceOf(stacking.address),
     ]);
     await dex.trade([order], tradeDetails);
+    const orderHashAmount = new BigNumber(
+      (await dex.hashToFilledAmount(orderHash)).toString()
+    );
     const [
       senderCossBalancesAfter,
       senderDummyBalancesAfter,
@@ -173,9 +177,322 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       stackingCossBalancesAfter.toString(),
       "The stacking contract shouldn't have received any base fees"
     );
+
+    assert.equal(
+      orderHashAmount.toFixed(),
+      order.takerAmount,
+      "The order hash amount should be increased by the taker amount"
+    );
   });
 
-  it("Checks a regular order cannot be created twice");
+  it("Checks a regular order cannot be created twice", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("0").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("0").toFixed(),
+      makerFees: new BigNumber("0").toFixed(),
+      upperBound: new BigNumber("0").toFixed(),
+      lowerBound: new BigNumber("0").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999999",
+      side: "1",
+      replaceOrder: false,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: "" }
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      side: order.side,
+      baseFee: false,
+    };
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    await utils.catchRevert(dex.trade([order], tradeDetails));
+  });
+
+  it("Checks an order with a wrong signature cannot be created", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("0").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("0").toFixed(),
+      makerFees: new BigNumber("0").toFixed(),
+      upperBound: new BigNumber("0").toFixed(),
+      lowerBound: new BigNumber("0").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999998",
+      side: "1",
+      replaceOrder: false,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: "" }
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      side: order.side,
+      baseFee: false,
+    };
+
+    order.signature =
+      (await web3.eth.sign(encodedParameters, accounts[1])) + "ffffff"; // <- wrong signature data
+    await utils.catchRevert(dex.trade([order], tradeDetails));
+  });
+
+  it("Checks an order with a to high taker amount cannot be created", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("0").toFixed(),
+      takerAmount: new BigNumber("3e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("0").toFixed(),
+      makerFees: new BigNumber("0").toFixed(),
+      upperBound: new BigNumber("0").toFixed(),
+      lowerBound: new BigNumber("0").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999998",
+      side: "1",
+      replaceOrder: false,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: "" }
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      side: order.side,
+      baseFee: false,
+    };
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    await utils.catchRevert(dex.trade([order], tradeDetails));
+  });
+
+  it("Checks an order with a conflicting base token detail cannot be created", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("0").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("0").toFixed(),
+      makerFees: new BigNumber("0").toFixed(),
+      upperBound: new BigNumber("0").toFixed(),
+      lowerBound: new BigNumber("0").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999998",
+      side: "1",
+      replaceOrder: false,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: "" }
+    )!;
+
+    const tradeDetails = {
+      baseToken: stacking.address,
+      quoteToken: dummy.address,
+      side: order.side,
+      baseFee: false,
+    };
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    await utils.catchRevert(dex.trade([order], tradeDetails));
+  });
+
+  it("Checks an order with a conflicting quote token detail cannot be created", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("0").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("0").toFixed(),
+      makerFees: new BigNumber("0").toFixed(),
+      upperBound: new BigNumber("0").toFixed(),
+      lowerBound: new BigNumber("0").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999998",
+      side: "1",
+      replaceOrder: false,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: "" }
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: stacking.address,
+      side: order.side,
+      baseFee: false,
+    };
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    await utils.catchRevert(dex.trade([order], tradeDetails));
+  });
+
+  it("Checks an order with a conflicting side cannot be crated", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("0").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("0").toFixed(),
+      makerFees: new BigNumber("0").toFixed(),
+      upperBound: new BigNumber("0").toFixed(),
+      lowerBound: new BigNumber("0").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999998",
+      side: "1",
+      replaceOrder: false,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: "" }
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      side: "0",
+      baseFee: false,
+    };
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    await utils.catchRevert(dex.trade([order], tradeDetails));
+  });
+
+  it("Checks an order with an expiry into the past cannot be used", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("0").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("0").toFixed(),
+      makerFees: new BigNumber("0").toFixed(),
+      upperBound: new BigNumber("0").toFixed(),
+      lowerBound: new BigNumber("0").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "10",
+      side: "1",
+      replaceOrder: false,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: "" }
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      side: order.side,
+      baseFee: false,
+    };
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    await utils.catchRevert(dex.trade([order], tradeDetails));
+  });
 
   it("Checks creating a round maker sell base fees trade works", async () => {
     const order = {
@@ -213,7 +530,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const tradeDetails = {
       baseToken: coss.address,
       quoteToken: dummy.address,
-      side: "1",
+      side: order.side,
       baseFee: true,
     };
 
@@ -343,7 +660,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const tradeDetails = {
       baseToken: coss.address,
       quoteToken: dummy.address,
-      side: "0",
+      side: order.side,
       baseFee: false,
     };
 
@@ -473,7 +790,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const tradeDetails = {
       baseToken: coss.address,
       quoteToken: dummy.address,
-      side: "0",
+      side: order.side,
       baseFee: true,
     };
 
