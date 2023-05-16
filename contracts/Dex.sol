@@ -200,16 +200,16 @@ contract Dex {
         if (baseFee) {
             tradeFees = (amountToOwner * fees) / 1e18 / 2;
             if (isBuying) {
-                amountToOwner += (amountToOwner * fees) / 1e18 / 2;
-            } else {
                 amountToOwner -= (amountToOwner * fees) / 1e18 / 2;
+            } else {
+                amountToOwner += (amountToOwner * fees) / 1e18 / 2;
             }
         } else {
             tradeFees = (amountToSender * fees) / 1e18 / 2;
             if (isBuying) {
-                amountToOwner -= (amountToSender * fees) / 1e18 / 2;
+                amountToSender += (amountToSender * fees) / 1e18 / 2;
             } else {
-                amountToOwner += (amountToSender * fees) / 1e18 / 2;
+                amountToSender -= (amountToSender * fees) / 1e18 / 2;
             }
         }
 
