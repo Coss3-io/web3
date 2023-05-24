@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
+import "../node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "./Stacking.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 // TODO The price field of a replacement order represents the price of the highest buy order
+// TODO add the order cancellation
+// TODO add an arbitrage function
+// TODO allow contract to send orders
+
 enum Side {
     BUY,
     SELL
@@ -66,11 +70,10 @@ contract Dex {
         uint price = 0;
         uint quoteAmount = 0;
 
-        if (tradeDetails.side == Side.BUY) {
+        if (tradeDetails.side == Side.SELL) {
             for (uint i = 0; i < orders.length; ++i) {
                 require(orders[i].baseToken == tradeDetails.baseToken);
                 require(orders[i].quoteToken == tradeDetails.quoteToken);
-                require(orders[i].side == tradeDetails.side);
                 require(orders[i].expiry > block.timestamp);
                 (price, quoteAmount) = _verifyOrder(
                     orders[i],
@@ -110,7 +113,6 @@ contract Dex {
             for (uint i = 0; i < orders.length; ++i) {
                 require(orders[i].baseToken == tradeDetails.baseToken);
                 require(orders[i].quoteToken == tradeDetails.quoteToken);
-                require(orders[i].side == tradeDetails.side);
                 require(orders[i].expiry > block.timestamp);
                 (price, quoteAmount) = _verifyOrder(
                     orders[i],
@@ -230,7 +232,7 @@ contract Dex {
         uint orderHash,
         Side senderSide
     ) private returns (uint price, uint quoteAmount) {
-
+        require(order.lowerBound <= order.price && order.price <= order.upperBound);
         if (order.makerFees > 2000) {
             if (senderSide == Side.BUY) {
                 price = order.lowerBound + order.step * order.mult + order.makerFees;
@@ -246,8 +248,7 @@ contract Dex {
         }
         price = order.lowerBound + order.step * order.mult;
         quoteAmount = (price * order.takerAmount) / 1e18; // TODO Handle the maker fees
-        require(price <= order.upperBound);
-
+        require(order.lowerBound <= price && price <= order.upperBound);
         if (price <= order.price) {
             if (senderSide == Side.SELL) {
                 hashToFilledAmount[orderHash] += order.takerAmount;
@@ -298,6 +299,7 @@ contract Dex {
                 senderSide
             );
         } else {
+            require(order.side != senderSide);
             price = order.price;
             quoteAmount = (order.takerAmount * order.price) / 1e18;
             hashToFilledAmount[orderHash] += order.takerAmount;
