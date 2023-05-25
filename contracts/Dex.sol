@@ -94,8 +94,8 @@ contract Dex {
                     amountToOwner = 0;
                     amountToSender = 0;
                 }
-                amountToOwner += quoteAmount;
-                amountToSender += orders[i].takerAmount;
+                amountToSender += quoteAmount;
+                amountToOwner += orders[i].takerAmount;
             }
 
             // Last trade of the batch creation
@@ -133,8 +133,8 @@ contract Dex {
                     amountToOwner = 0;
                     amountToSender = 0;
                 }
-                amountToSender += quoteAmount;
-                amountToOwner += orders[i].takerAmount;
+                amountToOwner += quoteAmount;
+                amountToSender += orders[i].takerAmount;
             }
 
             // Last trade of the batch creation
@@ -247,8 +247,11 @@ contract Dex {
             }
         }
         price = order.lowerBound + order.step * order.mult;
-        quoteAmount = (price * order.takerAmount) / 1e18; // TODO Handle the maker fees
+        orderHash = uint(keccak256(abi.encodePacked(orderHash,price)));
+        quoteAmount = (price * order.takerAmount) / 1e18;
+
         require(order.lowerBound <= price && price <= order.upperBound);
+        
         if (price <= order.price) {
             if (senderSide == Side.SELL) {
                 hashToFilledAmount[orderHash] += order.takerAmount;
