@@ -1175,7 +1175,6 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
   });
 });
 
-// TODO Checks we can take only part of an order
 // TODO checks batch replacement order work, and batch regular orders work
 contract(
   "Test: Basic replacement order functions",
@@ -3140,3 +3139,30 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 });
+
+contract("Testing batch orders behaviour", (accounts: Truffle.Accounts) => {
+  let stacking: StackingInstance;
+  let coss: CossInstance;
+  let dummy: DummyERC20Instance;
+  let dex: DexInstance;
+
+  before(async () => {
+    stacking = await Stacking.deployed();
+    coss = await Coss.deployed();
+    dummy = await Dummy.deployed();
+    dex = await Dex.deployed();
+
+    await coss.transfer(accounts[1], new BigNumber("100e18").toFixed());
+    await dummy.transfer(accounts[1], new BigNumber("100e18").toFixed());
+    await coss.approve(dex.address, new BigNumber("10e30").toFixed(), {
+      from: accounts[1],
+    });
+    await dummy.approve(dex.address, new BigNumber("10e30").toFixed(), {
+      from: accounts[1],
+    });
+    await dummy.approve(dex.address, new BigNumber("10e30").toFixed());
+    await coss.approve(dex.address, new BigNumber("10e30").toFixed());
+  });
+
+  it("Checking batch order execution on regular orders works", async () => {})
+})
