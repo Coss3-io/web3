@@ -202,19 +202,18 @@ contract Dex {
         if (baseFee) {
             tradeFees = (amountToOwner * fees) / 1e18 / 2;
             if (isBuying) {
-                amountToOwner -= (amountToOwner * fees) / 1e18 / 2;
+                amountToOwner -= tradeFees;
             } else {
-                amountToOwner += (amountToOwner * fees) / 1e18 / 2;
+                amountToOwner += tradeFees;
             }
         } else {
             tradeFees = (amountToSender * fees) / 1e18 / 2;
             if (isBuying) {
-                amountToSender += (amountToSender * fees) / 1e18 / 2;
+                amountToSender += tradeFees;
             } else {
-                amountToSender -= (amountToSender * fees) / 1e18 / 2;
+                amountToSender -= tradeFees;
             }
         }
-
         baseToken.transferFrom(sender, owner, amountToOwner);
         quoteToken.transferFrom(owner, sender, amountToSender);
     }
@@ -246,10 +245,9 @@ contract Dex {
                 price = (order.lowerBound + order.step * order.mult) * 1000 / (order.makerFees + 1000);
             }
         }
-        price = order.lowerBound + order.step * order.mult;
+
         orderHash = uint(keccak256(abi.encodePacked(orderHash,price)));
         quoteAmount = (price * order.takerAmount) / 1e18;
-
         require(order.lowerBound <= price && price <= order.upperBound);
         
         if (price <= order.price) {

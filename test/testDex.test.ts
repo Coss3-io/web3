@@ -891,7 +891,6 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
 });
 
 // TODO test only sell order with maker fees, checks the first buy is not takable
-// Todo check the maker fees behaviour
 // TODO Checks we can take only part of an order and part of a replacement order
 // TODO checks batch replacement order work, and batch regular orders work
 contract(
@@ -1572,6 +1571,188 @@ contract(
       );
 
       assert.equal(
+        orderHashAmount2.toString(),
+        order.takerAmount,
+        "The orderhashAmount of the second sell order should be equal to the taker amount"
+      );
+    });
+
+    it("Checks a replacement order works BUY -> BUY", async () => {
+      const newMult = "8";
+      const order = {
+        signature: "",
+        amount: new BigNumber("2e18").toFixed(),
+        mult: new BigNumber("6").toFixed(),
+        takerAmount: new BigNumber("2e18").toFixed(),
+        price: new BigNumber("1e18").toFixed(),
+        step: new BigNumber("1e17").toFixed(),
+        makerFees: new BigNumber("0").toFixed(),
+        upperBound: new BigNumber("15e17").toFixed(),
+        lowerBound: new BigNumber("5e17").toFixed(),
+        baseToken: coss.address,
+        quoteToken: dummy.address,
+        owner: accounts[1],
+        expiry: "9999999999999999",
+        side: side.SELL,
+        replaceOrder: true,
+      };
+
+      const encodedParameters = web3.utils.encodePacked(
+        { type: "uint256", value: order.amount },
+        { type: "uint256", value: order.price },
+        { type: "uint256", value: order.step },
+        { type: "uint256", value: order.makerFees },
+        { type: "uint256", value: order.upperBound },
+        { type: "uint256", value: order.lowerBound },
+        { type: "address", value: order.baseToken },
+        { type: "address", value: order.quoteToken },
+        { type: "uint64", value: order.expiry },
+        { type: "uint8", value: order.side },
+        { type: "bool", value: String(order.replaceOrder) }
+      )!;
+
+      const orderHash = web3.utils.sha3(
+        web3.utils.encodePacked(
+          { type: "bytes", value: web3.utils.sha3(encodedParameters)! },
+          {
+            type: "uint256",
+            value: new BigNumber(order.lowerBound)
+              .plus(new BigNumber(order.step).multipliedBy(order.mult))
+              .toFixed(),
+          }
+        )!
+      )!;
+      const orderHash2 = web3.utils.sha3(
+        web3.utils.encodePacked(
+          { type: "bytes", value: web3.utils.sha3(encodedParameters)! },
+          {
+            type: "uint256",
+            value: new BigNumber(order.lowerBound)
+              .plus(new BigNumber(order.step).multipliedBy(newMult))
+              .toFixed(),
+          }
+        )!
+      )!;
+
+      const tradeDetails = {
+        baseToken: coss.address,
+        quoteToken: dummy.address,
+        side: side.BUY,
+        baseFee: false,
+      };
+
+      let amountToOwner = new BigNumber(order.lowerBound)
+        .plus(new BigNumber(order.step).multipliedBy(order.mult))
+        .multipliedBy(order.takerAmount)
+        .dividedToIntegerBy("1e18")
+        .plus(
+          new BigNumber(order.lowerBound)
+            .plus(new BigNumber(order.step).multipliedBy(newMult))
+            .multipliedBy(order.takerAmount)
+            .dividedToIntegerBy("1e18")
+        );
+      const fees = amountToOwner
+        .multipliedBy("1e15")
+        .dividedToIntegerBy(2)
+        .dividedToIntegerBy("1e18");
+
+      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+
+      const [
+        senderCossBalancesBefore,
+        senderDummyBalancesBefore,
+        ownerCossBalancesBefore,
+        ownerDummyBalancesBefore,
+        stackingCossBalancesBefore,
+        stackingDummyBalancesBefore,
+      ] = await Promise.all([
+        coss.balanceOf(accounts[0]),
+        dummy.balanceOf(accounts[0]),
+        coss.balanceOf(accounts[1]),
+        dummy.balanceOf(accounts[1]),
+        coss.balanceOf(stacking.address),
+        dummy.balanceOf(stacking.address),
+      ]);
+      await dex.trade([order], tradeDetails);
+      order.mult = newMult;
+      await dex.trade([order], tradeDetails);
+
+      const orderHashAmount = new BigNumber(
+        (await dex.hashToFilledAmount(orderHash)).toString()
+      );
+      const orderHashAmount2 = new BigNumber(
+        (await dex.hashToFilledAmount(orderHash2)).toString()
+      );
+
+      const [
+        senderCossBalancesAfter,
+        senderDummyBalancesAfter,
+        ownerCossBalancesAfter,
+        ownerDummyBalancesAfter,
+        stackingCossBalancesAfter,
+        stackingDummyBalancesAfter,
+      ] = await Promise.all([
+        coss.balanceOf(accounts[0]),
+        dummy.balanceOf(accounts[0]),
+        coss.balanceOf(accounts[1]),
+        dummy.balanceOf(accounts[1]),
+        coss.balanceOf(stacking.address),
+        dummy.balanceOf(stacking.address),
+        coss.balanceOf(dex.address),
+        dummy.balanceOf(dex.address),
+      ]);
+
+      assert.equal(
+        senderCossBalancesAfter.toString(),
+        new BigNumber(senderCossBalancesBefore.toString())
+          .plus(order.takerAmount)
+          .plus(order.takerAmount)
+          .toFixed(),
+        "The sender coss balances should be increased as he is buying two orders from the owner"
+      );
+
+      assert.equal(
+        senderDummyBalancesAfter.toString(),
+        new BigNumber(senderDummyBalancesBefore.toString())
+          .minus(amountToOwner)
+          .minus(fees.multipliedBy(2))
+          .toFixed(),
+        "After two buys the sender should send dummy tokens, plus the fees"
+      );
+
+      assert.equal(
+        ownerCossBalancesAfter.toString(),
+        new BigNumber(ownerCossBalancesBefore.toString())
+          .minus(order.takerAmount)
+          .minus(order.takerAmount)
+          .toFixed(),
+        "After two sells the owner should have less coss tokens"
+      );
+
+      assert.equal(
+        new BigNumber(ownerDummyBalancesBefore.toString())
+          .plus(amountToOwner)
+          .plus(fees)
+          .toFixed(),
+        ownerDummyBalancesAfter.toString(),
+        "The owner should receive dummy tokens for his coss sells plus the fees"
+      );
+
+      assert.equal(
+        new BigNumber(stackingDummyBalancesBefore.toString())
+          .plus(fees)
+          .toFixed(),
+        stackingDummyBalancesAfter.toString(),
+        "The stacking contract should have received fees from two trades"
+      );
+
+      assert.equal(
+        new BigNumber(stackingCossBalancesBefore.toString()).toFixed(),
+        stackingCossBalancesAfter.toString(),
+        "The stacking contract shouldn't have received any base fees"
+      );
+
+      assert.equal(
         orderHashAmount.toString(),
         order.takerAmount,
         "The orderhashAmount of the first sell order should be equal to the taker amount"
@@ -1585,3 +1766,664 @@ contract(
     });
   }
 );
+
+contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
+  let stacking: StackingInstance;
+  let coss: CossInstance;
+  let dummy: DummyERC20Instance;
+  let dex: DexInstance;
+
+  before(async () => {
+    stacking = await Stacking.deployed();
+    coss = await Coss.deployed();
+    dummy = await Dummy.deployed();
+    dex = await Dex.deployed();
+
+    await coss.transfer(accounts[1], new BigNumber("100e18").toFixed());
+    await dummy.transfer(accounts[1], new BigNumber("100e18").toFixed());
+    await coss.approve(dex.address, new BigNumber("10e30").toFixed(), {
+      from: accounts[1],
+    });
+    await dummy.approve(dex.address, new BigNumber("10e30").toFixed(), {
+      from: accounts[1],
+    });
+    await dummy.approve(dex.address, new BigNumber("10e30").toFixed());
+    await coss.approve(dex.address, new BigNumber("10e30").toFixed());
+  });
+
+  it("Testing the negative fixed maker fees on a sell order", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("4").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("1e17").toFixed(),
+      makerFees: new BigNumber("1e16").toFixed(),
+      upperBound: new BigNumber("15e17").toFixed(),
+      lowerBound: new BigNumber("5e17").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999999",
+      side: side.SELL,
+      replaceOrder: true,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: String(order.replaceOrder) }
+    )!;
+
+    const orderHash = web3.utils.sha3(
+      web3.utils.encodePacked(
+        { type: "bytes", value: web3.utils.sha3(encodedParameters)! },
+        {
+          type: "uint256",
+          value: new BigNumber(order.lowerBound)
+            .plus(new BigNumber(order.step).multipliedBy(order.mult))
+            .minus(order.makerFees)
+            .toFixed(),
+        }
+      )!
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      side: side.SELL,
+      baseFee: false,
+    };
+
+    let amountToSender = new BigNumber(order.lowerBound)
+      .plus(new BigNumber(order.step).multipliedBy(order.mult))
+      .minus(order.makerFees)
+      .multipliedBy(order.takerAmount)
+      .dividedToIntegerBy("1e18");
+    const fees = amountToSender.multipliedBy("1e15").dividedToIntegerBy("1e18");
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+
+    const [
+      senderCossBalancesBefore,
+      senderDummyBalancesBefore,
+      ownerCossBalancesBefore,
+      ownerDummyBalancesBefore,
+      stackingCossBalancesBefore,
+      stackingDummyBalancesBefore,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[1]),
+      coss.balanceOf(stacking.address),
+      dummy.balanceOf(stacking.address),
+    ]);
+    await dex.trade([order], tradeDetails);
+
+    const orderHashAmount = new BigNumber(
+      (await dex.hashToFilledAmount(orderHash)).toString()
+    );
+
+    const [
+      senderCossBalancesAfter,
+      senderDummyBalancesAfter,
+      ownerCossBalancesAfter,
+      ownerDummyBalancesAfter,
+      stackingCossBalancesAfter,
+      stackingDummyBalancesAfter,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[1]),
+      coss.balanceOf(stacking.address),
+      dummy.balanceOf(stacking.address),
+      coss.balanceOf(dex.address),
+      dummy.balanceOf(dex.address),
+    ]);
+
+    assert.equal(
+      senderCossBalancesAfter.toString(),
+      new BigNumber(senderCossBalancesBefore.toString())
+        .minus(new BigNumber(order.takerAmount))
+        .toFixed(),
+      "The sender coss balances should be reduced as he is selling to the owner"
+    );
+
+    assert.equal(
+      senderDummyBalancesAfter.toString(),
+      new BigNumber(senderDummyBalancesBefore.toString())
+        .plus(amountToSender)
+        .minus(fees)
+        .toFixed(),
+      "After selling the sender should receive dummy tokens, minus the fees"
+    );
+
+    assert.equal(
+      ownerCossBalancesAfter.toString(),
+      new BigNumber(ownerCossBalancesBefore.toString())
+        .plus(order.takerAmount)
+        .toFixed(),
+      "After the buy the owner should have more coss"
+    );
+
+    assert.equal(
+      new BigNumber(ownerDummyBalancesBefore.toString())
+        .minus(amountToSender)
+        .plus(fees.dividedToIntegerBy(2))
+        .toFixed(),
+      ownerDummyBalancesAfter.toString(),
+      "The owner should sent dummy tokens for his coss buys minus the fees"
+    );
+
+    assert.equal(
+      new BigNumber(stackingDummyBalancesBefore.toString())
+        .plus(fees.dividedToIntegerBy(2))
+        .toFixed(),
+      stackingDummyBalancesAfter.toString(),
+      "The stacking contract should have received fees from trade"
+    );
+
+    assert.equal(
+      new BigNumber(stackingCossBalancesBefore.toString()).toFixed(),
+      stackingCossBalancesAfter.toString(),
+      "The stacking contract shouldn't have received any base fees"
+    );
+
+    assert.equal(
+      orderHashAmount.toString(),
+      order.takerAmount,
+      "The orderhashAmount of the first sell order should be equal to the taker amount"
+    );
+  });
+
+  it("Testing the negative fixed maker fees on a buy order", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("6").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("1e17").toFixed(),
+      makerFees: new BigNumber("1e16").toFixed(),
+      upperBound: new BigNumber("15e17").toFixed(),
+      lowerBound: new BigNumber("5e17").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999999",
+      side: side.SELL,
+      replaceOrder: true,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: String(order.replaceOrder) }
+    )!;
+
+    const orderHash = web3.utils.sha3(
+      web3.utils.encodePacked(
+        { type: "bytes", value: web3.utils.sha3(encodedParameters)! },
+        {
+          type: "uint256",
+          value: new BigNumber(order.lowerBound)
+            .plus(new BigNumber(order.step).multipliedBy(order.mult))
+            .plus(order.makerFees)
+            .toFixed(),
+        }
+      )!
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      side: side.BUY,
+      baseFee: false,
+    };
+
+    let amountToOwner = new BigNumber(order.lowerBound)
+      .plus(new BigNumber(order.step).multipliedBy(order.mult))
+      .plus(order.makerFees)
+      .multipliedBy(order.takerAmount)
+      .dividedToIntegerBy("1e18");
+    const fees = amountToOwner.multipliedBy("1e15").dividedToIntegerBy("1e18");
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+
+    const [
+      senderCossBalancesBefore,
+      senderDummyBalancesBefore,
+      ownerCossBalancesBefore,
+      ownerDummyBalancesBefore,
+      stackingCossBalancesBefore,
+      stackingDummyBalancesBefore,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[1]),
+      coss.balanceOf(stacking.address),
+      dummy.balanceOf(stacking.address),
+    ]);
+    await dex.trade([order], tradeDetails);
+
+    const orderHashAmount = new BigNumber(
+      (await dex.hashToFilledAmount(orderHash)).toString()
+    );
+
+    const [
+      senderCossBalancesAfter,
+      senderDummyBalancesAfter,
+      ownerCossBalancesAfter,
+      ownerDummyBalancesAfter,
+      stackingCossBalancesAfter,
+      stackingDummyBalancesAfter,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[1]),
+      coss.balanceOf(stacking.address),
+      dummy.balanceOf(stacking.address),
+      coss.balanceOf(dex.address),
+      dummy.balanceOf(dex.address),
+    ]);
+
+    assert.equal(
+      ownerCossBalancesAfter.toString(),
+      new BigNumber(ownerCossBalancesBefore.toString())
+        .minus(new BigNumber(order.takerAmount))
+        .toFixed(),
+      "The owner coss balances should be reduced as he is selling to the sender"
+    );
+
+    assert.equal(
+      ownerDummyBalancesAfter.toString(),
+      new BigNumber(ownerDummyBalancesBefore.toString())
+        .plus(amountToOwner)
+        .plus(fees.dividedToIntegerBy(2))
+        .toFixed(),
+      "After selling the owner should receive dummy tokens, plus the fees"
+    );
+
+    assert.equal(
+      senderCossBalancesAfter.toString(),
+      new BigNumber(senderCossBalancesBefore.toString())
+        .plus(order.takerAmount)
+        .toFixed(),
+      "After the buy the sender should have more coss"
+    );
+
+    assert.equal(
+      new BigNumber(senderDummyBalancesBefore.toString())
+        .minus(amountToOwner)
+        .minus(fees)
+        .toFixed(),
+      senderDummyBalancesAfter.toString(),
+      "The sender should sent dummy tokens for his coss buys minus the fees"
+    );
+
+    assert.equal(
+      new BigNumber(stackingDummyBalancesBefore.toString())
+        .plus(fees.dividedToIntegerBy(2))
+        .toFixed(),
+      stackingDummyBalancesAfter.toString(),
+      "The stacking contract should have received fees from trade"
+    );
+
+    assert.equal(
+      new BigNumber(stackingCossBalancesBefore.toString()).toFixed(),
+      stackingCossBalancesAfter.toString(),
+      "The stacking contract shouldn't have received any base fees"
+    );
+
+    assert.equal(
+      orderHashAmount.toString(),
+      order.takerAmount,
+      "The orderhashAmount of the first sell order should be equal to the taker amount"
+    );
+  });
+
+  it("Testing the negative relative maker fees on a sell order", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("4").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("1e17").toFixed(),
+      makerFees: new BigNumber("70").toFixed(),
+      upperBound: new BigNumber("15e17").toFixed(),
+      lowerBound: new BigNumber("5e17").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999999",
+      side: side.SELL,
+      replaceOrder: true,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: String(order.replaceOrder) }
+    )!;
+
+    const orderHash = web3.utils.sha3(
+      web3.utils.encodePacked(
+        { type: "bytes", value: web3.utils.sha3(encodedParameters)! },
+        {
+          type: "uint256",
+          value: new BigNumber(order.lowerBound)
+            .plus(new BigNumber(order.step).multipliedBy(order.mult))
+            .multipliedBy(1000)
+            .dividedToIntegerBy(Number(order.makerFees) + 1000)
+            .toFixed(),
+        }
+      )!
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      side: side.SELL,
+      baseFee: false,
+    };
+
+    let amountToSender = new BigNumber(order.lowerBound)
+      .plus(new BigNumber(order.step).multipliedBy(order.mult))
+      .multipliedBy(1000)
+      .dividedToIntegerBy(Number(order.makerFees) + 1000)
+      .multipliedBy(order.takerAmount)
+      .dividedToIntegerBy("1e18");
+
+    const fees = amountToSender
+      .multipliedBy("1e15")
+      .dividedToIntegerBy("1e18")
+      .dividedToIntegerBy(2);
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+
+    const [
+      senderCossBalancesBefore,
+      senderDummyBalancesBefore,
+      ownerCossBalancesBefore,
+      ownerDummyBalancesBefore,
+      stackingCossBalancesBefore,
+      stackingDummyBalancesBefore,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[1]),
+      coss.balanceOf(stacking.address),
+      dummy.balanceOf(stacking.address),
+    ]);
+    await dex.trade([order], tradeDetails);
+
+    const orderHashAmount = new BigNumber(
+      (await dex.hashToFilledAmount(orderHash)).toString()
+    );
+
+    const [
+      senderCossBalancesAfter,
+      senderDummyBalancesAfter,
+      ownerCossBalancesAfter,
+      ownerDummyBalancesAfter,
+      stackingCossBalancesAfter,
+      stackingDummyBalancesAfter,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[1]),
+      coss.balanceOf(stacking.address),
+      dummy.balanceOf(stacking.address),
+      coss.balanceOf(dex.address),
+      dummy.balanceOf(dex.address),
+    ]);
+
+    assert.equal(
+      senderCossBalancesAfter.toString(),
+      new BigNumber(senderCossBalancesBefore.toString())
+        .minus(new BigNumber(order.takerAmount))
+        .toFixed(),
+      "The sender coss balances should be reduced as he is selling to the owner"
+    );
+
+    assert.equal(
+      senderDummyBalancesAfter.toString(),
+      new BigNumber(senderDummyBalancesBefore.toString())
+        .plus(amountToSender)
+        .minus(fees.multipliedBy(2))
+        .toFixed(),
+      "After selling the sender should receive dummy tokens, minus the fees"
+    );
+
+    assert.equal(
+      ownerCossBalancesAfter.toString(),
+      new BigNumber(ownerCossBalancesBefore.toString())
+        .plus(order.takerAmount)
+        .toFixed(),
+      "After the buy the owner should have more coss"
+    );
+
+    assert.equal(
+      new BigNumber(ownerDummyBalancesBefore.toString())
+        .minus(amountToSender)
+        .plus(fees)
+        .toFixed(),
+      ownerDummyBalancesAfter.toString(),
+      "The owner should sent dummy tokens for his coss buys minus the fees"
+    );
+
+    assert.equal(
+      new BigNumber(stackingDummyBalancesBefore.toString())
+        .plus(fees)
+        .toFixed(),
+      stackingDummyBalancesAfter.toString(),
+      "The stacking contract should have received fees from trade"
+    );
+
+    assert.equal(
+      new BigNumber(stackingCossBalancesBefore.toString()).toFixed(),
+      stackingCossBalancesAfter.toString(),
+      "The stacking contract shouldn't have received any base fees"
+    );
+
+    assert.equal(
+      orderHashAmount.toString(),
+      order.takerAmount,
+      "The orderhashAmount of the first sell order should be equal to the taker amount"
+    );
+  });
+
+  it("Testing the negative relative maker fees on a buy order", async () => {
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("6").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("1e18").toFixed(),
+      step: new BigNumber("1e17").toFixed(),
+      makerFees: new BigNumber("70").toFixed(),
+      upperBound: new BigNumber("15e17").toFixed(),
+      lowerBound: new BigNumber("5e17").toFixed(),
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      owner: accounts[1],
+      expiry: "9999999999999999",
+      side: side.SELL,
+      replaceOrder: true,
+    };
+
+    const encodedParameters = web3.utils.encodePacked(
+      { type: "uint256", value: order.amount },
+      { type: "uint256", value: order.price },
+      { type: "uint256", value: order.step },
+      { type: "uint256", value: order.makerFees },
+      { type: "uint256", value: order.upperBound },
+      { type: "uint256", value: order.lowerBound },
+      { type: "address", value: order.baseToken },
+      { type: "address", value: order.quoteToken },
+      { type: "uint64", value: order.expiry },
+      { type: "uint8", value: order.side },
+      { type: "bool", value: String(order.replaceOrder) }
+    )!;
+
+    const orderHash = web3.utils.sha3(
+      web3.utils.encodePacked(
+        { type: "bytes", value: web3.utils.sha3(encodedParameters)! },
+        {
+          type: "uint256",
+          value: new BigNumber(order.lowerBound)
+            .plus(new BigNumber(order.step).multipliedBy(order.mult))
+            .multipliedBy(Number(order.makerFees) + 1000)
+            .dividedToIntegerBy(1000)
+            .toFixed(),
+        }
+      )!
+    )!;
+
+    const tradeDetails = {
+      baseToken: coss.address,
+      quoteToken: dummy.address,
+      side: side.BUY,
+      baseFee: false,
+    };
+
+    let amountToOwner = new BigNumber(order.lowerBound)
+      .plus(new BigNumber(order.step).multipliedBy(order.mult))
+      .multipliedBy(Number(order.makerFees) + 1000)
+      .dividedToIntegerBy(1000)
+      .multipliedBy(order.takerAmount)
+      .dividedToIntegerBy("1e18");
+
+    const fees = amountToOwner
+      .multipliedBy("1e15")
+      .dividedToIntegerBy(2)
+      .dividedToIntegerBy("1e18");
+
+    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+
+    const [
+      senderCossBalancesBefore,
+      senderDummyBalancesBefore,
+      ownerCossBalancesBefore,
+      ownerDummyBalancesBefore,
+      stackingCossBalancesBefore,
+      stackingDummyBalancesBefore,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[1]),
+      coss.balanceOf(stacking.address),
+      dummy.balanceOf(stacking.address),
+    ]);
+    await dex.trade([order], tradeDetails);
+
+    const orderHashAmount = new BigNumber(
+      (await dex.hashToFilledAmount(orderHash)).toString()
+    );
+
+    const [
+      senderCossBalancesAfter,
+      senderDummyBalancesAfter,
+      ownerCossBalancesAfter,
+      ownerDummyBalancesAfter,
+      stackingCossBalancesAfter,
+      stackingDummyBalancesAfter,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[1]),
+      coss.balanceOf(stacking.address),
+      dummy.balanceOf(stacking.address),
+      coss.balanceOf(dex.address),
+      dummy.balanceOf(dex.address),
+    ]);
+
+    assert.equal(
+      ownerCossBalancesAfter.toString(),
+      new BigNumber(ownerCossBalancesBefore.toString())
+        .minus(new BigNumber(order.takerAmount))
+        .toFixed(),
+      "The owner coss balances should be reduced as he is selling to the sender"
+    );
+
+    assert.equal(
+      ownerDummyBalancesAfter.toString(),
+      new BigNumber(ownerDummyBalancesBefore.toString())
+        .plus(amountToOwner)
+        .plus(fees)
+        .toFixed(),
+      "After selling the owner should receive dummy tokens, plus the fees"
+    );
+
+    assert.equal(
+      senderCossBalancesAfter.toString(),
+      new BigNumber(senderCossBalancesBefore.toString())
+        .plus(order.takerAmount)
+        .toFixed(),
+      "After the buy the sender should have more coss"
+    );
+
+    assert.equal(
+      new BigNumber(senderDummyBalancesBefore.toString())
+        .minus(amountToOwner)
+        .minus(fees.multipliedBy(2))
+        .toFixed(),
+      senderDummyBalancesAfter.toString(),
+      "The sender should sent dummy tokens for his coss buys minus the fees"
+    );
+
+    assert.equal(
+      new BigNumber(stackingDummyBalancesBefore.toString())
+        .plus(fees)
+        .toFixed(),
+      stackingDummyBalancesAfter.toString(),
+      "The stacking contract should have received fees from trade"
+    );
+
+    assert.equal(
+      new BigNumber(stackingCossBalancesBefore.toString()).toFixed(),
+      stackingCossBalancesAfter.toString(),
+      "The stacking contract shouldn't have received any base fees"
+    );
+
+    assert.equal(
+      orderHashAmount.toString(),
+      order.takerAmount,
+      "The orderhashAmount of the first sell order should be equal to the taker amount"
+    );
+  });
+});
