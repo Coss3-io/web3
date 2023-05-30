@@ -91,6 +91,7 @@ contract Dex {
                         tradeDetails.baseFee,
                         false
                     );
+                    owner = orders[i].owner;
                     amountToOwner = 0;
                     amountToSender = 0;
                 }
@@ -130,6 +131,7 @@ contract Dex {
                         tradeDetails.baseFee,
                         true
                     );
+                    owner = orders[i].owner;
                     amountToOwner = 0;
                     amountToSender = 0;
                 }
@@ -153,14 +155,58 @@ contract Dex {
         _handleFees(tradeDetails, tradeFees);
     }
 
-    function tradeNotOptimised(Order[] calldata orders) external pure {}
+    function tradeNotOptimised(
+        Order[] calldata orders,
+        TradeDetails[] calldata tradeDetails
+    ) external {
+        uint tradeFees = 0;
+        uint price = 0;
+        uint quoteAmount = 0;
+
+            for (uint i = 0; i < orders.length; ++i) {
+                require(orders[i].baseToken == tradeDetails[i].baseToken);
+                require(orders[i].quoteToken == tradeDetails[i].quoteToken);
+                require(orders[i].expiry > block.timestamp);
+                (price, quoteAmount) = _verifyOrder(
+                    orders[i],
+                    tradeDetails[i].side
+                );
+                if (tradeDetails[i].side == Side.SELL) {
+                    tradeFees = _createTrade(
+                        orders[i].takerAmount,
+                        quoteAmount,
+                        tradeDetails[i].baseToken,
+                        tradeDetails[i].quoteToken,
+                        orders[i].owner,
+                        msg.sender,
+                        tradeDetails[i].baseFee,
+                        false
+                    );
+                } else {
+                    tradeFees = _createTrade(
+                        orders[i].takerAmount,
+                        quoteAmount,
+                        tradeDetails[i].baseToken,
+                        tradeDetails[i].quoteToken,
+                        msg.sender,
+                        orders[i].owner,
+                        tradeDetails[i].baseFee,
+                        true
+                    );
+                }
+                _handleFees(tradeDetails[i], tradeFees);
+            }
+    }
 
     /**
      * @dev Function used to send the fees to the stacking contract for future distribution
-     * @param tradeDetails - The details of the trade (baseToken, quoteToken needed) 
+     * @param tradeDetails - The details of the trade (baseToken, quoteToken needed)
      * @param tradeFees - The fees for the current trade
      */
-    function _handleFees(TradeDetails memory tradeDetails, uint tradeFees) private {
+    function _handleFees(
+        TradeDetails memory tradeDetails,
+        uint tradeFees
+    ) private {
         if (tradeDetails.baseFee) {
             tradeDetails.baseToken.transferFrom(
                 msg.sender,
@@ -231,25 +277,40 @@ contract Dex {
         uint orderHash,
         Side senderSide
     ) private returns (uint price, uint quoteAmount) {
-        require(order.lowerBound <= order.price && order.price <= order.upperBound);
+        require(
+            order.lowerBound <= order.price && order.price <= order.upperBound
+        );
         if (order.makerFees > 2000) {
             if (senderSide == Side.BUY) {
-                price = order.lowerBound + order.step * order.mult + order.makerFees;
+                price =
+                    order.lowerBound +
+                    order.step *
+                    order.mult +
+                    order.makerFees;
             } else {
-                price = order.lowerBound + order.step * order.mult - order.makerFees;
+                price =
+                    order.lowerBound +
+                    order.step *
+                    order.mult -
+                    order.makerFees;
             }
         } else {
             if (senderSide == Side.BUY) {
-                price = (order.lowerBound + order.step * order.mult) * (order.makerFees + 1000) / 1000;
+                price =
+                    ((order.lowerBound + order.step * order.mult) *
+                        (order.makerFees + 1000)) /
+                    1000;
             } else {
-                price = (order.lowerBound + order.step * order.mult) * 1000 / (order.makerFees + 1000);
+                price =
+                    ((order.lowerBound + order.step * order.mult) * 1000) /
+                    (order.makerFees + 1000);
             }
         }
 
-        orderHash = uint(keccak256(abi.encodePacked(orderHash,price)));
+        orderHash = uint(keccak256(abi.encodePacked(orderHash, price)));
         quoteAmount = (price * order.takerAmount) / 1e18;
         require(order.lowerBound <= price && price <= order.upperBound);
-        
+
         if (price <= order.price) {
             if (senderSide == Side.SELL) {
                 hashToFilledAmount[orderHash] += order.takerAmount;
@@ -279,6 +340,7 @@ contract Dex {
         Side senderSide
     ) private returns (uint price, uint quoteAmount) {
         bytes memory data = abi.encodePacked(
+            order.owner,
             order.amount,
             order.price,
             order.step,
