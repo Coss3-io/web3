@@ -2,6 +2,7 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 import "../node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "../node_modules/@openzeppelin/contracts/utils/Address.sol";
 import "./Stacking.sol";
 
 // TODO The price field of a replacement order represents the price of the highest buy order
@@ -45,6 +46,7 @@ contract Dex {
     uint constant fees = 1e15;
     Stacking public stackingContract;
     mapping(uint => uint) public hashToFilledAmount;
+    mapping(uint => bool) public cancelledOrders;
 
     constructor(Stacking _stackingContract) {
         stackingContract = _stackingContract;
@@ -163,39 +165,66 @@ contract Dex {
         uint price = 0;
         uint quoteAmount = 0;
 
-            for (uint i = 0; i < orders.length; ++i) {
-                require(orders[i].baseToken == tradeDetails[i].baseToken);
-                require(orders[i].quoteToken == tradeDetails[i].quoteToken);
-                require(orders[i].expiry > block.timestamp);
-                (price, quoteAmount) = _verifyOrder(
-                    orders[i],
-                    tradeDetails[i].side
+        for (uint i = 0; i < orders.length; ++i) {
+            require(orders[i].baseToken == tradeDetails[i].baseToken);
+            require(orders[i].quoteToken == tradeDetails[i].quoteToken);
+            require(orders[i].expiry > block.timestamp);
+            (price, quoteAmount) = _verifyOrder(
+                orders[i],
+                tradeDetails[i].side
+            );
+            if (tradeDetails[i].side == Side.SELL) {
+                tradeFees = _createTrade(
+                    orders[i].takerAmount,
+                    quoteAmount,
+                    tradeDetails[i].baseToken,
+                    tradeDetails[i].quoteToken,
+                    orders[i].owner,
+                    msg.sender,
+                    tradeDetails[i].baseFee,
+                    false
                 );
-                if (tradeDetails[i].side == Side.SELL) {
-                    tradeFees = _createTrade(
-                        orders[i].takerAmount,
-                        quoteAmount,
-                        tradeDetails[i].baseToken,
-                        tradeDetails[i].quoteToken,
-                        orders[i].owner,
-                        msg.sender,
-                        tradeDetails[i].baseFee,
-                        false
-                    );
-                } else {
-                    tradeFees = _createTrade(
-                        orders[i].takerAmount,
-                        quoteAmount,
-                        tradeDetails[i].baseToken,
-                        tradeDetails[i].quoteToken,
-                        msg.sender,
-                        orders[i].owner,
-                        tradeDetails[i].baseFee,
-                        true
-                    );
-                }
-                _handleFees(tradeDetails[i], tradeFees);
+            } else {
+                tradeFees = _createTrade(
+                    orders[i].takerAmount,
+                    quoteAmount,
+                    tradeDetails[i].baseToken,
+                    tradeDetails[i].quoteToken,
+                    msg.sender,
+                    orders[i].owner,
+                    tradeDetails[i].baseFee,
+                    true
+                );
             }
+            _handleFees(tradeDetails[i], tradeFees);
+        }
+    }
+
+    /**
+     * @dev Function used to cancel a list of orders, only the owner can cancel its orders
+     * @param orders[] - the list of the orders the user wants to cancel
+     */
+    function cancelOrders(Order[] calldata orders) external {
+        for (uint i = 0; i < orders.length; ++i) {
+            bytes memory data = abi.encodePacked(
+                orders[i].owner,
+                orders[i].amount,
+                orders[i].price,
+                orders[i].step,
+                orders[i].makerFees,
+                orders[i].upperBound,
+                orders[i].lowerBound,
+                orders[i].baseToken,
+                orders[i].quoteToken,
+                orders[i].expiry,
+                orders[i].side,
+                orders[i].replaceOrder
+            );
+            uint orderHash = uint(keccak256(data));
+            require(orders[i].owner == msg.sender);
+            require(!cancelledOrders[orderHash]);
+            cancelledOrders[orderHash] = true;
+        }
     }
 
     /**
@@ -329,7 +358,7 @@ contract Dex {
     }
 
     /**
-     * @dev Verifies that the orderr have been signed by order.owner
+     * @dev Verifies that the orderis valid and returns the exchanged amount
      * @param order - The order data to verify
      * @param senderSide - The side the sender is taking
      * @return price - the price of this trade
@@ -368,13 +397,16 @@ contract Dex {
             hashToFilledAmount[orderHash] += order.takerAmount;
             require(hashToFilledAmount[orderHash] <= order.amount);
         }
-        require(
-            order.owner ==
-                ECDSA.recover(
-                    ECDSA.toEthSignedMessageHash(data),
-                    order.signature
-                ),
-            "Invalid signature"
-        );
+        if (!Address.isContract(order.owner)) {
+            require(!cancelledOrders[orderHash]);
+            require(
+                order.owner ==
+                    ECDSA.recover(
+                        ECDSA.toEthSignedMessageHash(data),
+                        order.signature
+                    ),
+                "Invalid signature"
+            );
+        }
     }
 }

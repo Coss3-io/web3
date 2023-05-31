@@ -4259,3 +4259,255 @@ contract("Testing batch orders behaviour", (accounts: Truffle.Accounts) => {
     );
   });
 });
+
+contract(
+  "Testing orders cancellation function",
+  (accounts: Truffle.Accounts) => {
+    let stacking: StackingInstance;
+    let coss: CossInstance;
+    let dummy: DummyERC20Instance;
+    let dex: DexInstance;
+
+    before(async () => {
+      stacking = await Stacking.deployed();
+      coss = await Coss.deployed();
+      dummy = await Dummy.deployed();
+      dex = await Dex.deployed();
+
+      await coss.transfer(accounts[1], new BigNumber("100e18").toFixed());
+      await dummy.transfer(accounts[1], new BigNumber("100e18").toFixed());
+      await coss.approve(dex.address, new BigNumber("10e30").toFixed(), {
+        from: accounts[1],
+      });
+      await dummy.approve(dex.address, new BigNumber("10e30").toFixed(), {
+        from: accounts[1],
+      });
+      await coss.transfer(accounts[2], new BigNumber("100e18").toFixed());
+      await dummy.transfer(accounts[2], new BigNumber("100e18").toFixed());
+      await coss.approve(dex.address, new BigNumber("10e30").toFixed(), {
+        from: accounts[2],
+      });
+      await dummy.approve(dex.address, new BigNumber("10e30").toFixed(), {
+        from: accounts[2],
+      });
+      await dummy.approve(dex.address, new BigNumber("10e30").toFixed());
+      await coss.approve(dex.address, new BigNumber("10e30").toFixed());
+    });
+
+    it("Checks someone else than the owner cannot cancel an order", async () => {
+      const order = {
+        signature: "",
+        amount: new BigNumber("2e18").toFixed(),
+        mult: new BigNumber("0").toFixed(),
+        takerAmount: new BigNumber("2e18").toFixed(),
+        price: new BigNumber("2e18").toFixed(),
+        step: new BigNumber("0").toFixed(),
+        makerFees: new BigNumber("0").toFixed(),
+        upperBound: new BigNumber("0").toFixed(),
+        lowerBound: new BigNumber("0").toFixed(),
+        baseToken: coss.address,
+        quoteToken: dummy.address,
+        owner: accounts[1],
+        expiry: "9999999999999999",
+        side: side.SELL,
+        replaceOrder: false,
+      };
+
+      const encodedParameters = web3.utils.encodePacked(
+        { type: "address", value: order.owner },
+        { type: "uint256", value: order.amount },
+        { type: "uint256", value: order.price },
+        { type: "uint256", value: order.step },
+        { type: "uint256", value: order.makerFees },
+        { type: "uint256", value: order.upperBound },
+        { type: "uint256", value: order.lowerBound },
+        { type: "address", value: order.baseToken },
+        { type: "address", value: order.quoteToken },
+        { type: "uint64", value: order.expiry },
+        { type: "uint8", value: order.side },
+        { type: "bool", value: "" }
+      )!;
+
+      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      await utils.catchRevert(dex.cancelOrders([order]));
+    });
+
+    it("Checks order cancellation works", async () => {
+      const order = {
+        signature: "",
+        amount: new BigNumber("2e18").toFixed(),
+        mult: new BigNumber("0").toFixed(),
+        takerAmount: new BigNumber("2e18").toFixed(),
+        price: new BigNumber("2e18").toFixed(),
+        step: new BigNumber("0").toFixed(),
+        makerFees: new BigNumber("0").toFixed(),
+        upperBound: new BigNumber("0").toFixed(),
+        lowerBound: new BigNumber("0").toFixed(),
+        baseToken: coss.address,
+        quoteToken: dummy.address,
+        owner: accounts[1],
+        expiry: "9999999999999999",
+        side: side.SELL,
+        replaceOrder: false,
+      };
+
+      const encodedParameters = web3.utils.encodePacked(
+        { type: "address", value: order.owner },
+        { type: "uint256", value: order.amount },
+        { type: "uint256", value: order.price },
+        { type: "uint256", value: order.step },
+        { type: "uint256", value: order.makerFees },
+        { type: "uint256", value: order.upperBound },
+        { type: "uint256", value: order.lowerBound },
+        { type: "address", value: order.baseToken },
+        { type: "address", value: order.quoteToken },
+        { type: "uint64", value: order.expiry },
+        { type: "uint8", value: order.side },
+        { type: "bool", value: "" }
+      )!;
+      const orderHash = web3.utils.sha3(encodedParameters)!;
+
+      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      await dex.cancelOrders([order], { from: accounts[1] });
+
+      const cancelled = await dex.cancelledOrders(orderHash);
+      assert.equal(
+        cancelled,
+        true,
+        "The order should be marked as cancelled after the cancellation"
+      );
+    });
+
+    it("Checks we can't take an cancelled order", async () => {
+      const order = {
+        signature: "",
+        amount: new BigNumber("2e18").toFixed(),
+        mult: new BigNumber("0").toFixed(),
+        takerAmount: new BigNumber("2e18").toFixed(),
+        price: new BigNumber("2e18").toFixed(),
+        step: new BigNumber("0").toFixed(),
+        makerFees: new BigNumber("0").toFixed(),
+        upperBound: new BigNumber("0").toFixed(),
+        lowerBound: new BigNumber("0").toFixed(),
+        baseToken: coss.address,
+        quoteToken: dummy.address,
+        owner: accounts[1],
+        expiry: "9999999999999999",
+        side: side.SELL,
+        replaceOrder: false,
+      };
+
+      const encodedParameters = web3.utils.encodePacked(
+        { type: "address", value: order.owner },
+        { type: "uint256", value: order.amount },
+        { type: "uint256", value: order.price },
+        { type: "uint256", value: order.step },
+        { type: "uint256", value: order.makerFees },
+        { type: "uint256", value: order.upperBound },
+        { type: "uint256", value: order.lowerBound },
+        { type: "address", value: order.baseToken },
+        { type: "address", value: order.quoteToken },
+        { type: "uint64", value: order.expiry },
+        { type: "uint8", value: order.side },
+        { type: "bool", value: "" }
+      )!;
+
+      const tradeDetails = {
+        baseToken: coss.address,
+        quoteToken: dummy.address,
+        side: side.BUY,
+        baseFee: false,
+      };
+
+      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      await utils.catchRevert(dex.trade([order], tradeDetails));
+    });
+
+    it("Checks we can't cancel an already cancelled order", async () => {
+      const order = {
+        signature: "",
+        amount: new BigNumber("2e18").toFixed(),
+        mult: new BigNumber("0").toFixed(),
+        takerAmount: new BigNumber("2e18").toFixed(),
+        price: new BigNumber("2e18").toFixed(),
+        step: new BigNumber("0").toFixed(),
+        makerFees: new BigNumber("0").toFixed(),
+        upperBound: new BigNumber("0").toFixed(),
+        lowerBound: new BigNumber("0").toFixed(),
+        baseToken: coss.address,
+        quoteToken: dummy.address,
+        owner: accounts[1],
+        expiry: "9999999999999999",
+        side: side.SELL,
+        replaceOrder: false,
+      };
+
+      const encodedParameters = web3.utils.encodePacked(
+        { type: "address", value: order.owner },
+        { type: "uint256", value: order.amount },
+        { type: "uint256", value: order.price },
+        { type: "uint256", value: order.step },
+        { type: "uint256", value: order.makerFees },
+        { type: "uint256", value: order.upperBound },
+        { type: "uint256", value: order.lowerBound },
+        { type: "address", value: order.baseToken },
+        { type: "address", value: order.quoteToken },
+        { type: "uint64", value: order.expiry },
+        { type: "uint8", value: order.side },
+        { type: "bool", value: "" }
+      )!;
+
+      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      await utils.catchRevert(dex.cancelOrders([order], { from: accounts[1] }));
+    });
+
+    it("Checks the replacement order cancellation works", async () => {
+      const order = {
+        signature: "",
+        amount: new BigNumber("2e18").toFixed(),
+        mult: new BigNumber("5").toFixed(),
+        takerAmount: new BigNumber("2e18").toFixed(),
+        price: new BigNumber("1e18").toFixed(),
+        step: new BigNumber("1e17").toFixed(),
+        makerFees: new BigNumber("0").toFixed(),
+        upperBound: new BigNumber("15e17").toFixed(),
+        lowerBound: new BigNumber("5e17").toFixed(),
+        baseToken: coss.address,
+        quoteToken: dummy.address,
+        owner: accounts[1],
+        expiry: "9999999999999999",
+        side: side.SELL,
+        replaceOrder: true,
+      };
+
+      const encodedParameters = web3.utils.encodePacked(
+        { type: "address", value: order.owner },
+        { type: "uint256", value: order.amount },
+        { type: "uint256", value: order.price },
+        { type: "uint256", value: order.step },
+        { type: "uint256", value: order.makerFees },
+        { type: "uint256", value: order.upperBound },
+        { type: "uint256", value: order.lowerBound },
+        { type: "address", value: order.baseToken },
+        { type: "address", value: order.quoteToken },
+        { type: "uint64", value: order.expiry },
+        { type: "uint8", value: order.side },
+        { type: "bool", value: String(order.replaceOrder) }
+      )!;
+
+      const tradeDetails = {
+        baseToken: coss.address,
+        quoteToken: dummy.address,
+        side: side.SELL,
+        baseFee: false,
+      };
+
+      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+
+      await dex.trade([order], tradeDetails);
+      await dex.cancelOrders([order], { from: accounts[1] });
+      tradeDetails.side = side.BUY;
+      await utils.catchRevert(dex.trade([order], tradeDetails));
+    });
+  }
+);
