@@ -2302,7 +2302,6 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
           type: "uint256",
           value: new BigNumber(order.lowerBound)
             .plus(new BigNumber(order.step).multipliedBy(order.mult))
-            .minus(order.makerFees)
             .toFixed(),
         }
       )!
@@ -2459,7 +2458,6 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
           type: "uint256",
           value: new BigNumber(order.lowerBound)
             .plus(new BigNumber(order.step).multipliedBy(order.mult))
-            .plus(order.makerFees)
             .toFixed(),
         }
       )!
@@ -2616,8 +2614,6 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
           type: "uint256",
           value: new BigNumber(order.lowerBound)
             .plus(new BigNumber(order.step).multipliedBy(order.mult))
-            .multipliedBy(1000)
-            .dividedToIntegerBy(Number(order.makerFees) + 1000)
             .toFixed(),
         }
       )!
@@ -2779,8 +2775,6 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
           type: "uint256",
           value: new BigNumber(order.lowerBound)
             .plus(new BigNumber(order.step).multipliedBy(order.mult))
-            .multipliedBy(Number(order.makerFees) + 1000)
-            .dividedToIntegerBy(1000)
             .toFixed(),
         }
       )!
@@ -2942,8 +2936,6 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
           type: "uint256",
           value: new BigNumber(order.lowerBound)
             .plus(new BigNumber(order.step).multipliedBy(order.mult))
-            .multipliedBy(1000)
-            .dividedToIntegerBy(Number(order.makerFees) + 1000)
             .toFixed(),
         }
       )!
@@ -3105,8 +3097,6 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
           type: "uint256",
           value: new BigNumber(order.lowerBound)
             .plus(new BigNumber(order.step).multipliedBy(order.mult))
-            .multipliedBy(Number(order.makerFees) + 1000)
-            .dividedToIntegerBy(1000)
             .toFixed(),
         }
       )!

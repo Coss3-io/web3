@@ -69,7 +69,6 @@ contract Dex {
         uint amountToOwner = 0;
         uint amountToSender = 0;
         uint tradeFees = 0;
-        uint price = 0;
         uint quoteAmount = 0;
 
         if (tradeDetails.side == Side.SELL) {
@@ -77,10 +76,7 @@ contract Dex {
                 require(orders[i].baseToken == tradeDetails.baseToken);
                 require(orders[i].quoteToken == tradeDetails.quoteToken);
                 require(orders[i].expiry > block.timestamp);
-                (price, quoteAmount) = _verifyOrder(
-                    orders[i],
-                    tradeDetails.side
-                );
+                quoteAmount = _verifyOrder(orders[i], tradeDetails.side);
 
                 if (owner != orders[i].owner) {
                     tradeFees += _createTrade(
@@ -117,10 +113,7 @@ contract Dex {
                 require(orders[i].baseToken == tradeDetails.baseToken);
                 require(orders[i].quoteToken == tradeDetails.quoteToken);
                 require(orders[i].expiry > block.timestamp);
-                (price, quoteAmount) = _verifyOrder(
-                    orders[i],
-                    tradeDetails.side
-                );
+                quoteAmount = _verifyOrder(orders[i], tradeDetails.side);
 
                 if (owner != orders[i].owner) {
                     tradeFees += _createTrade(
@@ -162,17 +155,13 @@ contract Dex {
         TradeDetails[] calldata tradeDetails
     ) external {
         uint tradeFees = 0;
-        uint price = 0;
         uint quoteAmount = 0;
 
         for (uint i = 0; i < orders.length; ++i) {
             require(orders[i].baseToken == tradeDetails[i].baseToken);
             require(orders[i].quoteToken == tradeDetails[i].quoteToken);
             require(orders[i].expiry > block.timestamp);
-            (price, quoteAmount) = _verifyOrder(
-                orders[i],
-                tradeDetails[i].side
-            );
+            quoteAmount = _verifyOrder(orders[i], tradeDetails[i].side);
             if (tradeDetails[i].side == Side.SELL) {
                 tradeFees = _createTrade(
                     orders[i].takerAmount,
@@ -298,14 +287,14 @@ contract Dex {
      * @param order - The replacement order to check
      * @param senderSide - The side the sender is taking
      * @param orderHash - The hash of the order being operated on
-     * @return price - The price of this trade
      * @return quoteAmount - The amount being traded
      */
     function _checkReplaceOrder(
         Order memory order,
         uint orderHash,
         Side senderSide
-    ) private returns (uint price, uint quoteAmount) {
+    ) private returns (uint quoteAmount) {
+        uint price = 0;
         require(
             order.lowerBound <= order.price && order.price <= order.upperBound
         );
@@ -336,7 +325,14 @@ contract Dex {
             }
         }
 
-        orderHash = uint(keccak256(abi.encodePacked(orderHash, price)));
+        orderHash = uint(
+            keccak256(
+                abi.encodePacked(
+                    orderHash,
+                    order.lowerBound + order.step * order.mult
+                )
+            )
+        );
         quoteAmount = (price * order.takerAmount) / 1e18;
         require(order.lowerBound <= price && price <= order.upperBound);
 
@@ -361,13 +357,12 @@ contract Dex {
      * @dev Verifies that the orderis valid and returns the exchanged amount
      * @param order - The order data to verify
      * @param senderSide - The side the sender is taking
-     * @return price - the price of this trade
      * @return quoteAmount - The amount of quote being exchanged
      */
     function _verifyOrder(
         Order memory order,
         Side senderSide
-    ) private returns (uint price, uint quoteAmount) {
+    ) private returns (uint quoteAmount) {
         bytes memory data = abi.encodePacked(
             order.owner,
             order.amount,
@@ -385,14 +380,9 @@ contract Dex {
 
         uint orderHash = uint(keccak256(data));
         if (order.replaceOrder) {
-            (price, quoteAmount) = _checkReplaceOrder(
-                order,
-                orderHash,
-                senderSide
-            );
+            quoteAmount = _checkReplaceOrder(order, orderHash, senderSide);
         } else {
             require(order.side != senderSide);
-            price = order.price;
             quoteAmount = (order.takerAmount * order.price) / 1e18;
             hashToFilledAmount[orderHash] += order.takerAmount;
             require(hashToFilledAmount[orderHash] <= order.amount);
