@@ -107,7 +107,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const fees = amountToOwner.multipliedBy("1e15").dividedToIntegerBy("1e18");
     amountToOwner = amountToOwner.plus(fees.dividedToIntegerBy(2));
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -248,7 +248,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const fees = amountToOwner.multipliedBy("1e15").dividedToIntegerBy("1e18");
     amountToOwner = amountToOwner.plus(fees.dividedToIntegerBy(2));
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[7]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[7]));
 
     const [
       senderCossBalancesBefore,
@@ -381,7 +381,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 
@@ -427,7 +427,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     };
 
     order.signature =
-      (await web3.eth.sign(encodedParameters, accounts[1])) + "ffffff"; // <- wrong signature data
+      (String(await web3.eth.sign(encodedParameters, accounts[1])) + "ffffff"); // <- wrong signature data
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 
@@ -472,7 +472,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 
@@ -517,7 +517,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 
@@ -562,7 +562,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 
@@ -607,7 +607,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 
@@ -652,7 +652,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 
@@ -704,7 +704,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const fees = amountToSender.multipliedBy("1e15").dividedToIntegerBy("1e18");
     amountToSender = amountToSender.minus(fees.dividedToIntegerBy(2));
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -837,7 +837,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const fees = amountToSender.multipliedBy("1e15").dividedToIntegerBy("1e18");
     amountToSender = amountToSender.minus(fees.dividedToIntegerBy(2));
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -980,7 +980,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const fees = amountToSender.multipliedBy("1e15").dividedToIntegerBy("1e18");
     amountToSender = amountToSender.minus(fees.dividedToIntegerBy(2));
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -1122,7 +1122,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const fees = amountToSender.multipliedBy("1e15").dividedToIntegerBy("1e18");
     amountToSender = amountToSender.minus(fees.dividedToIntegerBy(2));
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -1254,7 +1254,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
     const fees = amountToOwner.multipliedBy("1e15").dividedToIntegerBy("1e18");
     amountToOwner = amountToOwner.plus(fees.dividedToIntegerBy(2));
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -1405,7 +1405,7 @@ contract(
         baseFee: false,
       };
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
       await utils.catchRevert(dex.trade([order], tradeDetails));
     });
 
@@ -1450,7 +1450,7 @@ contract(
         baseFee: false,
       };
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
       await utils.catchRevert(dex.trade([order], tradeDetails));
     });
 
@@ -1495,7 +1495,7 @@ contract(
         baseFee: false,
       };
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
       await utils.catchRevert(dex.trade([order], tradeDetails));
     });
 
@@ -1540,7 +1540,7 @@ contract(
         baseFee: false,
       };
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
       await utils.catchRevert(dex.trade([order], tradeDetails));
     });
 
@@ -1602,7 +1602,7 @@ contract(
         .multipliedBy("1e15")
         .dividedToIntegerBy("1e18");
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
       const [
         senderCossBalancesBefore,
@@ -1762,7 +1762,7 @@ contract(
         .multipliedBy("1e15")
         .dividedToIntegerBy("1e18");
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
       const [
         senderCossBalancesBefore,
@@ -1938,7 +1938,7 @@ contract(
         .multipliedBy("1e15")
         .dividedToIntegerBy("1e18");
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
       const [
         senderCossBalancesBefore,
@@ -2126,7 +2126,7 @@ contract(
         .dividedToIntegerBy(2)
         .dividedToIntegerBy("1e18");
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
       const [
         senderCossBalancesBefore,
@@ -2321,7 +2321,7 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
       .dividedToIntegerBy("1e18");
     const fees = amountToSender.multipliedBy("1e15").dividedToIntegerBy("1e18");
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -2477,7 +2477,7 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
       .dividedToIntegerBy("1e18");
     const fees = amountToOwner.multipliedBy("1e15").dividedToIntegerBy("1e18");
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -2638,7 +2638,7 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
       .dividedToIntegerBy("1e18")
       .dividedToIntegerBy(2);
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -2799,7 +2799,7 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
       .dividedToIntegerBy(2)
       .dividedToIntegerBy("1e18");
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -2960,7 +2960,7 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
       .dividedToIntegerBy("1e18")
       .dividedToIntegerBy(2);
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -3121,7 +3121,7 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
       .dividedToIntegerBy(2)
       .dividedToIntegerBy("1e18");
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
     const [
       senderCossBalancesBefore,
@@ -3258,7 +3258,7 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 
@@ -3304,7 +3304,7 @@ contract("Testing maker fees behaviour", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     await utils.catchRevert(dex.trade([order], tradeDetails));
   });
 });
@@ -3464,11 +3464,11 @@ contract("Testing batch orders behaviour", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
-    order1.signature = await web3.eth.sign(encodedParameters1, accounts[1]);
-    order2.signature = await web3.eth.sign(encodedParameters2, accounts[1]);
-    order3.signature = await web3.eth.sign(encodedParameters3, accounts[2]);
-    order4.signature = await web3.eth.sign(encodedParameters4, accounts[2]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
+    order1.signature = String(await web3.eth.sign(encodedParameters1, accounts[1]));
+    order2.signature = String(await web3.eth.sign(encodedParameters2, accounts[1]));
+    order3.signature = String(await web3.eth.sign(encodedParameters3, accounts[2]));
+    order4.signature = String(await web3.eth.sign(encodedParameters4, accounts[2]));
 
     let amountToOwner = new BigNumber(order.takerAmount)
       .multipliedBy(order.price)
@@ -3690,11 +3690,11 @@ contract("Testing batch orders behaviour", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
-    order1.signature = await web3.eth.sign(encodedParameters1, accounts[1]);
-    order2.signature = await web3.eth.sign(encodedParameters2, accounts[1]);
-    order3.signature = await web3.eth.sign(encodedParameters3, accounts[2]);
-    order4.signature = await web3.eth.sign(encodedParameters4, accounts[2]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
+    order1.signature = String(await web3.eth.sign(encodedParameters1, accounts[1]));
+    order2.signature = String(await web3.eth.sign(encodedParameters2, accounts[1]));
+    order3.signature = String(await web3.eth.sign(encodedParameters3, accounts[2]));
+    order4.signature = String(await web3.eth.sign(encodedParameters4, accounts[2]));
 
     let amountToOwner = new BigNumber(order.takerAmount)
       .multipliedBy(order.price)
@@ -3867,10 +3867,10 @@ contract("Testing batch orders behaviour", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     order1.signature = order.signature;
     order2.signature = order.signature;
-    order3.signature = await web3.eth.sign(encodedParameters2, accounts[2]);
+    order3.signature = String(await web3.eth.sign(encodedParameters2, accounts[2]));
     order4.signature = order3.signature;
 
     let amountToOwner = new BigNumber(order.takerAmount)
@@ -4095,10 +4095,10 @@ contract("Testing batch orders behaviour", (accounts: Truffle.Accounts) => {
       baseFee: false,
     };
 
-    order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+    order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
     order1.signature = order.signature;
     order2.signature = order.signature;
-    order3.signature = await web3.eth.sign(encodedParameters2, accounts[7]);
+    order3.signature = String(await web3.eth.sign(encodedParameters2, accounts[7]));
     order4.signature = order3.signature;
 
     let amountToOwner = new BigNumber(order.takerAmount)
@@ -4318,7 +4318,7 @@ contract(
         { type: "bool", value: "" }
       )!;
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
       await utils.catchRevert(dex.cancelOrders([order]));
     });
 
@@ -4357,7 +4357,7 @@ contract(
       )!;
       const orderHash = web3.utils.sha3(encodedParameters)!;
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
       await dex.cancelOrders([order], { from: accounts[1] });
 
       const cancelled = await dex.cancelledOrders(orderHash);
@@ -4409,7 +4409,7 @@ contract(
         baseFee: false,
       };
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
       await utils.catchRevert(dex.trade([order], tradeDetails));
     });
 
@@ -4447,7 +4447,7 @@ contract(
         { type: "bool", value: "" }
       )!;
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
       await utils.catchRevert(dex.cancelOrders([order], { from: accounts[1] }));
     });
 
@@ -4492,7 +4492,7 @@ contract(
         baseFee: false,
       };
 
-      order.signature = await web3.eth.sign(encodedParameters, accounts[1]);
+      order.signature = String(await web3.eth.sign(encodedParameters, accounts[1]));
 
       await dex.trade([order], tradeDetails);
       await dex.cancelOrders([order], { from: accounts[1] });
