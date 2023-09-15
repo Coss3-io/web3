@@ -5,6 +5,9 @@ const config = require("./dev.config.js")
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
+  testEnvironmentOptions: {
+    customExportConditions: ["node", "node-addons"],
+ },
   moduleFileExtensions: ["ts", "vue", "js", "vue", "json"],
   setupFilesAfterEnv: ["<rootDir>/jest-setup.ts"],
   moduleNameMapper: {

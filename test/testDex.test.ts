@@ -1088,7 +1088,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       baseToken: coss.address,
       quoteToken: dummy.address,
       owner: accounts[1],
-      expiry: String(Math.floor(Date.now() / 1000 + 3600)),
+      expiry: String(Math.floor(Date.now() / 1000 + 3612)),
       side: side.BUY,
       replaceOrder: false,
     };
@@ -1220,7 +1220,7 @@ contract("Test: basic dex testing function", (accounts: Truffle.Accounts) => {
       baseToken: coss.address,
       quoteToken: dummy.address,
       owner: accounts[1],
-      expiry: String(Math.floor(Date.now() / 1000 + 3600)),
+      expiry: String(Math.floor(Date.now() / 1000 + 3604)),
       side: side.BUY,
       replaceOrder: false,
     };

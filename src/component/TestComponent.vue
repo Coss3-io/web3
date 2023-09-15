@@ -1,6 +1,6 @@
 <template>
   <div
-    class="p-10 flex justify-between w-10/12 shadow-lg shadow-black m-auto rounded-lg mt-5"
+    class="p-10 flex justify-between w-10/12 shadow-lg shadow-black m-auto rounded-lg"
   >
     <div
       class="h-16 text-black w-44 bg-gray-300 shadow-lg shadow-gray-800 rounded-lg flex items-center justify-center"
@@ -16,7 +16,7 @@
     </div>
     <div
         @click="testStore[TestActions.Increment]"
-      class="cursor-pointer text-black h-16 w-24 bg-gray-600 shadow-lg shadow-black rounded-lg flex items-center justify-center active:shadow-none hover:shadow-black/50 transition-all"
+      class="btn btn-primary"
       data-testid="increment"
 
     >
