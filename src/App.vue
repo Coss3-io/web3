@@ -1,8 +1,8 @@
 <template>
-  <TestComponent></TestComponent>
+  <NavBar></NavBar>
 </template>
 <script setup lang="ts">
-import TestComponent from "./component/TestComponent.vue";
+import NavBar from "./component/NavBar.vue";
 import { Suspense as suspense_, SuspenseProps, VNodeProps } from "vue";
 
 const Suspense = suspense_ as {

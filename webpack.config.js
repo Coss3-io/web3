@@ -7,7 +7,7 @@ const htmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlMinimizerPlugin = require("html-minimizer-webpack-plugin");
 const autoprefixer = require("autoprefixer");
-const PurgecssPlugin = require("purgecss-webpack-plugin");
+const { PurgeCSSPlugin } = require("purgecss-webpack-plugin");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const { DefinePlugin } = require("webpack");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
@@ -123,7 +123,7 @@ module.exports = {
       template: path.resolve(__dirname, "public", "index.html"),
       favicon: "./public/favicon.ico",
     }),
-    new PurgecssPlugin({
+    new PurgeCSSPlugin({
       paths: glob.sync(`${path.resolve(__dirname, "src")}/**/*`, {
         nodir: true,
       }),
