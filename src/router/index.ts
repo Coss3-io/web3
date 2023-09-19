@@ -13,7 +13,7 @@ const router: Router = createRouter({
 });
 
 router.beforeEach((to, from) => {
-  document.title = `dapp Name | ${String(to.name)}`;
+  document.title = `coss3.io | ${String(to.name)}`;
 });
 
 export default router;
