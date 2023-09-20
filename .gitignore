@@ -1,5 +1,6 @@
 node_modules/
 **/.DS_Store
+src/**/.DS_Store
 build/
 types/
 dist/
