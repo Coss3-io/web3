@@ -1,0 +1,9 @@
+.fadeNav-enter-active,
+.fadeNav-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fadeNav-enter-from,
+.fadeNav-leave-to {
+  opacity: 0;
+}
