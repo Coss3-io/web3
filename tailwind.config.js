@@ -12,6 +12,7 @@ module.exports = {
     },
     animation: {
       slideIn: 'slideIn 0.3s ease-in-out 0.3s forwards',
+      ...defaultTheme.animation
     },
     screens: {
       xs: "475px",

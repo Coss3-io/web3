@@ -8,6 +8,7 @@
       </transition>
     </router-view>
   </div>
+  <Footer></Footer>
   <div class="drawer-side z-10">
     <label for="main-drawer" class="drawer-overlay"></label>
     <SideBar></SideBar>
@@ -16,6 +17,7 @@
 <script setup lang="ts">
 import NavBar from "./component/navigation/NavBar.vue";
 import SideBar from "./component/navigation/SideBar.vue";
+import Footer from "./component/navigation/Footer.vue";
 import { Suspense as suspense_, SuspenseProps, VNodeProps } from "vue";
 
 const Suspense = suspense_ as {
