@@ -15,7 +15,7 @@ module.exports = {
       ...defaultTheme.animation
     },
     screens: {
-      xs: "475px",
+      xs: "385px",
       ...defaultTheme.screens,
     },
   },
