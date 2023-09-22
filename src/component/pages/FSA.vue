@@ -28,11 +28,16 @@
     </div>
 
     <div
-      class="bg-base-100 h-96 col-span-6 rounded-lg p-4 m-2 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+      class="bg-base-100 h-96 col-span-6 rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
     >
       <div class="flex justify-start">
-        <div class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold">
-          COSS stacked over time
+        <div
+          class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
+        >
+          <img :src="logo" class="w-8 h-8 " />
+          <div>
+              COSS stacked over time
+          </div>
         </div>
       </div>
 
@@ -43,13 +48,14 @@
 <script setup lang="ts">
 import * as echarts from "echarts";
 import { onMounted } from "vue";
+import {logo } from "../../asset/images/images"
 
 onMounted(() => {
   var chartDom = document.getElementById("main");
   if (!chartDom) return;
 
   var myChart = echarts.getInstanceByDom(chartDom);
-  if (myChart) myChart.dispose()
+  if (myChart) myChart.dispose();
 
   myChart = echarts.init(chartDom, "dark");
   var option: any;
