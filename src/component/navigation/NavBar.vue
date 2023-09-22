@@ -20,13 +20,13 @@
         </label>
       </div>
       <div class="lg:navbar-start">
-        <a class="btn h-max btn-ghost text-lg gap-5">
+        <RouterLink :to="{ name: RouteNames.Home }" class="btn h-max btn-ghost text-lg gap-5">
           <img :src="logo" class="lg:w-16 lg:h-16 w-14 left-14" />
           <span>
             Coss3
             <span class="text-cyan-300">.io</span>
           </span>
-        </a>
+        </RouterLink>
       </div>
       <div class="navbar-end lg:gap-3 xl:gap-6 2xl:gap-14 invisible lg:visible">
         <DocsButton></DocsButton>
@@ -40,6 +40,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { RouterLink } from "vue-router";
+import { RouteNames } from "../../router";
 import { logo } from "../../asset/images/images";
 import FSAButton from "../buttons/FSA.vue";
 import LendingButton from "../buttons/Lending.vue";
