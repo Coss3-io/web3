@@ -46,7 +46,24 @@
   </div>
 </template>
 <script setup lang="ts">
-import * as echarts from "echarts";
+import * as echarts from 'echarts/core';
+import {
+  ToolboxComponent,
+  TooltipComponent,
+  GridComponent
+} from 'echarts/components';
+import { LineChart } from 'echarts/charts';
+import { UniversalTransition } from 'echarts/features';
+import { CanvasRenderer } from 'echarts/renderers';
+
+echarts.use([
+  ToolboxComponent,
+  TooltipComponent,
+  GridComponent,
+  LineChart,
+  CanvasRenderer,
+  UniversalTransition
+]);
 import { onMounted } from "vue";
 import {logo } from "../../asset/images/images"
 
