@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-12 grid-rows-[auto] m-2 bg-base-300 rounded-lg p-5 h-full"
+    class="grid grid-cols-12 grid-rows-[auto] m-2 bg-base-300 rounded-lg p-5 h-full min-h-full"
   >
     <div class="col-span-full m-2 flex justify-start">
       <div class="tooltip" data-tip="click for help">
@@ -23,136 +23,225 @@
         </button>
       </div>
     </div>
-    <div class="bg-red-500 h-10 col-span-6">
-      <div class="bg-orange-500">a</div>
-    </div>
-
     <div
-      class="bg-base-100 h-96 col-span-6 rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+      class="col-start-7 bg-base-100 h-[22rem] col-span-6 rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-slideIn"
     >
       <div class="flex justify-start">
         <div
           class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
         >
-          <img :src="logo" class="w-8 h-8 " />
-          <div>
-              COSS stacked over time
-          </div>
+          <img :src="logo" class="w-8 h-8" />
+          <div>COSS stacked over time</div>
         </div>
       </div>
 
-      <div class="h-full pb-10" id="main"></div>
+      <div class="h-full pb-10" id="graph2"></div>
+    </div>
+    <div
+      class="col-start-7 flex flex-col bg-base-100 h-[22rem] col-span-6 rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+    >
+      <div>
+        <div class="flex justify-start">
+          <div
+            class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
+              />
+            </svg>
+
+            <div>Token distrution over time</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex h-full items-center">
+        <div class="w-full h-full" id="graph1"></div>
+        <div class="w-full h-full" id="graph3"></div>
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import * as echarts from 'echarts/core';
+import * as echarts from "echarts/core";
 import {
   ToolboxComponent,
   TooltipComponent,
-  GridComponent
-} from 'echarts/components';
-import { LineChart } from 'echarts/charts';
-import { UniversalTransition } from 'echarts/features';
-import { CanvasRenderer } from 'echarts/renderers';
+  GridComponent,
+  LegendComponent,
+} from "echarts/components";
+import { LineChart } from "echarts/charts";
+import { UniversalTransition } from "echarts/features";
+import { CanvasRenderer } from "echarts/renderers";
+import { PieChart } from "echarts/charts";
+import { LabelLayout } from "echarts/features";
 
 echarts.use([
   ToolboxComponent,
   TooltipComponent,
+  LegendComponent,
   GridComponent,
+  PieChart,
+  LabelLayout,
   LineChart,
   CanvasRenderer,
-  UniversalTransition
+  UniversalTransition,
 ]);
 import { onMounted } from "vue";
-import {logo } from "../../asset/images/images"
+import { logo } from "../../asset/images/images";
+
+let options1 = {
+  animationDelay: 800,
+    color: [
+    "#925ef2",
+    "#7cffb2",
+    "#fddd60",
+    "#ff6e76",
+    "#58d9f9",
+    "#05c091",
+    "#ff8a45",
+    "#8d48e3",
+    "#dd79ff",
+  ],
+  backgroundColor: "rgb(255,255,255, 0)",
+  tooltip: {
+    trigger: "item",
+  },
+  legend: {
+    top: "5%",
+    left: "center",
+  },
+  series: [
+    {
+      type: "pie",
+      radius: ["40%", "70%"],
+      avoidLabelOverlap: false,
+      itemStyle: {
+        borderRadius: 5,
+        borderColor: "#fff",
+        borderWidth: 0,
+      },
+      label: {
+        show: false,
+        position: "center",
+      },
+      labelLine: {
+        show: false,
+      },
+      data: [
+        { value: 1048, name: "Search Engine" },
+        { value: 735, name: "Direct" },
+        { value: 580, name: "Email" },
+        { value: 484, name: "Union Ads" },
+        { value: 300, name: "Video Ads" },
+      ],
+    },
+  ],
+};
+
+let options2 = {
+  animationDelay: 500,
+  color: ["rgba(163,62,173,1)"],
+  backgroundColor: "rgb(255,255,255, 0)",
+  axisPointer: { lineStyle: { color: "rgba(255,255,255,0)" } },
+  tooltip: {
+    trigger: "axis",
+    axisPointer: {
+      type: "cross",
+      label: {
+        backgroundColor: "rgb(135,135,135, 0.5)",
+      },
+    },
+  },
+  toolbox: {
+    feature: {
+      saveAsImage: {},
+    },
+  },
+  grid: {
+    left: "3%",
+    right: "4%",
+    bottom: "3%",
+    containLabel: true,
+  },
+  xAxis: [
+    {
+      type: "category",
+      boundaryGap: false,
+      data: [
+        "block 1",
+        "block 2",
+        "block 3",
+        "block 4",
+        "block 5",
+        "block 6",
+        "block 7",
+      ],
+      axisLine: { show: false },
+    },
+  ],
+  yAxis: [
+    {
+      type: "value",
+      splitLine: { show: false },
+      min: function (value: { min: number }) {
+        return value.min - Math.floor(value.min / 25);
+      },
+      max: "dataMax",
+    },
+  ],
+  series: [
+    {
+      name: "Token Stacked",
+      type: "line",
+      stack: "Total",
+      smooth: true,
+      lineStyle: {
+        width: 0,
+      },
+      showSymbol: false,
+      areaStyle: {
+        opacity: 0.8,
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          {
+            offset: 0,
+            color: "rgba(163,62,173,1)",
+          },
+          {
+            offset: 1,
+            color: "rgba(87,12,226,1)",
+          },
+        ]),
+      },
+      emphasis: {
+        focus: "series",
+      },
+      data: [201, 221, 205, 209, 198, 203, 201],
+    },
+  ],
+};
 
 onMounted(() => {
-  var chartDom = document.getElementById("main");
-  if (!chartDom) return;
+  setGraph(document.getElementById("graph1"), options1);
+  setGraph(document.getElementById("graph3"), options1);
+  setGraph(document.getElementById("graph2"), options2);
+});
 
-  var myChart = echarts.getInstanceByDom(chartDom);
+function setGraph(htmlelement: HTMLElement | null, option: any): void {
+  if (!htmlelement) return;
+  let myChart = echarts.getInstanceByDom(htmlelement);
   if (myChart) myChart.dispose();
 
-  myChart = echarts.init(chartDom, "dark");
-  var option: any;
-  option = {
-    color: ["rgba(163,62,173,1)"],
-    backgroundColor: "rgb(255,255,255, 0)",
-    axisPointer: { lineStyle: { color: "rgba(255,255,255,0)" } },
-    tooltip: {
-      trigger: "axis",
-      axisPointer: {
-        type: "cross",
-        label: {
-          backgroundColor: "rgb(135,135,135, 0.5)",
-        },
-      },
-    },
-    toolbox: {
-      feature: {
-        saveAsImage: {},
-      },
-    },
-    grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "3%",
-      containLabel: true,
-    },
-    xAxis: [
-      {
-        type: "category",
-        boundaryGap: false,
-        data: [
-          "block 1",
-          "block 2",
-          "block 3",
-          "block 4",
-          "block 5",
-          "block 6",
-          "block 7",
-        ],
-        axisLine: { show: false },
-      },
-    ],
-    yAxis: [
-      {
-        type: "value",
-        splitLine: { show: false },
-      },
-    ],
-    series: [
-      {
-        name: "Token Stacked",
-        type: "line",
-        stack: "Total",
-        smooth: true,
-        lineStyle: {
-          width: 0,
-        },
-        showSymbol: false,
-        areaStyle: {
-          opacity: 0.8,
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            {
-              offset: 0,
-              color: "rgba(163,62,173,1)",
-            },
-            {
-              offset: 1,
-              color: "rgba(87,12,226,1)",
-            },
-          ]),
-        },
-        emphasis: {
-          focus: "series",
-        },
-        data: [140, 232, 101, 264, 90, 340, 250],
-      },
-    ],
-  };
-
+  myChart = echarts.init(htmlelement, "dark");
   option && myChart.setOption(option);
-});
+}
 </script>
