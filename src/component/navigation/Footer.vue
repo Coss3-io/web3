@@ -18,7 +18,7 @@
         class="sm:col-span-1 col-span-2 sm:justify-self-start justify-self-center flex flex-col xs:items-start items-center"
       >
         <header class="footer-title mb-auto mt-auto">Social</header>
-        <div class="grid grid-flow-col gap-4">
+        <div class="flex flex-wrap sm:gap-4 gap-2">
           <a class="btn btn-circle">
             <svg
               class="fill-current"

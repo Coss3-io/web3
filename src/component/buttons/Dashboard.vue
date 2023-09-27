@@ -1,5 +1,5 @@
 <template>
-  <a class="btn btn-primary">
+  <a class="btn btn-primary" @click="unCheck">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -18,3 +18,11 @@
     Dashboard
   </a>
 </template>
+<script setup lang="ts">
+  const unCheck = () => {
+    let label = document.getElementById("main-drawer")!
+    if ("checked" in label){
+      label.checked = false;
+    } 
+  }
+</script>

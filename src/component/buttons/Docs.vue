@@ -1,5 +1,5 @@
 <template>
-  <a class="btn btn-ghost relative">
+  <a class="btn btn-ghost relative" @click="unCheck">
     <div class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2">
       <div
         class="absolute animate-ping w-3 h-3 bg-primary rounded-full"
@@ -25,3 +25,11 @@
     Docs
   </a>
 </template>
+<script setup lang="ts">
+  const unCheck = () => {
+    let label = document.getElementById("main-drawer")!
+    if ("checked" in label){
+      label.checked = false;
+    } 
+  }
+</script>

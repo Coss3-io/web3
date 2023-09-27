@@ -24,21 +24,52 @@
       </div>
     </div>
     <div
-      class="col-start-7 bg-base-100 h-[22rem] col-span-6 rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-slideIn"
+      class="flex flex-col gap-3 lg:row-span-2 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 m-2 opacity-0 translate-y-3 animate-slideIn"
+    >
+      <div class="flex justify-start">
+        <div
+          class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
+            />
+          </svg>
+
+          <div>User FSA overview</div>
+        </div>
+      </div>
+      <div class="flex justify-center">
+        <UserOverview></UserOverview>
+      </div>
+      
+      <BlockFSA></BlockFSA>
+    </div>
+    <div
+      class="bg-base-100 h-[22rem] min-h-fit lg:col-span-6 col-span-full rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
     >
       <div class="flex justify-start">
         <div
           class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
         >
           <img :src="logo" class="w-8 h-8" />
-          <div>COSS stacked over time</div>
+          <div>Total COSS stacked</div>
         </div>
       </div>
 
       <div class="h-full pb-10" id="graph2"></div>
     </div>
     <div
-      class="col-start-7 flex flex-col bg-base-100 h-[22rem] col-span-6 rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+      class="flex flex-col bg-base-100 h-[22rem] lg:col-span-6 col-span-full rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
     >
       <div>
         <div class="flex justify-start">
@@ -60,7 +91,7 @@
               />
             </svg>
 
-            <div>Token distrution over time</div>
+            <div>Overall distribution</div>
           </div>
         </div>
       </div>
@@ -72,6 +103,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import UserOverview from "../sections/FSA/UserOverview.vue";
+import BlockFSA from "../sections/FSA/BlockFSA.vue";
 import * as echarts from "echarts/core";
 import {
   ToolboxComponent,
@@ -101,7 +134,7 @@ import { logo } from "../../asset/images/images";
 
 let options1 = {
   animationDelay: 800,
-    color: [
+  color: [
     "#925ef2",
     "#7cffb2",
     "#fddd60",
