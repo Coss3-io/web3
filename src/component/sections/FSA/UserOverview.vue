@@ -6,7 +6,7 @@
       class="stat p-5 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
     >
       <div class="stat-title">Your FSA</div>
-      <div class="stat-valu xl:text-[30px] 2xl:text-[36px]">$1,200,000</div>
+      <div class="stat-value xl:text-[30px] 2xl:text-[36px]">$1,200,000</div>
       <div class="stat-desc">$1,200 as of last round</div>
     </div>
     <div
