@@ -66,10 +66,10 @@
         </div>
       </div>
 
-      <div class="h-full pb-10" id="graph2"></div>
+      <div class="h-full pb-10" id="graph3"></div>
     </div>
     <div
-      class="flex flex-col bg-base-100 h-[22rem] lg:col-span-6 col-span-full rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
+      class="flex flex-col bg-base-100 h-96 xs:h-[22rem] lg:col-span-6 col-span-full rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
     >
       <div>
         <div class="flex justify-start">
@@ -91,13 +91,13 @@
               />
             </svg>
 
-            <div>Overall distribution</div>
+            <div>Top 5 distribution</div>
           </div>
         </div>
       </div>
-      <div class="flex h-full items-center">
+      <div class="flex md:flex-row flex-col h-full items-center">
         <div class="w-full h-full" id="graph1"></div>
-        <div class="w-full h-full" id="graph3"></div>
+        <div class="w-full h-full" id="graph2"></div>
       </div>
     </div>
   </div>
@@ -112,6 +112,7 @@ import {
   GridComponent,
   LegendComponent,
 } from "echarts/components";
+import { TitleComponent } from 'echarts/components';
 import { LineChart } from "echarts/charts";
 import { UniversalTransition } from "echarts/features";
 import { CanvasRenderer } from "echarts/renderers";
@@ -120,6 +121,7 @@ import { LabelLayout } from "echarts/features";
 
 echarts.use([
   ToolboxComponent,
+  TitleComponent,
   TooltipComponent,
   LegendComponent,
   GridComponent,
@@ -134,6 +136,15 @@ import { logo } from "../../asset/images/images";
 
 let options1 = {
   animationDelay: 800,
+  title: {
+    text: 'Last Block',
+    textAlign: 'center',
+    right: "right",
+    textStyle: {
+      color: "rgb(166, 173, 186)",
+      fontSize: 12, 
+    }
+  },
   color: [
     "#925ef2",
     "#7cffb2",
@@ -150,8 +161,10 @@ let options1 = {
     trigger: "item",
   },
   legend: {
+    align: "left",
+    orient: "vertical",
     top: "5%",
-    left: "center",
+    left: "left",
   },
   series: [
     {
@@ -182,6 +195,65 @@ let options1 = {
 };
 
 let options2 = {
+  animationDelay: 800,
+  title: {
+    text: 'All Time',
+    textAlign: 'center',
+    right: "right",
+    textStyle: {
+      color: "rgb(166, 173, 186)",
+      fontSize: 12, 
+    }
+  },
+  color: [
+    "#925ef2",
+    "#7cffb2",
+    "#fddd60",
+    "#ff6e76",
+    "#58d9f9",
+    "#05c091",
+    "#ff8a45",
+    "#8d48e3",
+    "#dd79ff",
+  ],
+  backgroundColor: "rgb(255,255,255, 0)",
+  tooltip: {
+    trigger: "item",
+  },
+  legend: {
+    align: "left",
+    orient: "vertical",
+    top: "5%",
+    left: "left",
+  },
+  series: [
+    {
+      type: "pie",
+      radius: ["40%", "70%"],
+      avoidLabelOverlap: false,
+      itemStyle: {
+        borderRadius: 5,
+        borderColor: "#fff",
+        borderWidth: 0,
+      },
+      label: {
+        show: false,
+        position: "center",
+      },
+      labelLine: {
+        show: false,
+      },
+      data: [
+        { value: 1048, name: "Search Engine" },
+        { value: 735, name: "Direct" },
+        { value: 580, name: "Email" },
+        { value: 484, name: "Union Ads" },
+        { value: 300, name: "Video Ads" },
+      ],
+    },
+  ],
+};
+let options3 = {
   animationDelay: 500,
   color: ["rgba(163,62,173,1)"],
   backgroundColor: "rgb(255,255,255, 0)",
@@ -265,8 +337,8 @@ let options2 = {
 
 onMounted(() => {
   setGraph(document.getElementById("graph1"), options1);
-  setGraph(document.getElementById("graph3"), options1);
   setGraph(document.getElementById("graph2"), options2);
+  setGraph(document.getElementById("graph3"), options3);
 });
 
 function setGraph(htmlelement: HTMLElement | null, option: any): void {
