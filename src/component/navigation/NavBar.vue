@@ -21,7 +21,7 @@
       </div>
       <div class="lg:navbar-start">
         <RouterLink :to="{ name: RouteNames.Home }" class="btn h-max btn-ghost text-lg gap-5">
-          <img :src="logo" class="lg:w-16 lg:h-16 w-14 left-14" />
+          <img :src="logo" class="lg:w-16 lg:h-16 w-14 left-14 p-1" />
           <span>
             Coss3
             <span class="text-cyan-300">.io</span>
