@@ -8,6 +8,7 @@ import {
 export enum RouteNames {
   Home = "Home",
   Test = "Test",
+  Bot = "Bot",
   FSA = "FSA",
 }
 
@@ -21,10 +22,10 @@ let routes: RouteRecordRaw[] = [
     name: RouteNames.Home,
   },
   {
-    path: "/test",
+    path: "/bot",
     component: () =>
       import(
-        /* webpackPreload: true */ /* webpackChunkName: "test" */ "../component/pages/Test.vue"
+        /* webpackPreload: true */ /* webpackChunkName: "bot" */ "../component/pages/Test.vue"
       ),
     name: RouteNames.Test,
   },
