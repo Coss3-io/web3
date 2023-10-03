@@ -106,6 +106,21 @@
           </Transition>
         </div>
       </div>
+      <div class="col-span-7 relative">
+        <router-view
+          v-slot="{
+            Component,
+            route,
+          }: {
+            Component: Object,
+            route: { path: string },
+          }"
+        >
+          <transition name="fadeNav">
+            <component :is="Component" :key="route.path"/>
+          </transition>
+        </router-view>
+      </div>
     </div>
   </div>
 </template>

@@ -2,9 +2,9 @@
   <input id="main-drawer" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content relative min-h-screen">
     <NavBar></NavBar>
-    <router-view v-slot="{ Component, route }: { Component: Object, route: {path: string} }">
+    <router-view v-slot="{ Component }: { Component: Object}">
       <transition name="fadeNav">
-        <component :is="Component" :key="route.path" />
+        <component :is="Component"/>
       </transition>
     </router-view>
   </div>
