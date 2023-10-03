@@ -25,9 +25,9 @@ let routes: RouteRecordRaw[] = [
     path: "/bot",
     component: () =>
       import(
-        /* webpackPreload: true */ /* webpackChunkName: "bot" */ "../component/pages/Test.vue"
+        /* webpackPreload: true */ /* webpackChunkName: "bot" */ "../component/pages/Bot.vue"
       ),
-    name: RouteNames.Test,
+    name: RouteNames.Bot,
   },
   {
     path: "/fsa",

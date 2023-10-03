@@ -58,7 +58,7 @@
     </div>
   </div>
   <div
-    class="h-full max-h-72 xl:max-h-[25rem] overflow-auto border-red-500 custom-scroll flex flex-col gap-2 p-1"
+    class="h-full max-h-72 xl:max-h-[25rem] overflow-auto custom-scroll flex flex-col gap-2 p-1"
   >
     <div class="grid grid-cols-4 place-items-center text-[9px]">
       <div>Token</div>

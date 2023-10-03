@@ -16,10 +16,10 @@
         <h1 class="xs:text-3xl text-2xl lg:text-5xl font-bold">Start earning while sleeping</h1>
         <p class="lg:py-6 py-3 hidden xs:block">With a unique new decentralized trading experience, coss3.io let's you enjoy brand new web3 features</p>
         <div class="flex gap-5 lg:justify-start justify-center py-2">
-          <RouterLink :to="{ name: RouteNames.Test }" class="btn btn-primary">
+          <RouterLink :to="{ name: RouteNames.Bot }" class="btn btn-primary">
             Start now
           </RouterLink>
-          <RouterLink :to="{ name: RouteNames.Test }" class="btn btn-ghost">
+          <RouterLink :to="{ name: RouteNames.Bot }" class="btn btn-ghost">
             Learn more
           </RouterLink>
         </div>
