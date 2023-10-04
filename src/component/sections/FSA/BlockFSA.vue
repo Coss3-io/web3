@@ -21,7 +21,7 @@
       <div>FSA details</div>
     </div>
     <div class="flex items-center gap-3 grow justify-center">
-      <button class="btn btn-primary btn-sm disabled text-sm">
+      <button class="btn btn-primary btn-sm text-sm">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

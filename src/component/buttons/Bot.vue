@@ -1,5 +1,9 @@
 <template>
-  <RouterLink :to="RouteNames.Bot" class="btn btn-ghost" @click="unCheck">
+  <RouterLink
+    :to="{ name: RouteNames.NewBot }"
+    class="btn btn-ghost"
+    @click="unCheck"
+  >
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -20,10 +24,10 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import { RouteNames } from "../../router";
-  const unCheck = () => {
-    let label = document.getElementById("main-drawer")!
-    if ("checked" in label){
-      label.checked = false;
-    } 
+const unCheck = () => {
+  let label = document.getElementById("main-drawer")!;
+  if ("checked" in label) {
+    label.checked = false;
   }
+};
 </script>

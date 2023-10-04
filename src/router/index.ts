@@ -34,7 +34,7 @@ let routes: RouteRecordRaw[] = [
         name: RouteNames.NewBot,
         component: () =>
         import(
-          /* webpackPreload: true */ /* webpackChunkName: "newBot" */ "../component/pages/TestB.vue"
+          /* webpackPreload: true */ /* webpackChunkName: "newBot" */ "../component/sections/Bot/NewBot.vue"
           ),
         },
         {
@@ -42,7 +42,7 @@ let routes: RouteRecordRaw[] = [
           name: RouteNames.Bot,
           component: () =>
             import(
-              /* webpackPreload: true */ /* webpackChunkName: "botId" */ "../component/pages/Test.vue"
+              /* webpackPreload: true */ /* webpackChunkName: "botId" */ "../component/sections/Bot/BotDetails.vue"
             ),
         },
     ],

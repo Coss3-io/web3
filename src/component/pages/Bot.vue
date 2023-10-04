@@ -28,26 +28,34 @@
         class="col-span-5 min-h-[38rem] flex flex-col bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 m-2 opacity-0 translate-y-3 animate-slideIn"
       >
         <div class="flex justify-between gap-3 flex-wrap">
-          <div
-            class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
+          <div class="flex gap-3 items-center">
+            <div
+              class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0l-3.75-3.75M17.25 21L21 17.25"
-              />
-            </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0l-3.75-3.75M17.25 21L21 17.25"
+                />
+              </svg>
 
-            <div>Bots List</div>
-          </div>
+              <div>Bots List</div>
+            </div>
+            <RouterLink
+              :to="{ name: RouteNames.NewBot, params: { id: '' } }"
+              class="badge badge-primary text-sm font-bold shadow-xs shadow-black hover:bg-primary-focus active:scale-95 transition-all"
+            >
+              + new bot
+            </RouterLink>
+          </div> 
           <div class="flex items-center">
             <div class="form-control relative">
               <label class="cursor-pointer label gap-3 swap grid grid-cols-2">
@@ -117,7 +125,7 @@
           }"
         >
           <transition name="fadeNav">
-            <component :is="Component" :key="route.path"/>
+            <component :is="Component" :key="route.path" />
           </transition>
         </router-view>
       </div>
@@ -128,7 +136,8 @@
 import { ref } from "vue";
 import BotsList from "../sections/Bot/BotsList.vue";
 import BotsCard from "../sections/Bot/BotsCard.vue";
-import { RouterView } from "vue-router";
+import { RouterView, RouterLink } from "vue-router";
+import { RouteNames } from "../../router";
 
 let cardView = ref<boolean>(true);
 </script>
