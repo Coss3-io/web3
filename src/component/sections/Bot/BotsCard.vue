@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-12 gap-4 p-1 pb-3 h-full max-h-72 xl:max-h-[30rem] overflow-auto custom-scroll"
+    class="grid grid-cols-12 gap-4 p-1 pb-3 max-h-[39rem] overflow-auto custom-scroll"
   >
     <div class="col-span-4" v-for="(bot, index) in botsList" :key="index">
       <RouterLink :to="{ name: RouteNames.Bot, params: { id: index } }">
@@ -65,7 +65,7 @@
                     class="w-5 h-5"
                   />
                   <div class="grow text-center font-sans font-bold">
-                    {{ bot.quote }}
+                    {{ bot.base }}
                   </div>
                 </div>
                 <div
@@ -76,7 +76,7 @@
                     class="w-5 h-5"
                   />
                   <div class="grow text-center font-sans font-bold">
-                    {{ bot.base }}
+                    {{ bot.quote }}
                   </div>
                 </div>
               </div>
@@ -156,6 +156,38 @@ const botsList = [
     quoteName: cryptoNames.usdc,
     profits: 2,
     fees: 5,
+  },
+  {
+    base: 488,
+    quote: 535,
+    baseName: cryptoNames.avax,
+    quoteName: cryptoNames.usdc,
+    profits: 4,
+    fees: 3,
+  },
+  {
+    base: 86,
+    quote: 78,
+    baseName: cryptoNames.bnb,
+    quoteName: cryptoNames.usdt,
+    profits: 2,
+    fees: 4,
+  },
+  {
+    base: 5024,
+    quote: 453,
+    baseName: cryptoNames.coss,
+    quoteName: cryptoNames.usdt,
+    profits: 45,
+    fees: 2,
+  },
+  {
+    base: 488,
+    quote: 535,
+    baseName: cryptoNames.avax,
+    quoteName: cryptoNames.usdc,
+    profits: 4,
+    fees: 3,
   },
 ];
 </script>

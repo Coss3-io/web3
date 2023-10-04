@@ -25,7 +25,7 @@
         </div>
       </div>
       <div
-        class="col-span-5 min-h-[38rem] flex flex-col bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 m-2 opacity-0 translate-y-3 animate-slideIn"
+        class="col-span-5 flex flex-col bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 m-2 opacity-0 translate-y-3 animate-slideIn"
       >
         <div class="flex justify-between gap-3 flex-wrap">
           <div class="flex gap-3 items-center">
@@ -114,20 +114,22 @@
           </Transition>
         </div>
       </div>
-      <div class="col-span-7 relative">
-        <router-view
-          v-slot="{
-            Component,
-            route,
-          }: {
-            Component: Object,
-            route: { path: string },
-          }"
-        >
-          <transition name="fadeNav">
-            <component :is="Component" :key="route.path" />
-          </transition>
-        </router-view>
+      <div class="col-span-7 relative bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 m-2 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]">
+        <div class="relative w-full">
+          <router-view
+            v-slot="{
+              Component,
+              route,
+            }: {
+              Component: Object,
+              route: { path: string },
+            }"
+          >
+            <transition name="fadeNav">
+              <component :is="Component" :key="route.path" />
+            </transition>
+          </router-view>
+        </div>
       </div>
     </div>
   </div>
