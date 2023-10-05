@@ -1,6 +1,6 @@
 <template>
   <div
-    class="h-full max-h-72 xl:max-h-[38rem] overflow-auto custom-scroll flex flex-col gap-2 p-1"
+    class="flex flex-col gap-2 p-1"
   >
     <div class="grid grid-cols-6 place-items-center text-[9px]">
       <div>Id</div>
@@ -36,6 +36,83 @@ import { RouterLink } from "vue-router";
 import { RouteNames } from "../../../router";
 
 let tokenFees = ref([
+  {
+    base: ether,
+    baseAmount: 543,
+    quote: usdt,
+    quoteAmount: 38,
+    fees: 5,
+  },
+  {
+    base: avax,
+    baseAmount: 38757,
+    quote: usdc,
+    quoteAmount: 5572,
+    fees: 8,
+  },
+  {
+    base: bnb,
+    baseAmount: 7522,
+    quote: usdt,
+    quoteAmount: 53,
+    fees: 2,
+  },
+  {
+    base: logo,
+    baseAmount: 738,
+    quote: usdc,
+    quoteAmount: 782,
+    fees: 8,
+  },
+  {
+    base: polygon,
+    baseAmount: 7827,
+    quote: usdt,
+    quoteAmount: 456,
+    fees: 9,
+  },
+  {
+    base: aave,
+    baseAmount: 345,
+    quote: usdc,
+    quoteAmount: 3547,
+    fees: 8,
+  },
+  {
+    base: ether,
+    baseAmount: 12835,
+    quote: usdt,
+    quoteAmount: 478,
+    fees: 5,
+  },
+  {
+    base: avax,
+    baseAmount: 5752,
+    quote: usdc,
+    quoteAmount: 527,
+    fees: 1,
+  },
+  {
+    base: bnb,
+    baseAmount: 1234,
+    quote: usdt,
+    quoteAmount: 234,
+    fees: 34,
+  },
+  {
+    base: logo,
+    baseAmount: 87887,
+    quote: usdc,
+    quoteAmount: 75,
+    fees: 7,
+  },
+  {
+    base: aave,
+    baseAmount: 1234,
+    quote: usdt,
+    quoteAmount: 234,
+    fees: 34,
+  },
   {
     base: ether,
     baseAmount: 543,

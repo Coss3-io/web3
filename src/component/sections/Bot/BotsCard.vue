@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-12 gap-4 p-1 pb-3 max-h-[39rem] overflow-auto custom-scroll"
+    class="grid grid-cols-12 gap-4 p-1 pb-3"
   >
     <div class="col-span-4" v-for="(bot, index) in botsList" :key="index">
       <RouterLink :to="{ name: RouteNames.Bot, params: { id: index } }">

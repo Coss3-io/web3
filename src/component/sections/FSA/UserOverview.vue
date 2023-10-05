@@ -6,15 +6,15 @@
       class="stat xl:p-3 p-5 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
     >
       <div class="stat-title">Your FSA</div>
-      <div class="stat-value xl:text-[30px] 2xl:text-[36px]">$1,200,000</div>
-      <div class="stat-desc">$1,200 as of last round</div>
+      <div class="stat-value xl:text-[30px] 2xl:text-[36px]">$1,520,230</div>
+      <div class="stat-desc">$230 as of last round</div>
     </div>
     <div
       class="stat xl:p-3 p-5 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
     >
-      <div class="stat-title">Current round</div>
-      <div class="stat-value xl:text-[30px] 2xl:text-[36px]">$1,520</div>
-      <div class="stat-desc">↘︎ 90 (14%)</div>
+      <div class="stat-title">Annualised Yield</div>
+      <div class="stat-value xl:text-[30px] 2xl:text-[36px]">23%</div>
+      <div class="stat-desc">~$1,200 earned this year</div>
     </div>
     <div
       class="stat xl:p-3 p-5 xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
