@@ -1,7 +1,7 @@
 <template>
   <div class="p-2 w-full">
     <div
-      class="grid grid-cols-12 grid-rows-[auto] bg-base-300 rounded-lg p-5 w-full"
+      class="grid grid-cols-12 lg:grid-rows-[min-content_7fr_5fr] bg-base-300 rounded-lg p-5 gap-3 w-full lg:h-[calc(100vh-110px)]"
     >
       <div class="col-span-full m-2 flex justify-start">
         <div class="tooltip" data-tip="click for help">
@@ -25,7 +25,7 @@
         </div>
       </div>
       <div
-        class="flex flex-col gap-3 lg:row-span-2 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 m-2 opacity-0 translate-y-3 animate-slideIn"
+        class="flex flex-col gap-3 lg:row-span-2 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
       >
         <div class="flex justify-start">
           <div
@@ -56,7 +56,7 @@
         <BlockFSA></BlockFSA>
       </div>
       <div
-        class="bg-base-100 h-[22rem] min-h-fit lg:col-span-6 col-span-full rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+        class="flex flex-col bg-base-100 h-[22rem] lg:h-full w-full lg:col-span-6 col-span-full rounded-lg p-4 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
       >
         <div class="flex justify-start">
           <div
@@ -67,10 +67,10 @@
           </div>
         </div>
 
-        <div class="h-full pb-10" id="graph3"></div>
+        <div class="h-full" id="graph3"></div>
       </div>
       <div
-        class="flex flex-col bg-base-100 h-96 xs:h-[22rem] lg:col-span-6 col-span-full rounded-lg p-4 m-2 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
+        class="flex flex-col bg-base-100 h-96 lg:h-full lg:col-span-6 col-span-full rounded-lg p-4 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
       >
         <div>
           <div class="flex justify-start">

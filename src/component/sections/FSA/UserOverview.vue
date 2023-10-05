@@ -1,23 +1,23 @@
 <template>
   <div
-    class="stats divide-x-2 stats-vertical bg-primary text-primary-content grid 2xl:grid-cols-3 xl:grid-cols-[auto_1fr_auto] lg:grid-cols-2 md:grid-cols-3 sm:grid-cols-[1fr_1fr] rounded-2xl w-full"
+    class="stats divide-x-2 xl:px-2 stats-vertical bg-primary text-primary-content grid 2xl:grid-cols-3 xl:grid-cols-[auto_1fr_auto] lg:grid-cols-2 md:grid-cols-3 sm:grid-cols-[1fr_1fr] rounded-2xl w-full"
   >
     <div
-      class="stat p-5 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
+      class="stat xl:p-3 p-5 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
     >
       <div class="stat-title">Your FSA</div>
       <div class="stat-value xl:text-[30px] 2xl:text-[36px]">$1,200,000</div>
       <div class="stat-desc">$1,200 as of last round</div>
     </div>
     <div
-      class="stat p-5 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
+      class="stat xl:p-3 p-5 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
     >
       <div class="stat-title">Current round</div>
       <div class="stat-value xl:text-[30px] 2xl:text-[36px]">$1,520</div>
       <div class="stat-desc">↘︎ 90 (14%)</div>
     </div>
     <div
-      class="stat p-5 xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
+      class="stat xl:p-3 p-5 xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
     >
       <div class="stat-title">Deposited COSS</div>
       <div
