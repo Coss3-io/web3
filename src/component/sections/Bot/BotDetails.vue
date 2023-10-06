@@ -61,7 +61,7 @@
         <div class="stat-desc text-secondary">+2345 USD raw</div>
       </div>
     </div>
-    <div class="col-span-5 p-5">
+    <div class="col-span-5 p-2">
       <div
         class="card bg-base-300 text-neutral-content w-full shadow shadow-black/50"
       >
@@ -203,7 +203,9 @@
               <div
                 class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow shadow-black/50 relative"
               >
-                <div class="absolute text-[9px] -bottom-3 font-light text-secondary">
+                <div
+                  class="absolute text-[9px] -bottom-3 font-light text-secondary"
+                >
                   start USD value
                 </div>
                 <div class="flex gap-3 items-center">
@@ -227,7 +229,9 @@
               <div
                 class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow shadow-black/50 relative"
               >
-                <div class="absolute text-[9px] -bottom-3 font-light text-secondary">
+                <div
+                  class="absolute text-[9px] -bottom-3 font-light text-secondary"
+                >
                   USD value
                 </div>
                 <div class="flex items-center gap-3">
@@ -341,7 +345,20 @@
         </div>
       </div>
     </div>
-    <div class="col-span-7 p-5"></div>
+    <div class="col-span-7 p-2">
+      <div
+        class="h-full w-full rounded-xl bg-base-300 sh shadow-black/50 flex flex-col p-3"
+      >
+        <div class="flex px-2 py-1 justify-start">
+          <div
+            class="text-primary-content text-lg py-0.5 bg-neutral shadow shadow-black/50 rounded-full px-4 font-bold"
+          >
+            Balance Repartition
+          </div>
+        </div>
+        <div class="h-full w-full" :id="`graph${$route.params.id}`"></div>
+      </div>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -358,16 +375,86 @@ import {
 import { cryptoNames } from "../../../types/cryptoNames";
 import { useRoute } from "vue-router";
 import { onBeforeMount } from "vue";
+import * as echarts from "echarts/core";
+import { TooltipComponent, LegendComponent } from "echarts/components";
+import { PieChart } from "echarts/charts";
+import { LabelLayout } from "echarts/features";
+import { CanvasRenderer } from "echarts/renderers";
+import { setGraph } from "../../../asset/scripts/utils";
+import { onMounted } from "vue";
+
 let route = useRoute();
+echarts.use([
+  TooltipComponent,
+  LegendComponent,
+  PieChart,
+  CanvasRenderer,
+  LabelLayout,
+]);
+
+let option = {
+  animationDelay: 300,
+  color: [
+    "#925ef2",
+    "#7cffb2",
+    "#fddd60",
+    "#ff6e76",
+    "#58d9f9",
+    "#05c091",
+    "#ff8a45",
+    "#8d48e3",
+    "#dd79ff",
+  ],
+  backgroundColor: "rgb(255,255,255, 0)",
+  tooltip: {
+    trigger: "item",
+  },
+  legend: {
+    align: "left",
+    orient: "vertical",
+    top: "5%",
+    left: "left",
+  },
+  series: [
+    {
+      type: "pie",
+      radius: ["40%", "70%"],
+      avoidLabelOverlap: false,
+      itemStyle: {
+        borderRadius: 5,
+        borderColor: "#fff",
+        borderWidth: 0,
+      },
+      label: {
+        show: false,
+        position: "center",
+      },
+      labelLine: {
+        show: false,
+      },
+      data: [
+        { value: 1048, name: "Search Engine" },
+        { value: 735, name: "Direct" },
+        { value: 580, name: "Email" },
+        { value: 484, name: "Union Ads" },
+        { value: 300, name: "Video Ads" },
+      ],
+    },
+  ],
+};
 
 const cryptoDetails = {
-  [cryptoNames.polygon]: { bg: "text-purple-600", logo: polygon },
-  [cryptoNames.avax]: { bg: "text-red-600", logo: avax },
-  [cryptoNames.bnb]: { bg: "text-yellow-600", logo: bnb },
-  [cryptoNames.usdc]: { bg: "text-blue-600", logo: usdc },
-  [cryptoNames.usdt]: { bg: "text-emerald-600", logo: usdt },
-  [cryptoNames.ether]: { bg: "text-gray-400", logo: ether },
-  [cryptoNames.coss]: { bg: "text-blue-600", logo: logo },
+  [cryptoNames.polygon]: {
+    bg: "text-purple-600",
+    logo: polygon,
+    color: "#a347d1",
+  },
+  [cryptoNames.avax]: { bg: "text-red-600", logo: avax, color: "#de2c2c" },
+  [cryptoNames.bnb]: { bg: "text-yellow-600", logo: bnb, color: "#edda0c" },
+  [cryptoNames.usdc]: { bg: "text-blue-600", logo: usdc, color: "#009dff" },
+  [cryptoNames.usdt]: { bg: "text-emerald-600", logo: usdt, color: "#00c41d" },
+  [cryptoNames.ether]: { bg: "text-gray-400", logo: ether, color: "#b6bfb7" },
+  [cryptoNames.coss]: { bg: "text-blue-600", logo: logo, color: "#25e5fa" },
 };
 
 let selectedBot = ref<(typeof botsList)[0]>();
@@ -393,7 +480,7 @@ const botsList = [
     upperBound: 5345,
   },
   {
-    base: "34K",
+    base: 34,
     quote: 535,
     baseName: cryptoNames.avax,
     quoteName: cryptoNames.usdc,
@@ -477,9 +564,24 @@ const botsList = [
 
 onBeforeMount(() => {
   if (typeof route.params.id == "string") {
-    console.log(route.params.id);
     selectedBot.value = botsList[parseInt(route.params.id)];
-    console.log(selectedBot.value);
   }
+});
+
+onMounted(() => {
+  option.color = [
+    cryptoDetails[selectedBot.value!.baseName].color,
+    cryptoDetails[selectedBot.value!.quoteName].color,
+  ];
+  option.series[0].data = [
+    { value: selectedBot.value!.base, name: selectedBot.value!.baseName },
+    { value: selectedBot.value!.quote, name: selectedBot.value!.quoteName },
+  ];
+  setGraph(
+    document.getElementById(`graph${route.params.id}`),
+    echarts.getInstanceByDom,
+    echarts.init,
+    option
+  );
 });
 </script>
