@@ -120,6 +120,7 @@ import { UniversalTransition } from "echarts/features";
 import { CanvasRenderer } from "echarts/renderers";
 import { PieChart } from "echarts/charts";
 import { LabelLayout } from "echarts/features";
+import { setGraph } from "../../asset/scripts/utils";
 
 echarts.use([
   ToolboxComponent,
@@ -338,17 +339,23 @@ let options3 = {
 };
 
 onMounted(() => {
-  setGraph(document.getElementById("graph1"), options1);
-  setGraph(document.getElementById("graph2"), options2);
-  setGraph(document.getElementById("graph3"), options3);
+  setGraph(
+    document.getElementById("graph1"),
+    echarts.getInstanceByDom,
+    echarts.init,
+    options1
+  );
+  setGraph(
+    document.getElementById("graph2"),
+    echarts.getInstanceByDom,
+    echarts.init,
+    options2
+  );
+  setGraph(
+    document.getElementById("graph3"),
+    echarts.getInstanceByDom,
+    echarts.init,
+    options3
+  );
 });
-
-function setGraph(htmlelement: HTMLElement | null, option: any): void {
-  if (!htmlelement) return;
-  let myChart = echarts.getInstanceByDom(htmlelement);
-  if (myChart) myChart.dispose();
-
-  myChart = echarts.init(htmlelement, "dark");
-  option && myChart.setOption(option);
-}
 </script>
