@@ -1,15 +1,17 @@
 <template>
-  <div
-    class="grid grid-cols-12 gap-4 p-1 pb-3"
-  >
-    <div class="col-span-4" v-for="(bot, index) in botsList" :key="index">
+  <div class="grid grid-cols-12 gap-4 p-1 pb-3">
+    <div
+      class="col-span-full sm:col-span-6 md:col-span-4 xl:col-span-6 2xl:col-span-4"
+      v-for="(bot, index) in botsList"
+      :key="index"
+    >
       <RouterLink :to="{ name: RouteNames.Bot, params: { id: index } }">
         <div
           :class="{
             'outline-1 outline outline-primary':
               String($route.params.id) == String(index),
           }"
-          class="card card-compact text-primary-content/50 bg-neutral cursor-pointer shadow-xl transition-all active:scale-95 relative"
+          class="card card-compact text-primary-content/50 bg-neutral h-full cursor-pointer shadow-xl transition-all active:scale-95 relative"
         >
           <div
             class="absolute badge border border-warning/70 bg-transparent font-sans font-bold px-2 text-warning/70 text-xs top-2 right-2"
@@ -55,31 +57,34 @@
               </span>
             </div>
             <hr class="border-white/20 w-1/2 m-auto pb-3" />
-            <div class="flex flex-col justify-center gap-3">
-              <div class="flex flex-wrap justify-around gap-2">
-                <div
-                  class="flex grow gap-2 items-center p-1 px-2 rounded-full bg-base-300 shadow-sm shadow-black/50"
-                >
-                  <img
-                    :src="cryptoDetails[bot.baseName].logo"
-                    class="w-5 h-5"
-                  />
-                  <div class="grow text-center font-sans font-bold">
-                    {{ bot.base }}
+            <div class="flex grow flex-col justify-between gap-3">
+              <div class="grow flex item-center justify-center">
+                <div class="flex flex-wrap justify-around gap-2 items-center grow">
+                  <div
+                    class="flex grow gap-2 items-center p-1 px-2 rounded-full bg-base-300 shadow-sm shadow-black/50"
+                  >
+                    <img
+                      :src="cryptoDetails[bot.baseName].logo"
+                      class="w-5 h-5"
+                    />
+                    <div class="grow text-center font-sans font-bold">
+                      {{ bot.base }}
+                    </div>
                   </div>
-                </div>
-                <div
-                  class="flex grow gap-2 font-sans font-bold items-center p-1 px-2 bg-base-300 rounded-full shadow-lg shadow-black/50"
-                >
-                  <img
-                    :src="cryptoDetails[bot.quoteName].logo"
-                    class="w-5 h-5"
-                  />
-                  <div class="grow text-center font-sans font-bold">
-                    {{ bot.quote }}
+                  <div
+                    class="flex grow gap-2 font-sans font-bold items-center p-1 px-2 bg-base-300 rounded-full shadow-lg shadow-black/50"
+                  >
+                    <img
+                      :src="cryptoDetails[bot.quoteName].logo"
+                      class="w-5 h-5"
+                    />
+                    <div class="grow text-center font-sans font-bold">
+                      {{ bot.quote }}
+                    </div>
                   </div>
                 </div>
               </div>
+
               <div
                 class="flex justify-center font-bold font-sans gap-2 bg-base-300 w-full px-2 p-1 ronded-full border border-white/50 shadow-lg shadow-black/50 rounded-full"
               >

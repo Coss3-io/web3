@@ -1,7 +1,7 @@
 <template>
   <div class="p-2 w-full">
     <div
-      class="grid grid-cols-12 grid-rows-[min-content_1fr] bg-base-300 rounded-lg p-5 w-full lg:h-[calc(100vh-110px)] gap-3"
+      class="grid grid-cols-12 grid-rows-[min-content_1fr] bg-base-300 rounded-lg p-5 w-full xl:h-[calc(100vh-110px)] gap-3"
     >
       <div class="col-span-full flex justify-start">
         <div class="tooltip" data-tip="click for help">
@@ -25,9 +25,9 @@
         </div>
       </div>
       <div
-        class="col-span-5 flex flex-col overflow-hidden gap-3 bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
+        class="xl:col-span-5 col-span-full flex flex-col overflow-hidden gap-3 bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
       >
-        <div class="flex justify-between gap-3 flex-wrap">
+        <div class="flex justify-center xs:justify-between gap-3 flex-wrap">
           <div class="flex gap-3 items-center">
             <div
               class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
@@ -107,15 +107,15 @@
             </div>
           </div>
         </div>
-        <div class="pt-4 relative overflow-hidden h-full">
+        <div class="pt-4 relative overflow-hidden xl:h-full h-80 lg:h-96">
           <Transition name="fadeNav">
             <div v-if="cardView" class="w-full h-full overflow-auto custom-scroll"><BotsCard></BotsCard></div>
             <div v-else class="w-full h-full overflow-auto custom-scroll"><BotsList></BotsList></div>
           </Transition>
         </div>
       </div>
-      <div class="col-span-7 h-full relative bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]">
-         <div class="relative w-full">
+      <div class="xl:col-span-7 col-span-full lg:min-h-0 min-h-[775px] relative bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]">
+         <div class="relative w-full h-full">
           <router-view
             v-slot="{
               Component,

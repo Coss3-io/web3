@@ -1,6 +1,8 @@
 <template>
-  <div class="w-full grid grid-cols-12 gap-3">
-    <div class="stats col-span-full shadow bg-base-300 shadow-black/50">
+  <div
+    class="w-full h-full grid grid-cols-12 gap-3 grid-rows-[min-content_1fr_min-content]"
+  >
+    <div class="stats stats-vertical lg:stats-horizontal divide-solid col-span-full sm:col-span-5 lg:col-span-full shadow bg-base-300 shadow-black/50">
       <div class="stat place-items-center">
         <div class="stat-figure">
           <img
@@ -18,7 +20,6 @@
         </div>
         <div class="stat-desc">+21% since launch</div>
       </div>
-
       <div class="stat place-items-center">
         <div class="stat-figure">
           <img
@@ -36,10 +37,9 @@
         </div>
         <div class="stat-desc">-21% since launch</div>
       </div>
-
       <div class="stat place-items-center">
         <div class="stat-figure text-secondary">
-          <div class="">
+          <div class="flex shrink">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -61,59 +61,20 @@
         <div class="stat-desc text-secondary">+2345 USD raw</div>
       </div>
     </div>
-    <div class="col-span-5 p-2">
+    <div class="col-span-full sm:col-span-7 lg:col-span-5 xl:row-span-2">
       <div
-        class="card bg-base-300 text-neutral-content w-full shadow shadow-black/50"
+        class="card bg-base-300 h-full text-neutral-content w-full shadow shadow-black/50"
       >
-        <div class="card-body items-center text-center gap-4 p-5">
+        <div
+          class="card-body items-center text-center 2xl:gap-10 gap-3 p-5 justify-between max-h-full"
+        >
           <h2
             class="card-title text-primary-content bg-neutral shadow shadow-black/50 rounded-full px-4"
           >
             Bot #{{ selectedBot?.fees }} Details
           </h2>
           <div
-            class="flex flex-col w-full items-start bg-neutral rounded-xl p-3 gap-3 font-bold"
-          >
-            <div class="flex gap-3 items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z"
-                />
-              </svg>
-              Accurate Balance
-            </div>
-            <div class="flex flex-wrap gap-4 justify-around w-full">
-              <div
-                class="flex gap-3 px-4 py-0.5 items-center bg-base-300 rounded-full shadow shadow-black/50"
-              >
-                <img
-                  class="w-6 h-6"
-                  :src="cryptoDetails[selectedBot!.baseName].logo"
-                />
-                {{ selectedBot?.base }}
-              </div>
-              <div
-                class="flex gap-3 px-4 py-0.5 items-center bg-base-300 rounded-full shadow shadow-black/50"
-              >
-                <img
-                  class="w-6 h-6"
-                  :src="cryptoDetails[selectedBot!.quoteName].logo"
-                />
-                {{ selectedBot?.quote }}
-              </div>
-            </div>
-          </div>
-          <div
-            class="flex flex-col w-full items-start bg-neutral rounded-xl p-3 gap-3 font-bold"
+            class="2xl:grow flex flex-col w-full justify-around bg-neutral rounded-xl p-3 gap-3 font-bold"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -172,7 +133,7 @@
             </div>
           </div>
           <div
-            class="flex flex-col w-full items-start bg-neutral rounded-xl p-3 gap-3 font-bold"
+            class="2xl:grow justify-around flex flex-col w-full bg-neutral rounded-xl p-3 gap-3 font-bold"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -255,7 +216,7 @@
             </div>
           </div>
           <div
-            class="flex flex-col w-full items-start bg-neutral rounded-xl p-3 gap-3 font-bold"
+            class="2xl:grow justify-around flex flex-col w-full bg-neutral rounded-xl p-3 gap-3 font-bold"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -345,9 +306,9 @@
         </div>
       </div>
     </div>
-    <div class="col-span-7 p-2">
+    <div class="col-span-full sm:col-span-7 sm:row-start-auto row-start-5 h-80 lg:h-full">
       <div
-        class="h-full w-full rounded-xl bg-base-300 sh shadow-black/50 flex flex-col p-3"
+        class="h-full w-full rounded-xl bg-base-300 shadow shadow-black/50 flex flex-col p-3"
       >
         <div class="flex px-2 py-1 justify-start">
           <div
@@ -356,7 +317,127 @@
             Balance Repartition
           </div>
         </div>
-        <div class="h-full w-full" :id="`graph${$route.params.id}`"></div>
+        <div class="h-full w-full" :id="`botgraph${$route.params.id}`"></div>
+      </div>
+    </div>
+    <div class="stats xl:grid xl:grid-cols-2 2xl:grid-cols-3 xl:grid-rows-[1fr_min-content] stats-vertical lg:stats-horizontal sm:col-span-5 col-span-full lg:col-span-full xl:col-span-7 shadow bg-base-300 shadow-black/50 relative !overflow-visible">
+        <span v-if="selectedBot?.baseName == 'avax'" class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0"></span>
+        <span v-if="selectedBot?.baseName == 'avax'" class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0 border-red-500 animate-ping"></span>
+      <div class="stat place-items-center grid-cols-[1fr_max-content] 2xl:gap-1">
+        <div class="stat-figure">
+          <img
+            :src="cryptoDetails[selectedBot!.baseName].logo"
+            alt="ether"
+            class="w-7 h-7 shrink-0"
+          />
+        </div>
+        <div class="stat-title">Wallet Base</div>
+        <div
+          class="stat-value"
+          :class="cryptoDetails[selectedBot!.baseName].bg"
+        >
+          {{ selectedBot?.base }}
+        </div>
+        <div class="stat-desc relative">
+          +21% above needs
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            class="stroke-success w-5 h-5 absolute top-0 -right-1 translate-x-full -translate-y-0.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div class="stat place-items-center xl:row-start-1 grid-cols-[1fr_max-content] 2xl:gap-1">
+        <div class="stat-figure">
+          <img
+            :src="cryptoDetails[selectedBot!.quoteName].logo"
+            alt="usdc"
+            class="w-7 h-7"
+          />
+        </div>
+        <div class="stat-title">Wallet Quote</div>
+        <div
+          class="stat-value"
+          :class="cryptoDetails[selectedBot!.quoteName].bg"
+        >
+          {{ selectedBot?.quote }}
+        </div>
+        <div class="stat-desc relative">
+          -21% below needs
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            class="stroke-error w-5 h-5 absolute top-0 -right-1 translate-x-full -translate-y-0.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div
+        v-if="selectedBot?.baseName == 'avax'"
+        class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 2xl:col-span-1 xl:col-start-1 xl:col-span-2 place-items-center xl:!border-t-[1px] xl:!border-solid grid-cols-[1fr_max-content] xl:grid-cols-2 2xl:grid-cols-[1fr_max-content]"
+      >
+        <div class="stat-figure text-secondary xl:justify-self-center">
+          <div class="">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              class="stroke-error w-10 h-10"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div class="stat-title row-span-2 whitespace-normal">
+          Rebalance Needed
+        </div>
+        <div class="stat-desc text-error whitespace-normal">
+          Click for details
+        </div>
+      </div>
+      <div v-else class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 xl:col-start-1 xl:col-span-2 2xl:col-span-1 place-items-center xl:!border-t-[1px] xl:!border-solid xl:grid-cols-2">
+        <div class="stat-figure text-secondary xl:justify-self-center">
+          <div class="">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              class="stroke-success w-10 h-10"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div class="stat-title row-span-3 whitespace-normal">
+          Everything is ok
+        </div>
       </div>
     </div>
   </div>
@@ -414,6 +495,7 @@ let option = {
     orient: "vertical",
     top: "5%",
     left: "left",
+    textStyle: { fontWeight: "bold" },
   },
   series: [
     {
@@ -470,12 +552,12 @@ const botsList = [
     upperBound: 288,
   },
   {
-    base: 5024,
-    quote: 453,
+    base: 123,
+    quote: 456,
     baseName: cryptoNames.coss,
     quoteName: cryptoNames.usdt,
-    profits: 45,
-    fees: 2,
+    profits: 789,
+    fees: 1,
     lowerBound: 4572,
     upperBound: 5345,
   },
@@ -578,7 +660,7 @@ onMounted(() => {
     { value: selectedBot.value!.quote, name: selectedBot.value!.quoteName },
   ];
   setGraph(
-    document.getElementById(`graph${route.params.id}`),
+    document.getElementById(`botgraph${route.params.id}`),
     echarts.getInstanceByDom,
     echarts.init,
     option
