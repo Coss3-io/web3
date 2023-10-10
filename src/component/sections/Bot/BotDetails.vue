@@ -306,7 +306,7 @@
         </div>
       </div>
     </div>
-    <div class="col-span-full sm:col-span-7 sm:row-start-auto row-start-5 h-80 lg:h-full">
+    <div class="col-span-full sm:col-span-7 sm:row-start-auto row-start-4 h-80 lg:h-full">
       <div
         class="h-full w-full rounded-xl bg-base-300 shadow shadow-black/50 flex flex-col p-3"
       >
