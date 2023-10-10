@@ -114,7 +114,7 @@
           </Transition>
         </div>
       </div>
-      <div class="xl:col-span-7 col-span-full lg:min-h-0 min-h-[775px] relative bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]">
+      <div class="xl:col-span-7 col-span-full xl:min-h-0 min-h-[775px] relative bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]">
          <div class="relative w-full h-full">
           <router-view
             v-slot="{
