@@ -109,7 +109,7 @@ import {
   bnb,
   usdc,
 } from "../../../asset/images/images";
-import { cryptoNames } from "../../../types/cryptoNames";
+import { cryptoNames } from "../../../types/cryptoSpecs";
 import { RouteNames } from "../../../router";
 const cryptoDetails = {
   [cryptoNames.polygon]: { bg: "border border-purple-600", logo: polygon },
@@ -196,3 +196,4 @@ const botsList = [
   },
 ];
 </script>
+../../../types/cryptoSpecs

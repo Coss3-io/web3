@@ -453,7 +453,7 @@ import {
   bnb,
   logo,
 } from "../../../asset/images/images";
-import { cryptoNames } from "../../../types/cryptoNames";
+import { cryptoNames } from "../../../types/cryptoSpecs";
 import { useRoute } from "vue-router";
 import { onBeforeMount } from "vue";
 import * as echarts from "echarts/core";
@@ -667,3 +667,4 @@ onMounted(() => {
   );
 });
 </script>
+../../../types/cryptoNames

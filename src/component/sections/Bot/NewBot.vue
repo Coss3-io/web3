@@ -282,7 +282,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { cryptoNames } from "../../../types/cryptoNames";
+import { cryptoNames } from "../../../types/cryptoSpecs";
 import {
   usdt,
   ether,
@@ -315,3 +315,4 @@ let selectedQuote = ref<keyof typeof cryptoNames>();
 
 let basePriceValue = ref<number>(0);
 </script>
+../../../types/cryptoNames
