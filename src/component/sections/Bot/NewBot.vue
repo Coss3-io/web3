@@ -270,7 +270,7 @@
                     type="range"
                     min="0"
                     max="100"
-                    class="range range-sm range-green-500 shadow-red-500 w-full"
+                    class="range range-sm range-emerald-700 shadow-red-500 w-full"
                   />
                 </div>
               </div>
