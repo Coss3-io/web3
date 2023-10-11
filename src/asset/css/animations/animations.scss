@@ -8,3 +8,18 @@
 .fadeNav-leave-to {
   opacity: 0;
 }
+
+.fadeFast-enter-active,
+.fadeFast-leave-active {
+  position: absolute;
+  transition: opacity 0.5s ease;
+}
+
+.fadeFast-leave-from {
+  display: none;
+}
+
+.fadeFast-enter-from,
+.fadeFast-leave-to {
+  opacity: 0;
+}
