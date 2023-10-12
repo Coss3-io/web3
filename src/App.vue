@@ -1,6 +1,6 @@
 <template>
   <input id="main-drawer" type="checkbox" class="drawer-toggle" />
-  <div class="drawer-content relative min-h-screen">
+  <div class="drawer-content relative min-h-screen overflow-hidden">
     <NavBar></NavBar>
     <router-view v-slot="{ Component }: { Component: Object}">
       <transition name="fadeNav">
