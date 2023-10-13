@@ -2,7 +2,9 @@
   <div
     class="w-full h-full grid grid-cols-12 gap-3 grid-rows-[min-content_1fr_min-content]"
   >
-    <div class="stats stats-vertical lg:stats-horizontal divide-solid col-span-full sm:col-span-5 lg:col-span-full shadow bg-base-300 shadow-black/50">
+    <div
+      class="stats stats-vertical lg:stats-horizontal divide-solid col-span-full sm:col-span-5 lg:col-span-full shadow bg-base-300 shadow-black/50"
+    >
       <div class="stat place-items-center">
         <div class="stat-figure">
           <img
@@ -306,24 +308,55 @@
         </div>
       </div>
     </div>
-    <div class="col-span-full sm:col-span-7 sm:row-start-auto row-start-4 h-80 lg:h-full">
+    <div
+      class="col-span-full sm:col-span-7 sm:row-start-auto row-start-4 h-80 lg:h-full"
+    >
       <div
         class="h-full w-full rounded-xl bg-base-300 shadow shadow-black/50 flex flex-col p-3"
       >
-        <div class="flex px-2 py-1 justify-start">
+        <div class="flex px-2 py-1 justify-start items-center">
           <div
-            class="text-primary-content text-lg py-0.5 bg-neutral shadow shadow-black/50 rounded-full px-4 font-bold"
+            class="text-primary-content flex items-center gap-2 text-lg py-1 bg-neutral shadow shadow-black/50 rounded-full px-4 font-bold"
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
+              />
+            </svg>
             Balance Repartition
           </div>
         </div>
         <div class="h-full w-full" :id="`botgraph${$route.params.id}`"></div>
       </div>
     </div>
-    <div class="stats xl:grid xl:grid-cols-2 2xl:grid-cols-3 xl:grid-rows-[1fr_min-content] stats-vertical lg:stats-horizontal sm:col-span-5 col-span-full lg:col-span-full xl:col-span-7 shadow bg-base-300 shadow-black/50 relative !overflow-visible">
-        <span v-if="selectedBot?.baseName == 'avax'" class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0"></span>
-        <span v-if="selectedBot?.baseName == 'avax'" class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0 border-red-500 animate-ping"></span>
-      <div class="stat place-items-center grid-cols-[1fr_max-content] 2xl:gap-1">
+    <div
+      class="stats xl:grid xl:grid-cols-2 2xl:grid-cols-3 xl:grid-rows-[1fr_min-content] stats-vertical lg:stats-horizontal sm:col-span-5 col-span-full lg:col-span-full xl:col-span-7 shadow bg-base-300 shadow-black/50 relative !overflow-visible"
+    >
+      <span
+        v-if="selectedBot?.baseName == 'avax'"
+        class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0"
+      ></span>
+      <span
+        v-if="selectedBot?.baseName == 'avax'"
+        class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0 border-red-500 animate-ping"
+      ></span>
+      <div
+        class="stat place-items-center grid-cols-[1fr_max-content] 2xl:gap-1"
+      >
         <div class="stat-figure">
           <img
             :src="cryptoDetails[selectedBot!.baseName].logo"
@@ -356,7 +389,9 @@
         </div>
       </div>
 
-      <div class="stat place-items-center xl:row-start-1 grid-cols-[1fr_max-content] 2xl:gap-1">
+      <div
+        class="stat place-items-center xl:row-start-1 grid-cols-[1fr_max-content] 2xl:gap-1"
+      >
         <div class="stat-figure">
           <img
             :src="cryptoDetails[selectedBot!.quoteName].logo"
@@ -417,7 +452,10 @@
           Click for details
         </div>
       </div>
-      <div v-else class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 xl:col-start-1 xl:col-span-2 2xl:col-span-1 place-items-center xl:!border-t-[1px] xl:!border-solid xl:grid-cols-2">
+      <div
+        v-else
+        class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 xl:col-start-1 xl:col-span-2 2xl:col-span-1 place-items-center xl:!border-t-[1px] xl:!border-solid xl:grid-cols-2"
+      >
         <div class="stat-figure text-secondary xl:justify-self-center">
           <div class="">
             <svg
