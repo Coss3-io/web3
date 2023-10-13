@@ -101,28 +101,26 @@
                         "
                         class="relative w-full h-full flex justify-center items-center opacity-100 group-focus-within:hidden group-focus-within:opacity-0 transition-all"
                       >
-                        <transition-group name="fadeFast">
+                        <transition name="fadeFast">
                           <div
-                            :key="selectedBase"
+                            :key="'none'"
                             v-if="!selectedBase"
                             class="grow text-center p-2"
                           >
                             base
                           </div>
-                          <template v-for="name of cryptoNames">
-                            <div
-                              :key="name"
-                              v-if="name == selectedBase"
-                              class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
-                            >
-                              {{ selectedBase }}
-                              <img
-                                :src="cryptoDetails[selectedBase].logo"
-                                class="w-7 h-7"
-                              />
-                            </div>
-                          </template>
-                        </transition-group>
+                          <div
+                            :key="selectedBase"
+                            v-else-if="selectedBase in cryptoDetails"
+                            class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
+                          >
+                            {{ selectedBase }}
+                            <img
+                              :src="cryptoDetails[selectedBase].logo"
+                              class="w-7 h-7"
+                            />
+                          </div>
+                        </transition>
                       </div>
                     </label>
                     <ul
@@ -194,28 +192,26 @@
                         "
                         class="relative w-full h-full flex justify-center items-center opacity-100 group-focus-within:hidden group-focus-within:opacity-0 transition-all"
                       >
-                        <transition-group name="fadeFast">
+                      <transition name="fadeFast">
                           <div
-                            :key="selectedQuote"
+                            :key="'none'"
                             v-if="!selectedQuote"
                             class="grow text-center p-2"
                           >
-                            quote
+                            base
                           </div>
-                          <template v-for="name of cryptoNames">
-                            <div
-                              :key="name"
-                              v-if="name == selectedQuote"
-                              class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
-                            >
-                              {{ selectedQuote }}
-                              <img
-                                :src="cryptoDetails[selectedQuote].logo"
-                                class="w-7 h-7"
-                              />
-                            </div>
-                          </template>
-                        </transition-group>
+                          <div
+                            :key="selectedQuote"
+                            v-else-if="selectedQuote in cryptoDetails"
+                            class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
+                          >
+                            {{ selectedQuote }}
+                            <img
+                              :src="cryptoDetails[selectedQuote].logo"
+                              class="w-7 h-7"
+                            />
+                          </div>
+                        </transition>
                       </div>
                     </label>
                     <ul
@@ -670,32 +666,38 @@
                     </div>
                     <div
                       v-else-if="selectedBase && !selectedStep"
-                      class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
+                      class="w-full h-full flex justify-evenly uppercase gap-1 items-center p-1"
                     >
-                    <div class="w-5/12 flex justify-center">
-                      <transition name="fadeNav">
-                        <img
-                          :key="selectedBase"
-                          :src="!(selectedBase in cryptoDetails) ? unknownTokenLogo : cryptoDetails[selectedBase].logo"
-                          class="w-7 h-7"
-                        />
-                      </transition>
-                    </div>
-                      <div class="w-7/12">
-
+                      <div class="w-5/12 h-full flex justify-center">
+                        <transition name="fadeNav">
+                          <img
+                            :key="selectedBase"
+                            :src="
+                              !(selectedBase in cryptoDetails)
+                                ? unknownTokenLogo
+                                : cryptoDetails[selectedBase].logo
+                            "
+                            class="w-7 h-7"
+                          />
+                        </transition>
                       </div>
+                      <div class="w-7/12"></div>
                     </div>
                     <div
                       v-else
                       class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
                       :key="selectedBase"
                     >
-                    <div class="w-5/12 flex justify-center">
-                      <img
-                        :src="!(selectedBase in cryptoDetails) ? unknownTokenLogo : cryptoDetails[selectedBase].logo"
-                        class="w-7 h-7"
-                      />
-                    </div>
+                      <div class="w-5/12 flex justify-center">
+                        <img
+                          :src="
+                            !(selectedBase in cryptoDetails)
+                              ? unknownTokenLogo
+                              : cryptoDetails[selectedBase].logo
+                          "
+                          class="w-7 h-7"
+                        />
+                      </div>
                       <div class="w-7/12 text-center">
                         {{ lowerBoundValue }}
                       </div>
@@ -726,30 +728,36 @@
                       v-else-if="selectedQuote && !selectedStep"
                       class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
                     >
-                    <div class="w-5/12 flex justify-center relative">
-                      <transition name="fadeNav">
-                        <img
-                          :key="selectedQuote"
-                          :src="!(selectedQuote in cryptoDetails) ? unknownTokenLogo : cryptoDetails[selectedQuote].logo"
-                          class="w-7 h-7"
-                        />
-                      </transition>
-                    </div>
-                      <div class="w-7/12">
-
+                      <div class="w-5/12 flex justify-center relative">
+                        <transition name="fadeNav">
+                          <img
+                            :key="selectedQuote"
+                            :src="
+                              !(selectedQuote in cryptoDetails)
+                                ? unknownTokenLogo
+                                : cryptoDetails[selectedQuote].logo
+                            "
+                            class="w-7 h-7"
+                          />
+                        </transition>
                       </div>
+                      <div class="w-7/12"></div>
                     </div>
                     <div
                       v-else
                       class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
                       :key="selectedQuote"
                     >
-                    <div class="w-5/12 flex justify-center">
-                      <img
-                        :src="!(selectedQuote in cryptoDetails) ? unknownTokenLogo : cryptoDetails[selectedQuote].logo"
-                        class="w-7 h-7"
-                      />
-                    </div>
+                      <div class="w-5/12 flex justify-center">
+                        <img
+                          :src="
+                            !(selectedQuote in cryptoDetails)
+                              ? unknownTokenLogo
+                              : cryptoDetails[selectedQuote].logo
+                          "
+                          class="w-7 h-7"
+                        />
+                      </div>
                       <div class="w-7/12 text-center">
                         {{ upperBoundValue }}
                       </div>
