@@ -192,7 +192,7 @@
                         "
                         class="relative w-full h-full flex justify-center items-center opacity-100 group-focus-within:hidden group-focus-within:opacity-0 transition-all"
                       >
-                      <transition name="fadeFast">
+                        <transition name="fadeFast">
                           <div
                             :key="'none'"
                             v-if="!selectedQuote"
@@ -302,20 +302,33 @@
                           :style="{ width: `${lowerBoundValue}%` }"
                         ></div>
                         <transition name="fadeNav" appear>
-                          <img
+                          <svg
                             v-if="
                               selectedBase && !(selectedBase in cryptoDetails)
                             "
                             :key="unknownToken"
-                            :src="unknownTokenLogo"
-                            class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
+                            class="w-7 h-7 fill-primary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                             :style="{
                               transform: `translateX(${String(
                                 -lowerBoundValue / 1.15
                               )}%)`,
                               left: `${lowerBoundValue}%`,
                             }"
-                          />
+                            role="img"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 1000 1000"
+                          >
+                            <path
+                              id="path"
+                              style="
+                                opacity: 1;
+                                vector-effect: none;
+                                fill-opacity: 1;
+                              "
+                              d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
+                              transform=""
+                            ></path>
+                          </svg>
                           <img
                             v-else-if="
                               selectedBase && selectedBase in cryptoDetails
@@ -354,7 +367,7 @@
                           type="range"
                           min="0"
                           max="100"
-                          class="range range-sm w-full range-gray-400 absolute"
+                          class="range range-sm w-full range-primary absolute"
                         />
                       </transition>
                     </div>
@@ -401,20 +414,33 @@
                               left: `${upperBoundValue}%`,
                             }"
                           />
-                          <img
+                          <svg
                             v-else-if="
                               selectedQuote && !(selectedQuote in cryptoDetails)
                             "
                             :key="unknownToken"
-                            :src="unknownTokenLogo"
-                            class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
+                            class="w-7 h-7 fill-secondary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                             :style="{
                               transform: `translateX(${String(
                                 -upperBoundValue / 1.15
                               )}%)`,
                               left: `${upperBoundValue}%`,
                             }"
-                          />
+                            role="img"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 1000 1000"
+                          >
+                            <path
+                              id="path"
+                              style="
+                                opacity: 1;
+                                vector-effect: none;
+                                fill-opacity: 1;
+                              "
+                              d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
+                              transform=""
+                            ></path>
+                          </svg>
                         </transition>
                       </div>
                     </div>
@@ -439,8 +465,7 @@
                           type="range"
                           min="0"
                           max="100"
-                          class="range range-sm w-full absolute"
-                          :class="unknownTokenLogo"
+                          class="range range-sm range-secondary w-full absolute"
                         />
                       </transition>
                     </div>
@@ -668,15 +693,31 @@
                       v-else-if="selectedBase && !selectedStep"
                       class="w-full h-full flex justify-evenly uppercase gap-1 items-center p-1"
                     >
-                      <div class="w-5/12 h-full flex justify-center">
+                      <div class="w-5/12 h-full flex justify-center items-center">
                         <transition name="fadeNav">
+                          <svg
+                            v-if="!(selectedBase in cryptoDetails)"
+                            :key="unknownToken"
+                            class="w-7 h-7 fill-primary"
+                            role="img"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 1000 1000"
+                          >
+                            <path
+                              id="path"
+                              style="
+                                opacity: 1;
+                                vector-effect: none;
+                                fill-opacity: 1;
+                              "
+                              d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
+                              transform=""
+                            ></path>
+                          </svg>
                           <img
+                            v-else
                             :key="selectedBase"
-                            :src="
-                              !(selectedBase in cryptoDetails)
-                                ? unknownTokenLogo
-                                : cryptoDetails[selectedBase].logo
-                            "
+                            :src="cryptoDetails[selectedBase].logo"
                             class="w-7 h-7"
                           />
                         </transition>
@@ -688,13 +729,30 @@
                       class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
                       :key="selectedBase"
                     >
-                      <div class="w-5/12 flex justify-center">
+                      <div class="w-5/12 flex justify-center items-center">
+                        <svg
+                          v-if="!(selectedBase in cryptoDetails)"
+                          :key="unknownToken"
+                          class="w-7 h-7 fill-primary"
+                          role="img"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 1000 1000"
+                        >
+                          <path
+                            id="path"
+                            style="
+                              opacity: 1;
+                              vector-effect: none;
+                              fill-opacity: 1;
+                            "
+                            d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
+                            transform=""
+                          ></path>
+                        </svg>
                         <img
-                          :src="
-                            !(selectedBase in cryptoDetails)
-                              ? unknownTokenLogo
-                              : cryptoDetails[selectedBase].logo
-                          "
+                          v-else
+                          :key="selectedBase"
+                          :src="cryptoDetails[selectedBase].logo"
                           class="w-7 h-7"
                         />
                       </div>
@@ -728,15 +786,31 @@
                       v-else-if="selectedQuote && !selectedStep"
                       class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
                     >
-                      <div class="w-5/12 flex justify-center relative">
+                      <div class="w-5/12 flex justify-center items-center">
                         <transition name="fadeNav">
+                          <svg
+                            v-if="!(selectedQuote in cryptoDetails)"
+                            :key="unknownToken"
+                            class="w-7 h-7 fill-secondary"
+                            role="img"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 1000 1000"
+                          >
+                            <path
+                              id="path"
+                              style="
+                                opacity: 1;
+                                vector-effect: none;
+                                fill-opacity: 1;
+                              "
+                              d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
+                              transform=""
+                            ></path>
+                          </svg>
                           <img
+                            v-else
                             :key="selectedQuote"
-                            :src="
-                              !(selectedQuote in cryptoDetails)
-                                ? unknownTokenLogo
-                                : cryptoDetails[selectedQuote].logo
-                            "
+                            :src="cryptoDetails[selectedQuote].logo"
                             class="w-7 h-7"
                           />
                         </transition>
@@ -748,13 +822,30 @@
                       class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
                       :key="selectedQuote"
                     >
-                      <div class="w-5/12 flex justify-center">
+                      <div class="w-5/12 flex justify-center items-center">
+                        <svg
+                          v-if="!(selectedQuote in cryptoDetails)"
+                          :key="unknownToken"
+                          class="w-7 h-7 fill-secondary"
+                          role="img"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 1000 1000"
+                        >
+                          <path
+                            id="path"
+                            style="
+                              opacity: 1;
+                              vector-effect: none;
+                              fill-opacity: 1;
+                            "
+                            d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
+                            transform=""
+                          ></path>
+                        </svg>
                         <img
-                          :src="
-                            !(selectedQuote in cryptoDetails)
-                              ? unknownTokenLogo
-                              : cryptoDetails[selectedQuote].logo
-                          "
+                          v-else
+                          :key="selectedQuote"
+                          :src="cryptoDetails[selectedQuote].logo"
                           class="w-7 h-7"
                         />
                       </div>
