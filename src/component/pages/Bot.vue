@@ -126,7 +126,9 @@
             }"
           >
             <transition name="fadeNav">
-              <component :is="Component" :key="route.path" />
+              <KeepAlive include="NewBot">
+                <component :is="Component" :key="route.path" />
+              </KeepAlive>
             </transition>
           </router-view>
         </div>
