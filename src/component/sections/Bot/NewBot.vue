@@ -34,7 +34,7 @@
               </div>
             </div>
             <div
-              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-5"
+              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
             >
               <div
                 class="col-span-12 flex justify-start items-center gap-1 font-bold"
@@ -79,12 +79,7 @@
                         />
                       </svg>
                       <div
-                        class="group-focus-within:opacity-100 group-focus-within:flex opacity-0 transition-all"
-                        :class="
-                          selectedBase && !(selectedBase in cryptoDetails)
-                            ? 'flex items-center opacity-100'
-                            : 'hidden'
-                        "
+                        class="group-focus-within:opacity-100 group-focus-within:flex hidden opacity-0 transition-all"
                       >
                         <input
                           v-model="selectedBase"
@@ -94,18 +89,12 @@
                         />
                       </div>
                       <div
-                        :class="
-                          selectedBase && !(selectedBase in cryptoDetails)
-                            ? 'hidden'
-                            : ''
-                        "
-                        class="relative w-full h-full flex justify-center items-center opacity-100 group-focus-within:hidden group-focus-within:opacity-0 transition-all"
+                        class="relative w-full h-full flex justify-center items-center opacity-100 group-focus-within:absolute group-focus-within:opacity-0 transition-all"
                       >
                         <transition name="fadeFast">
                           <div
-                            :key="'none'"
                             v-if="!selectedBase"
-                            class="grow text-center p-2"
+                            class="grow text-center p-2 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
                           >
                             base
                           </div>
@@ -119,6 +108,17 @@
                               :src="cryptoDetails[selectedBase].logo"
                               class="w-7 h-7"
                             />
+                          </div>
+                          <div
+                            v-else
+                            :key="unknownToken"
+                            class="w-full flex justify-evenly uppercase gap-1 items-center p-1 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
+                          >
+                            {{ selectedBase }}
+                            <unknownTokenLogo
+                              class="w-7 h-7 fill-primary"
+                            >
+                            </unknownTokenLogo>
                           </div>
                         </transition>
                       </div>
@@ -170,12 +170,7 @@
                         />
                       </svg>
                       <div
-                        class="group-focus-within:opacity-100 group-focus-within:flex opacity-0 transition-all"
-                        :class="
-                          selectedQuote && !(selectedQuote in cryptoDetails)
-                            ? 'flex items-center opacity-100'
-                            : 'hidden'
-                        "
+                        class="group-focus-within:opacity-100 group-focus-within:flex hidden opacity-0 transition-all"
                       >
                         <input
                           v-model="selectedQuote"
@@ -185,18 +180,12 @@
                         />
                       </div>
                       <div
-                        :class="
-                          selectedQuote && !(selectedQuote in cryptoDetails)
-                            ? 'hidden'
-                            : ''
-                        "
-                        class="relative w-full h-full flex justify-center items-center opacity-100 group-focus-within:hidden group-focus-within:opacity-0 transition-all"
+                        class="relative w-full h-full flex justify-center items-center opacity-100 group-focus-within:absolute group-focus-within:opacity-0 transition-all"
                       >
                         <transition name="fadeFast">
                           <div
-                            :key="'none'"
                             v-if="!selectedQuote"
-                            class="grow text-center p-2"
+                            class="grow text-center p-2 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
                           >
                             base
                           </div>
@@ -210,6 +199,30 @@
                               :src="cryptoDetails[selectedQuote].logo"
                               class="w-7 h-7"
                             />
+                          </div>
+                          <div
+                            v-else
+                            :key="unknownToken"
+                            class="w-full flex justify-evenly uppercase gap-1 items-center p-1 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
+                          >
+                            {{ selectedQuote }}
+                            <svg
+                              class="w-7 h-7 fill-secondary"
+                              role="img"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 1000 1000"
+                            >
+                              <path
+                                id="path"
+                                style="
+                                  opacity: 1;
+                                  vector-effect: none;
+                                  fill-opacity: 1;
+                                "
+                                d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
+                                transform=""
+                              ></path>
+                            </svg>
                           </div>
                         </transition>
                       </div>
@@ -239,7 +252,7 @@
               </div>
             </div>
             <div
-              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-5"
+              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
             >
               <div
                 class="col-span-12 flex justify-between items-center font-bold"
@@ -302,7 +315,7 @@
                           :style="{ width: `${lowerBoundValue}%` }"
                         ></div>
                         <transition name="fadeNav" appear>
-                          <svg
+                          <unknownTokenLogo
                             v-if="
                               selectedBase && !(selectedBase in cryptoDetails)
                             "
@@ -314,21 +327,8 @@
                               )}%)`,
                               left: `${lowerBoundValue}%`,
                             }"
-                            role="img"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 1000 1000"
                           >
-                            <path
-                              id="path"
-                              style="
-                                opacity: 1;
-                                vector-effect: none;
-                                fill-opacity: 1;
-                              "
-                              d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
-                              transform=""
-                            ></path>
-                          </svg>
+                          </unknownTokenLogo>
                           <img
                             v-else-if="
                               selectedBase && selectedBase in cryptoDetails
@@ -414,7 +414,7 @@
                               left: `${upperBoundValue}%`,
                             }"
                           />
-                          <svg
+                          <unknownTokenLogo
                             v-else-if="
                               selectedQuote && !(selectedQuote in cryptoDetails)
                             "
@@ -426,21 +426,8 @@
                               )}%)`,
                               left: `${upperBoundValue}%`,
                             }"
-                            role="img"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 1000 1000"
                           >
-                            <path
-                              id="path"
-                              style="
-                                opacity: 1;
-                                vector-effect: none;
-                                fill-opacity: 1;
-                              "
-                              d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
-                              transform=""
-                            ></path>
-                          </svg>
+                          </unknownTokenLogo>
                         </transition>
                       </div>
                     </div>
@@ -474,7 +461,7 @@
               </div>
             </div>
             <div
-              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-5"
+              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
             >
               <div
                 class="col-span-12 flex justify-between items-center font-bold"
@@ -646,9 +633,68 @@
                   </div>
                 </div>
               </div>
+              <div class="col-span-12 flex justify-center">
+                <div
+                  class="flex bg-base-300 rounded-full items-center grow p-1"
+                >
+                  <input
+                    :disabled="!(lowerBoundValue && upperBoundValue)"
+                    :value="
+                      selectedAmount && lowerBoundValue && upperBoundValue
+                        ? selectedAmount
+                        : ''
+                    "
+                    @input="event => selectedAmount = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                    type="text"
+                    placeholder="amount"
+                    class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                  />
+                  <div
+                    class="flex bg-base-100 rounded-full items-center grow relative"
+                  >
+                    <div
+                      class="pointer-events-none absolute h-full z-10 w-full flex items-center"
+                    >
+                      <div
+                        class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                      >
+                        <div
+                          class="h-full"
+                          :style="{ width: `${selectedAmount}%` }"
+                        ></div>
+                        <transition name="fadeNav" appear>
+                          <img
+                            v-if="lowerBoundValue && upperBoundValue"
+                            :src="dollars"
+                            class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
+                            :style="{
+                              transform: `translateX(${String(
+                                -selectedAmount / 1.15
+                              )}%)`,
+                              left: `${selectedAmount}%`,
+                            }"
+                          />
+                        </transition>
+                      </div>
+                    </div>
+                    <div class="relative w-full h-5">
+                      <transition name="fadeNav" appear>
+                        <input
+                          v-if="lowerBoundValue && upperBoundValue"
+                          v-model="selectedAmount"
+                          type="range"
+                          min="0"
+                          max="100"
+                          class="range range-sm w-full absolute range-lime-300"
+                        />
+                      </transition>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div
-              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-5"
+              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
             >
               <div
                 class="col-span-12 flex justify-start items-center gap-1 font-bold"
@@ -693,27 +739,15 @@
                       v-else-if="selectedBase && !selectedStep"
                       class="w-full h-full flex justify-evenly uppercase gap-1 items-center p-1"
                     >
-                      <div class="w-5/12 h-full flex justify-center items-center">
+                      <div
+                        class="w-5/12 h-full flex justify-center items-center"
+                      >
                         <transition name="fadeNav">
-                          <svg
+                          <unknownTokenLogo
                             v-if="!(selectedBase in cryptoDetails)"
                             :key="unknownToken"
                             class="w-7 h-7 fill-primary"
-                            role="img"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 1000 1000"
-                          >
-                            <path
-                              id="path"
-                              style="
-                                opacity: 1;
-                                vector-effect: none;
-                                fill-opacity: 1;
-                              "
-                              d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
-                              transform=""
-                            ></path>
-                          </svg>
+                          ></unknownTokenLogo>
                           <img
                             v-else
                             :key="selectedBase"
@@ -730,25 +764,12 @@
                       :key="selectedBase"
                     >
                       <div class="w-5/12 flex justify-center items-center">
-                        <svg
+                        <unknownTokenLogo
                           v-if="!(selectedBase in cryptoDetails)"
                           :key="unknownToken"
                           class="w-7 h-7 fill-primary"
-                          role="img"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 1000 1000"
                         >
-                          <path
-                            id="path"
-                            style="
-                              opacity: 1;
-                              vector-effect: none;
-                              fill-opacity: 1;
-                            "
-                            d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
-                            transform=""
-                          ></path>
-                        </svg>
+                        </unknownTokenLogo>
                         <img
                           v-else
                           :key="selectedBase"
@@ -788,25 +809,12 @@
                     >
                       <div class="w-5/12 flex justify-center items-center">
                         <transition name="fadeNav">
-                          <svg
+                          <unknownTokenLogo
                             v-if="!(selectedQuote in cryptoDetails)"
                             :key="unknownToken"
                             class="w-7 h-7 fill-secondary"
-                            role="img"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 1000 1000"
                           >
-                            <path
-                              id="path"
-                              style="
-                                opacity: 1;
-                                vector-effect: none;
-                                fill-opacity: 1;
-                              "
-                              d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
-                              transform=""
-                            ></path>
-                          </svg>
+                          </unknownTokenLogo>
                           <img
                             v-else
                             :key="selectedQuote"
@@ -916,6 +924,7 @@ import {
   aave,
   unknownTokenLogo,
   moneyBag,
+  dollars,
 } from "../../../asset/images/images";
 import { ref } from "vue";
 
@@ -941,4 +950,5 @@ let upperBoundValue = ref<number>(0);
 
 let selectedStep = ref<number>(0);
 let selectedFees = ref<number>(0);
+let selectedAmount = ref<number>(0);
 </script>
