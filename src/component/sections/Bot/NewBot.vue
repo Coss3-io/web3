@@ -55,7 +55,7 @@
                 </svg>
                 Tokens
               </div>
-              <div class="col-span-6 flex justify-center">
+              <div class="col-span-full sm:col-span-6 flex justify-center">
                 <div
                   class="font-bold rounded-full bg-base-100 w-full h-9 flex gap-1 items-center px-3 hover:bg-base-200 transition-all"
                 >
@@ -117,8 +117,7 @@
                             {{ selectedBase }}
                             <unknownTokenLogo
                               class="w-7 h-7 fill-primary"
-                            >
-                            </unknownTokenLogo>
+                            ></unknownTokenLogo>
                           </div>
                         </transition>
                       </div>
@@ -146,7 +145,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-6 flex justify-center">
+              <div class="col-span-full sm:col-span-6 flex justify-center">
                 <div
                   class="font-bold rounded-full bg-base-100 w-full h-9 flex gap-1 items-center px-3 hover:bg-base-200 transition-all"
                 >
@@ -187,7 +186,7 @@
                             v-if="!selectedQuote"
                             class="grow text-center p-2 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
                           >
-                            base
+                            quote
                           </div>
                           <div
                             :key="selectedQuote"
@@ -252,7 +251,7 @@
               </div>
             </div>
             <div
-              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
+              class="col-span-12 xl:col-span-6 2xl:col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
             >
               <div
                 class="col-span-12 flex justify-between items-center font-bold"
@@ -282,7 +281,7 @@
                   <transition appear name="fadeNav">
                     <div
                       :key="selectedBase + selectedQuote"
-                      class="py-0.5 px-4 rounded-full badge border border-warning/70 bg-transparent font-sans font-bold text-warning/70"
+                      class="py-0.5 px-4 text-[11px] sm:text-sm rounded-full badge border border-warning/70 bg-transparent font-sans font-bold text-warning/70"
                     >
                       price: {{ selectedQuote }}
                     </div>
@@ -290,178 +289,181 @@
                 </div>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div
-                  class="flex bg-base-300 rounded-full items-center grow p-1"
-                >
-                  <input
-                    :disabled="selectedBase == undefined ? true : false"
-                    :value="lowerBoundValue ? lowerBoundValue : ''"
-                    @input="event => lowerBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
-                    type="text"
-                    placeholder="lower bound"
-                    class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                  />
+                <div class="grow">
+
                   <div
-                    class="flex bg-base-100 rounded-full items-center grow relative"
+                    class="flex bg-base-300 rounded-full items-center grow p-1"
                   >
+                    <input
+                      :disabled="selectedBase == undefined ? true : false"
+                      :value="lowerBoundValue ? lowerBoundValue : ''"
+                      @input="event => lowerBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                      type="text"
+                      placeholder="lower bound"
+                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                    />
                     <div
-                      class="pointer-events-none absolute h-full z-10 w-full flex items-center"
+                      class="flex bg-base-100 rounded-full items-center grow relative"
                     >
                       <div
-                        class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
                       >
                         <div
-                          class="h-full"
-                          :style="{ width: `${lowerBoundValue}%` }"
-                        ></div>
+                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        >
+                          <div
+                            class="h-full"
+                            :style="{ width: `${lowerBoundValue}%` }"
+                          ></div>
+                          <transition name="fadeNav" appear>
+                            <unknownTokenLogo
+                              v-if="
+                                selectedBase && !(selectedBase in cryptoDetails)
+                              "
+                              :key="unknownToken"
+                              class="w-7 h-7 fill-primary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
+                              :style="{
+                                transform: `translateX(${String(
+                                  -lowerBoundValue / 1.15
+                                )}%)`,
+                                left: `${lowerBoundValue}%`,
+                              }"
+                            ></unknownTokenLogo>
+                            <img
+                              v-else-if="
+                                selectedBase && selectedBase in cryptoDetails
+                              "
+                              :key="selectedBase"
+                              :src="cryptoDetails[selectedBase].logo"
+                              class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
+                              :style="{
+                                transform: `translateX(${String(
+                                  -lowerBoundValue / 1.15
+                                )}%)`,
+                                left: `${lowerBoundValue}%`,
+                              }"
+                            />
+                          </transition>
+                        </div>
+                      </div>
+                      <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
-                          <unknownTokenLogo
-                            v-if="
+                          <input
+                            v-if="selectedBase && selectedBase in cryptoDetails"
+                            :key="selectedBase"
+                            v-model="lowerBoundValue"
+                            type="range"
+                            min="0"
+                            max="100"
+                            class="range range-sm w-full absolute"
+                            :class="cryptoRange[selectedBase]"
+                          />
+                          <input
+                            v-else-if="
                               selectedBase && !(selectedBase in cryptoDetails)
                             "
                             :key="unknownToken"
-                            class="w-7 h-7 fill-primary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
-                            :style="{
-                              transform: `translateX(${String(
-                                -lowerBoundValue / 1.15
-                              )}%)`,
-                              left: `${lowerBoundValue}%`,
-                            }"
-                          >
-                          </unknownTokenLogo>
-                          <img
-                            v-else-if="
-                              selectedBase && selectedBase in cryptoDetails
-                            "
-                            :key="selectedBase"
-                            :src="cryptoDetails[selectedBase].logo"
-                            class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
-                            :style="{
-                              transform: `translateX(${String(
-                                -lowerBoundValue / 1.15
-                              )}%)`,
-                              left: `${lowerBoundValue}%`,
-                            }"
+                            v-model="lowerBoundValue"
+                            type="range"
+                            min="0"
+                            max="100"
+                            class="range range-sm w-full range-primary absolute"
                           />
                         </transition>
                       </div>
-                    </div>
-                    <div class="relative w-full h-5">
-                      <transition name="fadeNav" appear>
-                        <input
-                          v-if="selectedBase && selectedBase in cryptoDetails"
-                          :key="selectedBase"
-                          v-model="lowerBoundValue"
-                          type="range"
-                          min="0"
-                          max="100"
-                          class="range range-sm w-full absolute"
-                          :class="cryptoRange[selectedBase]"
-                        />
-                        <input
-                          v-else-if="
-                            selectedBase && !(selectedBase in cryptoDetails)
-                          "
-                          :key="unknownToken"
-                          v-model="lowerBoundValue"
-                          type="range"
-                          min="0"
-                          max="100"
-                          class="range range-sm w-full range-primary absolute"
-                        />
-                      </transition>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div
-                  class="flex bg-base-300 rounded-full items-center grow p-1"
-                >
-                  <input
-                    :disabled="selectedQuote == undefined ? true : false"
-                    :value="upperBoundValue ? upperBoundValue : ''"
-                    @input="event => upperBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
-                    type="text"
-                    placeholder="upper bound"
-                    class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                  />
+                <div class="grow">
                   <div
-                    class="flex bg-base-100 rounded-full items-center grow relative"
+                    class="flex bg-base-300 rounded-full items-center grow p-1"
                   >
+                    <input
+                      :disabled="selectedQuote == undefined ? true : false"
+                      :value="upperBoundValue ? upperBoundValue : ''"
+                      @input="event => upperBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                      type="text"
+                      placeholder="upper bound"
+                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                    />
                     <div
-                      class="pointer-events-none absolute h-full z-10 w-full flex items-center"
+                      class="flex bg-base-100 rounded-full items-center grow relative"
                     >
                       <div
-                        class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
                       >
                         <div
-                          class="h-full"
-                          :style="{ width: `${upperBoundValue}%` }"
-                        ></div>
+                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        >
+                          <div
+                            class="h-full"
+                            :style="{ width: `${upperBoundValue}%` }"
+                          ></div>
+                          <transition name="fadeNav" appear>
+                            <img
+                              v-if="
+                                selectedQuote && selectedQuote in cryptoDetails
+                              "
+                              :key="selectedQuote"
+                              :src="cryptoDetails[selectedQuote].logo"
+                              class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
+                              :style="{
+                                transform: `translateX(${String(
+                                  -upperBoundValue / 1.15
+                                )}%)`,
+                                left: `${upperBoundValue}%`,
+                              }"
+                            />
+                            <unknownTokenLogo
+                              v-else-if="
+                                selectedQuote && !(selectedQuote in cryptoDetails)
+                              "
+                              :key="unknownToken"
+                              class="w-7 h-7 fill-secondary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
+                              :style="{
+                                transform: `translateX(${String(
+                                  -upperBoundValue / 1.15
+                                )}%)`,
+                                left: `${upperBoundValue}%`,
+                              }"
+                            ></unknownTokenLogo>
+                          </transition>
+                        </div>
+                      </div>
+                      <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
-                          <img
-                            v-if="
-                              selectedQuote && selectedQuote in cryptoDetails
-                            "
+                          <input
+                            v-if="selectedQuote && selectedQuote in cryptoDetails"
                             :key="selectedQuote"
-                            :src="cryptoDetails[selectedQuote].logo"
-                            class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
-                            :style="{
-                              transform: `translateX(${String(
-                                -upperBoundValue / 1.15
-                              )}%)`,
-                              left: `${upperBoundValue}%`,
-                            }"
+                            v-model="upperBoundValue"
+                            type="range"
+                            min="0"
+                            max="100"
+                            class="range range-sm w-full absolute"
+                            :class="cryptoRange[selectedQuote]"
                           />
-                          <unknownTokenLogo
+                          <input
                             v-else-if="
                               selectedQuote && !(selectedQuote in cryptoDetails)
                             "
                             :key="unknownToken"
-                            class="w-7 h-7 fill-secondary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
-                            :style="{
-                              transform: `translateX(${String(
-                                -upperBoundValue / 1.15
-                              )}%)`,
-                              left: `${upperBoundValue}%`,
-                            }"
-                          >
-                          </unknownTokenLogo>
+                            v-model="upperBoundValue"
+                            type="range"
+                            min="0"
+                            max="100"
+                            class="range range-sm range-secondary w-full absolute"
+                          />
                         </transition>
                       </div>
-                    </div>
-                    <div class="relative w-full h-5">
-                      <transition name="fadeNav" appear>
-                        <input
-                          v-if="selectedQuote && selectedQuote in cryptoDetails"
-                          :key="selectedQuote"
-                          v-model="upperBoundValue"
-                          type="range"
-                          min="0"
-                          max="100"
-                          class="range range-sm w-full absolute"
-                          :class="cryptoRange[selectedQuote]"
-                        />
-                        <input
-                          v-else-if="
-                            selectedQuote && !(selectedQuote in cryptoDetails)
-                          "
-                          :key="unknownToken"
-                          v-model="upperBoundValue"
-                          type="range"
-                          min="0"
-                          max="100"
-                          class="range range-sm range-secondary w-full absolute"
-                        />
-                      </transition>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div
-              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
+              class="col-span-12 xl:col-span-6 2xl:col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
             >
               <div
                 class="col-span-12 flex justify-between items-center font-bold"
@@ -488,7 +490,7 @@
                   <transition name="fadeNav" appear>
                     <div
                       v-if="lowerBoundValue && upperBoundValue"
-                      class="py-0.5 px-4 rounded-full badge border border-warning/70 bg-transparent font-sans font-bold text-warning/70"
+                      class="py-0.5 px-4 text-[11px] sm:text-sm rounded-full min-w-max badge border border-warning/70 bg-transparent font-sans font-bold text-warning/70"
                     >
                       adviced fees: 2.5%
                     </div>
@@ -496,198 +498,204 @@
                 </div>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div
-                  class="flex bg-base-300 rounded-full items-center grow p-1"
-                >
-                  <input
-                    :disabled="!(lowerBoundValue && upperBoundValue)"
-                    :value="
-                      selectedStep && lowerBoundValue && upperBoundValue
-                        ? selectedStep
-                        : ''
-                    "
-                    @input="event => selectedStep = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
-                    type="text"
-                    placeholder="step"
-                    class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                  />
+                <div class="grow">
                   <div
-                    class="flex bg-base-100 rounded-full items-center grow relative"
+                    class="flex bg-base-300 rounded-full items-center grow p-1"
                   >
+                    <input
+                      :disabled="!(lowerBoundValue && upperBoundValue)"
+                      :value="
+                        selectedStep && lowerBoundValue && upperBoundValue
+                          ? selectedStep
+                          : ''
+                      "
+                      @input="event => selectedStep = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                      type="text"
+                      placeholder="step"
+                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                    />
                     <div
-                      class="pointer-events-none absolute h-full z-10 w-full flex items-center"
+                      class="flex bg-base-100 rounded-full items-center grow relative"
                     >
                       <div
-                        class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
                       >
                         <div
-                          class="h-full"
-                          :style="{ width: `${selectedStep}%` }"
-                        ></div>
+                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        >
+                          <div
+                            class="h-full"
+                            :style="{ width: `${selectedStep}%` }"
+                          ></div>
+                          <transition name="fadeNav" appear>
+                            <svg
+                              v-if="lowerBoundValue && upperBoundValue"
+                              class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
+                              :style="{
+                                transform: `translateX(${String(
+                                  -selectedStep / 1.15
+                                )}%)`,
+                                left: `${selectedStep}%`,
+                              }"
+                              version="1.1"
+                              id="Capa_1"
+                              xmlns="http://www.w3.org/2000/svg"
+                              xmlns:xlink="http://www.w3.org/1999/xlink"
+                              width="800px"
+                              height="800px"
+                              viewBox="0 0 515.458 515.458"
+                              xml:space="preserve"
+                            >
+                              <g>
+                                <path
+                                  d="M298.794,386.711c27.805,9.522,52.357,15.587,87.633,26.427C372.875,584.374,210.952,516.371,298.794,386.711z
+         M443.366,229.409c-1.826-51.415-10.882-118.86-83.017-108.292c-33.815,8.825-58.8,45.962-70.551,110.035
+        c-6.454,35.229-2.701,84.678,4.912,114.32c6.951,20.889,4.587,19.605,12.058,23.572c28.916,6.514,57.542,13.725,86.693,21.078
+        C423.075,369.209,447.397,258.182,443.366,229.409z M220.752,225.463c7.607-29.646,11.36-79.095,4.909-114.32
+        C213.919,47.067,188.931,9.924,155.11,1.105C82.975-9.463,73.919,57.981,72.093,109.399
+        c-4.031,28.768,20.294,139.802,49.911,160.711c29.149-7.353,57.771-14.558,86.696-21.078
+        C216.162,245.069,213.798,246.352,220.752,225.463z M129.029,293.132c13.547,171.234,175.47,103.231,87.63-26.427
+        C188.854,276.228,164.304,282.292,129.029,293.132z"
+                                />
+                              </g>
+                            </svg>
+                          </transition>
+                        </div>
+                      </div>
+                      <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
-                          <svg
+                          <input
                             v-if="lowerBoundValue && upperBoundValue"
-                            class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
-                            :style="{
-                              transform: `translateX(${String(
-                                -selectedStep / 1.15
-                              )}%)`,
-                              left: `${selectedStep}%`,
-                            }"
-                            version="1.1"
-                            id="Capa_1"
-                            xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                            width="800px"
-                            height="800px"
-                            viewBox="0 0 515.458 515.458"
-                            xml:space="preserve"
-                          >
-                            <g>
-                              <path
-                                d="M298.794,386.711c27.805,9.522,52.357,15.587,87.633,26.427C372.875,584.374,210.952,516.371,298.794,386.711z
-       M443.366,229.409c-1.826-51.415-10.882-118.86-83.017-108.292c-33.815,8.825-58.8,45.962-70.551,110.035
-      c-6.454,35.229-2.701,84.678,4.912,114.32c6.951,20.889,4.587,19.605,12.058,23.572c28.916,6.514,57.542,13.725,86.693,21.078
-      C423.075,369.209,447.397,258.182,443.366,229.409z M220.752,225.463c7.607-29.646,11.36-79.095,4.909-114.32
-      C213.919,47.067,188.931,9.924,155.11,1.105C82.975-9.463,73.919,57.981,72.093,109.399
-      c-4.031,28.768,20.294,139.802,49.911,160.711c29.149-7.353,57.771-14.558,86.696-21.078
-      C216.162,245.069,213.798,246.352,220.752,225.463z M129.029,293.132c13.547,171.234,175.47,103.231,87.63-26.427
-      C188.854,276.228,164.304,282.292,129.029,293.132z"
-                              />
-                            </g>
-                          </svg>
+                            v-model="selectedStep"
+                            type="range"
+                            min="0"
+                            max="100"
+                            class="range range-sm w-full absolute range-gray-700"
+                          />
                         </transition>
                       </div>
-                    </div>
-                    <div class="relative w-full h-5">
-                      <transition name="fadeNav" appear>
-                        <input
-                          v-if="lowerBoundValue && upperBoundValue"
-                          v-model="selectedStep"
-                          type="range"
-                          min="0"
-                          max="100"
-                          class="range range-sm w-full absolute range-gray-700"
-                        />
-                      </transition>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div
-                  class="flex bg-base-300 rounded-full items-center grow p-1"
-                >
-                  <input
-                    :disabled="!(lowerBoundValue && upperBoundValue)"
-                    :value="
-                      selectedFees && lowerBoundValue && upperBoundValue
-                        ? selectedFees
-                        : ''
-                    "
-                    @input="event => selectedFees = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
-                    type="text"
-                    placeholder="fees"
-                    class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                  />
+                <div class="grow">
                   <div
-                    class="flex bg-base-100 rounded-full items-center grow relative"
+                    class="flex bg-base-300 rounded-full items-center grow p-1"
                   >
+                    <input
+                      :disabled="!(lowerBoundValue && upperBoundValue)"
+                      :value="
+                        selectedFees && lowerBoundValue && upperBoundValue
+                          ? selectedFees
+                          : ''
+                      "
+                      @input="event => selectedFees = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                      type="text"
+                      placeholder="fees"
+                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                    />
                     <div
-                      class="pointer-events-none absolute h-full z-10 w-full flex items-center"
+                      class="flex bg-base-100 rounded-full items-center grow relative"
                     >
                       <div
-                        class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
                       >
                         <div
-                          class="h-full"
-                          :style="{ width: `${selectedFees}%` }"
-                        ></div>
+                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        >
+                          <div
+                            class="h-full"
+                            :style="{ width: `${selectedFees}%` }"
+                          ></div>
+                          <transition name="fadeNav" appear>
+                            <img
+                              v-if="lowerBoundValue && upperBoundValue"
+                              :src="moneyBag"
+                              class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
+                              :style="{
+                                transform: `translateX(${String(
+                                  -selectedFees / 1.15
+                                )}%)`,
+                                left: `${selectedFees}%`,
+                              }"
+                            />
+                          </transition>
+                        </div>
+                      </div>
+                      <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
-                          <img
+                          <input
                             v-if="lowerBoundValue && upperBoundValue"
-                            :src="moneyBag"
-                            class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
-                            :style="{
-                              transform: `translateX(${String(
-                                -selectedFees / 1.15
-                              )}%)`,
-                              left: `${selectedFees}%`,
-                            }"
+                            v-model="selectedFees"
+                            type="range"
+                            min="0"
+                            max="100"
+                            class="range range-sm w-full absolute range-amber-400"
                           />
                         </transition>
                       </div>
-                    </div>
-                    <div class="relative w-full h-5">
-                      <transition name="fadeNav" appear>
-                        <input
-                          v-if="lowerBoundValue && upperBoundValue"
-                          v-model="selectedFees"
-                          type="range"
-                          min="0"
-                          max="100"
-                          class="range range-sm w-full absolute range-amber-400"
-                        />
-                      </transition>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div
-                  class="flex bg-base-300 rounded-full items-center grow p-1"
-                >
-                  <input
-                    :disabled="!(lowerBoundValue && upperBoundValue)"
-                    :value="
-                      selectedAmount && lowerBoundValue && upperBoundValue
-                        ? selectedAmount
-                        : ''
-                    "
-                    @input="event => selectedAmount = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
-                    type="text"
-                    placeholder="amount"
-                    class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                  />
+                <div class="grow">
                   <div
-                    class="flex bg-base-100 rounded-full items-center grow relative"
+                    class="flex bg-base-300 rounded-full items-center grow p-1"
                   >
+                    <input
+                      :disabled="!(lowerBoundValue && upperBoundValue)"
+                      :value="
+                        selectedAmount && lowerBoundValue && upperBoundValue
+                          ? selectedAmount
+                          : ''
+                      "
+                      @input="event => selectedAmount = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                      type="text"
+                      placeholder="amount"
+                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                    />
                     <div
-                      class="pointer-events-none absolute h-full z-10 w-full flex items-center"
+                      class="flex bg-base-100 rounded-full items-center grow relative"
                     >
                       <div
-                        class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
                       >
                         <div
-                          class="h-full"
-                          :style="{ width: `${selectedAmount}%` }"
-                        ></div>
+                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
+                        >
+                          <div
+                            class="h-full"
+                            :style="{ width: `${selectedAmount}%` }"
+                          ></div>
+                          <transition name="fadeNav" appear>
+                            <img
+                              v-if="lowerBoundValue && upperBoundValue"
+                              :src="dollars"
+                              class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
+                              :style="{
+                                transform: `translateX(${String(
+                                  -selectedAmount / 1.15
+                                )}%)`,
+                                left: `${selectedAmount}%`,
+                              }"
+                            />
+                          </transition>
+                        </div>
+                      </div>
+                      <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
-                          <img
+                          <input
                             v-if="lowerBoundValue && upperBoundValue"
-                            :src="dollars"
-                            class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
-                            :style="{
-                              transform: `translateX(${String(
-                                -selectedAmount / 1.15
-                              )}%)`,
-                              left: `${selectedAmount}%`,
-                            }"
+                            v-model="selectedAmount"
+                            type="range"
+                            min="0"
+                            max="100"
+                            class="range range-sm w-full absolute range-lime-300"
                           />
                         </transition>
                       </div>
-                    </div>
-                    <div class="relative w-full h-5">
-                      <transition name="fadeNav" appear>
-                        <input
-                          v-if="lowerBoundValue && upperBoundValue"
-                          v-model="selectedAmount"
-                          type="range"
-                          min="0"
-                          max="100"
-                          class="range range-sm w-full absolute range-lime-300"
-                        />
-                      </transition>
                     </div>
                   </div>
                 </div>
@@ -716,7 +724,9 @@
 
                 Balance Needed
               </div>
-              <div class="col-span-6 flex justify-center relative">
+              <div
+                class="col-span-full sm:col-span-6 flex justify-center relative"
+              >
                 <transition name="fadeNav" appear>
                   <div
                     v-if="selectedBase"
@@ -768,8 +778,7 @@
                           v-if="!(selectedBase in cryptoDetails)"
                           :key="unknownToken"
                           class="w-7 h-7 fill-primary"
-                        >
-                        </unknownTokenLogo>
+                        ></unknownTokenLogo>
                         <img
                           v-else
                           :key="selectedBase"
@@ -784,7 +793,9 @@
                   </transition>
                 </div>
               </div>
-              <div class="col-span-6 flex justify-center relative">
+              <div
+                class="col-span-full sm:col-span-6 flex justify-center relative"
+              >
                 <transition name="fadeNav" appear>
                   <div
                     v-if="selectedQuote"
@@ -813,8 +824,7 @@
                             v-if="!(selectedQuote in cryptoDetails)"
                             :key="unknownToken"
                             class="w-7 h-7 fill-secondary"
-                          >
-                          </unknownTokenLogo>
+                          ></unknownTokenLogo>
                           <img
                             v-else
                             :key="selectedQuote"
@@ -865,7 +875,9 @@
                 </div>
               </div>
             </div>
-            <div class="col-span-12 p-3 flex justify-center gap-5">
+            <div
+              class="col-span-12 p-3 xl:p-0 2xl:p-3 flex flex-col sm:flex-row justify-center items-center gap-3"
+            >
               <button class="btn btn-primary btn-wide">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
