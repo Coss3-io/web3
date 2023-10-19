@@ -1,6 +1,6 @@
 <template>
   <div class="w-full h-full">
-    <div class="flex flex-col gap-3 items-start h-full">
+    <div class="flex flex-col gap-3 items-start h-full overflow-hidden rounded-xl">
       <div
         class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
       >
@@ -21,7 +21,7 @@
 
         <div>New Bot</div>
       </div>
-      <div class="grow w-full grid place-items-center">
+      <div class="grow w-full grid place-items-center overflow-y-auto custom-scroll">
         <div class="w-full">
           <div
             class="bg-base-300 rounded-xl shadow shadow-black/50 grid grid-cols-12 gap-2 p-2"
