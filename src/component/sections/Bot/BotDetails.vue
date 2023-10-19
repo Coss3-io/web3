@@ -65,10 +65,10 @@
     </div>
     <div class="col-span-full sm:col-span-7 lg:col-span-5 xl:row-span-2">
       <div
-        class="card bg-base-300 h-full text-neutral-content w-full shadow shadow-black/50"
+        class="card bg-base-300 h-full text-neutral-content w-full shadow shadow-black/50 overflow-y-auto custom-scroll"
       >
         <div
-          class="card-body items-center text-center 2xl:gap-10 gap-3 p-5 justify-between max-h-full"
+          class="card-body items-center text-center p-5 justify-between max-h-full"
         >
           <h2
             class="card-title text-primary-content bg-neutral shadow shadow-black/50 rounded-full px-4"
@@ -76,7 +76,7 @@
             Bot #{{ selectedBot?.fees }} Details
           </h2>
           <div
-            class="2xl:grow flex flex-col w-full justify-around bg-neutral rounded-xl p-3 gap-3 font-bold"
+            class="flex flex-col w-full justify-center bg-neutral rounded-xl p-3 gap-3 font-bold pb-4"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -135,7 +135,7 @@
             </div>
           </div>
           <div
-            class="2xl:grow justify-around flex flex-col w-full bg-neutral rounded-xl p-3 gap-3 font-bold"
+            class="justify-around flex flex-col w-full bg-neutral rounded-xl p-3 gap-3 font-bold pb-4"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -218,7 +218,7 @@
             </div>
           </div>
           <div
-            class="2xl:grow justify-around flex flex-col w-full bg-neutral rounded-xl p-3 gap-3 font-bold"
+            class=" justify-around flex flex-col w-full bg-neutral rounded-xl p-3 gap-3 font-bold pb-4"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -285,9 +285,8 @@
               </div>
             </div>
           </div>
-
           <div class="card-actions justify-center">
-            <button class="btn btn-neutral">
+            <button class="btn btn-neutral mb-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
