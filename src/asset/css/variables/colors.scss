@@ -53,3 +53,19 @@
 .range-secondary {
   --range-shdw: 316, 70%, 50%
 }
+
+.greenTrade.even {
+  @apply bg-green-600/10;
+}
+
+.greenTrade.odd{
+  @apply bg-green-900/10;
+}
+
+.redTrade.even {
+  @apply bg-red-600/10;
+}
+
+.redTrade.odd{
+  @apply bg-red-900/10;
+}

@@ -25,7 +25,7 @@
         </div>
       </div>
       <div
-        class="grid grid-cols-12 grid-rows-[min-content_1fr] h-full overflow-hidden gap-4 col-span-7 bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
+        class="grid grid-cols-12 grid-rows-[min-content_1fr_1fr] h-full overflow-hidden gap-2 col-span-7 bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
       >
         <div class="col-span-full justify-self-start items-start">
           <div
@@ -50,8 +50,11 @@
           </div>
         </div>
 
-        <div class="col-span-4 h-full w-full overflow-hidden flex flex-col gap-3 rounded-xl">
+        <div class="col-span-4 row-span-2 h-full w-full rounded-xl">
           <Orderbook :orderDetails="orderDetails"></Orderbook>
+        </div>
+        <div class="col-span-3 row-span-2 h-full w-full rounded-xl">
+          <TradeHistory :tradeHistory="tradeHistory"></TradeHistory>
         </div>
       </div>
       <div
@@ -86,6 +89,8 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import Orderbook from "../sections/Trade/Orderbook.vue"
+import TradeHistory from "../sections/Trade/TradeHistory.vue"
 
 const orderDetails = reactive({"price": 0, "amount": 0})
+const tradeHistory = reactive([{"price": 0, "amount": 0}])
 </script>
