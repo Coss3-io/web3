@@ -23,3 +23,46 @@
 .fadeFast-leave-to {
   opacity: 0;
 }
+
+.listBuy-move, 
+.listBuy-enter-active,
+.listBuy-leave-active,
+.listSell-move, 
+.listSell-enter-active,
+.listSell-leave-active {
+  transition: all 0.5s ease;
+}
+
+.listBuy-enter-from,
+.listBuy-leave-to,
+.listSell-enter-from,
+.listSell-leave-to {
+  opacity: 0;
+}
+
+.listSell-leave-to {
+  opacity: 0;
+  transform: translate(30px, -18px);
+}
+
+.listSell-enter-from {
+  opacity: 0;
+  transform: translate(30px);
+}
+
+.listBuy-enter-from,
+.listBuy-leave-to {
+  opacity: 0;
+  transform: translate(30px);
+}
+
+.listBuy-enter-active,
+.listSell-enter-active {
+  z-index: 10;
+}
+
+.listBuy-leave-active,
+.listSell-leave-active {
+  position: absolute;
+  z-index: 1;
+}
