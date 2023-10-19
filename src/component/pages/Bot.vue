@@ -3,7 +3,7 @@
     <div
       class="grid grid-cols-12 grid-rows-[min-content_1fr] bg-base-300 rounded-lg p-5 w-full xl:h-[calc(100vh-110px)] gap-3"
     >
-      <div class="col-span-full flex justify-start">
+      <div class="col-span-full m-2 flex justify-start">
         <div class="tooltip" data-tip="click for help">
           <button class="flex gap-4 btn btn-ghost text-4xl font-bold">
             <svg
