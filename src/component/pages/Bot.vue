@@ -62,8 +62,7 @@
                 <input
                   type="checkbox"
                   class="toggle toggle-primary col-start-2"
-                  @click="cardView = !cardView"
-                  checked
+                  v-model="cardView"
                 />
                 <span
                   class="label-text font-bold swap-on flex items-center gap-1"

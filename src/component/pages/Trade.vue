@@ -56,6 +56,12 @@
         <div class="col-span-3 row-span-2 h-full w-full rounded-xl">
           <TradeHistory :tradeHistory="tradeHistory"></TradeHistory>
         </div>
+        <div class="col-span-5 h-full w-full rounded-xl">
+          <BalancesDetails :balancesDetails="balancesDetails"></BalancesDetails>
+        </div>
+        <div class="col-span-5 h-full w-full rounded-xl">
+          <NewOrder :newOrder="newOrder"></NewOrder>
+        </div>
       </div>
       <div
         class="flex col-span-5 bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
@@ -88,9 +94,13 @@
 </template>
 <script setup lang="ts">
 import { reactive } from "vue";
-import Orderbook from "../sections/Trade/Orderbook.vue"
-import TradeHistory from "../sections/Trade/TradeHistory.vue"
+import Orderbook from "../sections/Trade/Orderbook.vue";
+import TradeHistory from "../sections/Trade/TradeHistory.vue";
+import NewOrder from "../sections/Trade/NewOrder.vue";
+import BalancesDetails from "../sections/Trade/BalancesDetails.vue";
 
-const orderDetails = reactive({"price": 0, "amount": 0})
-const tradeHistory = reactive([{"price": 0, "amount": 0}])
+const orderDetails = reactive({ price: 0, amount: 0 });
+const tradeHistory = reactive([{ price: 0, amount: 0 }]);
+const newOrder = reactive([{ price: 0, amount: 0 }]);
+const balancesDetails = reactive([{ price: 0, amount: 0 }]);
 </script>
