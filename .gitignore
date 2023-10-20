@@ -2,7 +2,9 @@ node_modules/
 **/.DS_Store
 src/**/.DS_Store
 build/
-types/
+typechain-types/
+artifacts/
+cache/
 dist/
 mnemonic.txt
 testnetMnemonic.txt
