@@ -3,13 +3,15 @@
     "outDir": "./dist/",
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "target": "ESNext",
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "module": "commonjs",
+    "target": "es2020",
     "jsx": "preserve",
-    "allowJs": true,
     "moduleResolution": "node",
     "noImplicitAny": true,
     "strict": true,
+    "resolveJsonModule": true,
     "removeComments": true,
     "types": [
       "node",
@@ -40,6 +42,13 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+    "./scripts",
+    "./test",
+    "./typechain-types",
+    "hardhat.config.ts"
   ],
+  "files": [
+    "hardhat.config.ts"
+  ]
 }
