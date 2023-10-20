@@ -1,17 +1,17 @@
 import BigNumber from "bignumber.js";
-import { CossInstance } from "../types/truffle-contracts";
+import { ethers } from "hardhat";
+import { assert } from "chai";
+import { Coss } from "../typechain-types";
 
-const Coss = artifacts.require("Coss");
-
-contract("Test: Coss token deployment", (accounts: Truffle.Accounts) => {
-  let coss: CossInstance;
-
+describe("Test: Coss token deployment", async () => {
+  let coss: Coss
   before(async () => {
-    coss = await Coss.deployed();
-  });
+    coss = await ethers.deployContract("Coss")
+  })
 
   it("Checks the initial amount of coss is sent to the sender", async () => {
-    const balance = await coss.balanceOf(accounts[0]);
+    const [owner] = await ethers.getSigners()
+    const balance = await coss.balanceOf(owner);
     assert.equal(balance.toString(), new BigNumber("5e24").toFixed());
   });
 });

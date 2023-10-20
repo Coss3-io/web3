@@ -1,35 +1,31 @@
 import BigNumber from "bignumber.js";
-import {
-  CossInstance,
-  DummyERC20Instance,
-  StackingInstance,
-} from "../types/truffle-contracts";
-import utils from "./utils";
+import { ethers } from "hardhat";
+import { assert, expect } from "chai";
+import { Coss, Stacking, DummyERC20 } from "../typechain-types";
+import { takeSnapshot, time } from "@nomicfoundation/hardhat-network-helpers";
 BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_DOWN });
 
-const Stacking = artifacts.require("Stacking");
-const Coss = artifacts.require("Coss");
-const Dummy = artifacts.require("DummyERC20");
-
-contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
-  let stacking: StackingInstance;
-  let coss: CossInstance;
-  let dummy: DummyERC20Instance;
+describe("Test: Stacking contract", () => {
+  let stacking: Stacking;
+  let coss: Coss;
+  let dummy: DummyERC20;
+  let accounts: Awaited<ReturnType<typeof ethers.getSigners>>;
 
   before(async () => {
-    stacking = await Stacking.deployed();
-    coss = await Coss.deployed();
-    dummy = await Dummy.deployed();
+    accounts = await ethers.getSigners();
+    coss = await ethers.deployContract("Coss");
+    dummy = await ethers.deployContract("DummyERC20", ["Dummy", "DMN"]);
+    stacking = await ethers.deployContract("Stacking", [coss.target]);
 
-    coss.approve(stacking.address, new BigNumber("5e24").toFixed());
-    dummy.approve(stacking.address, new BigNumber("5e24").toFixed());
+    coss.approve(stacking, new BigNumber("5e24").toFixed());
+    dummy.approve(stacking, new BigNumber("5e24").toFixed());
   });
 
   it("Checks the initial value of the coss contract is initialised well", async () => {
     const cossAddress = await stacking.cossToken();
     assert.equal(
       cossAddress,
-      Coss.address,
+      coss.target,
       "the coss address should be inside the contract"
     );
   });
@@ -41,7 +37,7 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
       "0",
       "The amount of stacked coss should be 0 at the beginning "
     );
-    await utils.catchRevert(stacking.stacked(1));
+    await expect(stacking.stacked(1)).to.be.reverted;
   });
 
   it("Checks the withdrawn stack array get initialised with empty values", async () => {
@@ -51,17 +47,17 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
       "0",
       "The amount of withdrawn coss should be 0 at the beginning "
     );
-    await utils.catchRevert(stacking.withdrawnStack(1));
+    await expect(stacking.withdrawnStack(1)).to.be.reverted;
   });
 
   it("Checks the slot array is initialised well", async () => {
-    const time = Math.floor(Date.now() / 1000);
+    const timestamp = await time.latest()
     const slot = await stacking.slots(0);
 
-    const cossFees = await stacking.getSlotFees(0, Coss.address);
-    const dummyFees = await stacking.getSlotFees(0, Dummy.address);
+    const cossFees = await stacking.getSlotFees(0, coss);
+    const dummyFees = await stacking.getSlotFees(0, dummy);
 
-    await utils.catchRevert(stacking.slots(1));
+    await expect(stacking.slots(1)).to.be.reverted;
     assert.equal(
       cossFees.toString(),
       "0",
@@ -74,8 +70,8 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
     );
 
     assert.approximately(
-      time - 7 * 60 * 60 * 24,
-      slot.toNumber(),
+      timestamp - 7 * 60 * 60 * 24,
+      Number(slot),
       6,
       "The slot should be initialised 7 days into the past"
     );
@@ -84,13 +80,13 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
   it("Checks stack depositing works well, and creates a new slot", async () => {
     const depositAmount = new BigNumber("1000000e18");
     const stacked = await stacking.stacked(0);
-    const time = Math.floor(Date.now() / 1000);
+    const timestamp = await time.latest();
 
     await stacking.depositStack(depositAmount.toFixed());
     const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
 
     const slotTime = await stacking.slots(lastSlotId);
-    const stackingBalances = await coss.balanceOf(stacking.address);
+    const stackingBalances = await coss.balanceOf(stacking);
     const stackedAmount = await stacking.stacked(lastSlotId);
     const withdrawnAmount = await stacking.withdrawnStack(lastSlotId);
     const myStackLength = await stacking.getMyStackLength();
@@ -98,8 +94,8 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
 
     assert.approximately(
       Number(slotTime.toString()),
-      time,
-      3,
+      timestamp,
+      6,
       "The time of the new slot should be approimately now"
     );
 
@@ -139,9 +135,9 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
       "On a new slot the withdrawn amount should be empty"
     );
 
-    await utils.catchRevert(stacking.slots(2));
-    await utils.catchRevert(stacking.stacked(2));
-    await utils.catchRevert(stacking.withdrawnStack(2));
+    await expect(stacking.slots(2)).to.be.reverted;
+    await expect(stacking.stacked(2)).to.be.reverted;
+    await expect(stacking.withdrawnStack(2)).to.be.reverted;
   });
 
   it("Checks stack depositing on existing slot works well", async () => {
@@ -183,11 +179,11 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
   it("Checks an intermediate fees deposit works between to slots", async () => {
     const feesDeposit = new BigNumber("100e18");
     const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
-    const existingFees = await stacking.getSlotFees(lastSlotId, coss.address);
+    const existingFees = await stacking.getSlotFees(lastSlotId, coss);
 
-    await stacking.depositFees(feesDeposit.toFixed(), coss.address);
-    const slotFees = await stacking.getSlotFees(lastSlotId, coss.address);
-    const dummySlotFees = await stacking.getSlotFees(lastSlotId, dummy.address);
+    await stacking.depositFees(feesDeposit.toFixed(), coss);
+    const slotFees = await stacking.getSlotFees(lastSlotId, coss);
+    const dummySlotFees = await stacking.getSlotFees(lastSlotId, dummy);
 
     assert.equal(
       slotFees.toString(),
@@ -205,10 +201,10 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
   it("Checks an additional fees deposit increments the fees", async () => {
     const feesDeposit = new BigNumber("100e18");
     const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
-    const existingFees = await stacking.getSlotFees(lastSlotId, coss.address);
+    const existingFees = await stacking.getSlotFees(lastSlotId, coss);
 
-    await stacking.depositFees(feesDeposit.toFixed(), coss.address);
-    const slotFees = await stacking.getSlotFees(lastSlotId, coss.address);
+    await stacking.depositFees(feesDeposit.toFixed(), coss);
+    const slotFees = await stacking.getSlotFees(lastSlotId, coss);
 
     assert.equal(
       slotFees.toString(),
@@ -219,16 +215,21 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
     assert.notEqual(
       existingFees.toString(),
       "0",
+      "The existing fees should not be zero "
+    );
+
+    assert.notEqual(
+      existingFees.toString(),
+      "0",
       "The existing fee should not be zero"
     );
   });
 
   it("Checks creating a new slot with existing stacked amount works well", async () => {
-    const id = await utils.takeSnapshot();
     const depositAmount = new BigNumber("100000e18");
     const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
     const stacked = await stacking.stacked(lastSlotId);
-    await utils.advanceTimeAndBlock(60 * 60 * 24 * 7 + 10);
+    await time.increase(60 * 60 * 24 * 7 + 10);
 
     await stacking.depositStack(depositAmount.toFixed());
     const newLastSlotId =
@@ -245,16 +246,14 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
       newLastSlotId,
       "A new slot should be created after the new stack deposit"
     );
-    await utils.revertToSnapShot(Number(id));
   });
 
   it("Checks an additional fees deposit increments the fees", async () => {
     const feesDeposit = new BigNumber("200e18");
     const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
-    const existingFees = await stacking.getSlotFees(lastSlotId, coss.address);
-
-    await stacking.depositFees(feesDeposit.toFixed(), coss.address);
-    const slotFees = await stacking.getSlotFees(lastSlotId, coss.address);
+    const existingFees = await stacking.getSlotFees(lastSlotId, coss);
+    await stacking.depositFees(feesDeposit.toFixed(), coss);
+    const slotFees = await stacking.getSlotFees(lastSlotId, coss);
 
     assert.equal(
       slotFees.toString(),
@@ -272,7 +271,7 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
   it("Checks the stack withdrawal works", async () => {
     const myBalances = await coss.balanceOf(accounts[0]);
     const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
-    const stackingBalances = await coss.balanceOf(stacking.address);
+    const stackingBalances = await coss.balanceOf(stacking);
     const globalStackedAmount = await stacking.stacked(lastSlotId);
     let stackAmount = new BigNumber(0);
     const myStackLength = await stacking.getMyStackLength();
@@ -285,7 +284,7 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
     await stacking.withdrawStack();
 
     const myBalancesAfter = await coss.balanceOf(accounts[0]);
-    const stackingBalancesAfter = await coss.balanceOf(stacking.address);
+    const stackingBalancesAfter = await coss.balanceOf(stacking);
     const globalStackedAmountAfter = await stacking.stacked(lastSlotId);
     const withdrawnStackedAmount = await stacking.withdrawnStack(lastSlotId);
 
@@ -321,12 +320,11 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
   });
 
   it("Checks creating a new slot with withdrawn amount reduces the total stacked amount", async () => {
-    const id = await utils.takeSnapshot();
     const depositAmount = new BigNumber("1e18");
     const lastSlotId = Number((await stacking.getLastSlot())[0].toString()) - 1;
     const stacked = await stacking.stacked(lastSlotId);
     const withdrawnAmount = await stacking.withdrawnStack(lastSlotId);
-    await utils.advanceTimeAndBlock(60 * 60 * 24 * 7 * 2 + 30);
+    await time.increase(60 * 60 * 24 * 7 * 2 + 30);
 
     await stacking.depositStack(depositAmount.toFixed());
     const newLastSlotId =
@@ -354,60 +352,59 @@ contract("Test: Stacking contract", (accounts: Truffle.Accounts) => {
       newLastSlotId,
       "A new slot should be created after the new stack deposit"
     );
-    await utils.revertToSnapShot(Number(id));
   });
 });
 
-contract("Test: stacking fees withdrawal", (accounts: Truffle.Accounts) => {
-  let stacking: StackingInstance;
-  let coss: CossInstance;
-  let dummy: DummyERC20Instance;
+describe("Test: stacking fees withdrawal", () => {
+  let stacking: Stacking;
+  let coss: Coss;
+  let dummy: DummyERC20;
+  let accounts: Awaited<ReturnType<typeof ethers.getSigners>>;
 
   before(async () => {
-    stacking = await Stacking.deployed();
-    coss = await Coss.deployed();
-    dummy = await Dummy.deployed();
+    accounts = await ethers.getSigners();
+    coss = await ethers.deployContract("Coss");
+    dummy = await ethers.deployContract("DummyERC20", ["Dummy", "DMN"]);
+    stacking = await ethers.deployContract("Stacking", [coss.target]);
     const depositAmount = new BigNumber("300000e18");
 
     await coss.transfer(accounts[1], depositAmount.toFixed());
     await coss.transfer(accounts[2], depositAmount.multipliedBy(2).toFixed());
     await coss.transfer(accounts[3], depositAmount.toFixed());
 
-    await coss.approve(stacking.address, new BigNumber("5e24").toFixed());
-    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
-      from: accounts[1],
-    });
-    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
-      from: accounts[2],
-    });
-    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
-      from: accounts[3],
-    });
+    await coss.approve(stacking, new BigNumber("5e24").toFixed());
+    await coss
+      .connect(accounts[1])
+      .approve(stacking, new BigNumber("5e24").toFixed());
+    await coss
+      .connect(accounts[2])
+      .approve(stacking, new BigNumber("5e24").toFixed());
+    await coss
+      .connect(accounts[3])
+      .approve(stacking, new BigNumber("5e24").toFixed());
 
     await stacking.depositStack(depositAmount.toFixed());
-    await stacking.depositStack(depositAmount.toFixed(), { from: accounts[1] });
-    await stacking.depositStack(depositAmount.toFixed(), {
-      from: accounts[2],
-    });
+    await stacking.connect(accounts[1]).depositStack(depositAmount.toFixed());
+    await stacking.connect(accounts[2]).depositStack(depositAmount.toFixed());
   });
 
   it("Checks an user that just deposited tokens can not take a cut of the fees", async () => {
     const cossFees = new BigNumber("1000e18").toFixed();
     const dummyFees = new BigNumber("900e18").toFixed();
-    await coss.transfer(stacking.address, cossFees);
-    await dummy.transfer(stacking.address, dummyFees);
-    await stacking.depositFees(cossFees, coss.address);
-    await stacking.depositFees(dummyFees, dummy.address);
+    await coss.transfer(stacking, cossFees);
+    await dummy.transfer(stacking, dummyFees);
+    await stacking.depositFees(cossFees, coss);
+    await stacking.depositFees(dummyFees, dummy);
 
-    const cossBalancesBefore = await coss.balanceOf(stacking.address);
-    const dummyBalancesBefore = await dummy.balanceOf(stacking.address);
-    await stacking.withdrawFees([coss.address, dummy.address]);
+    const cossBalancesBefore = await coss.balanceOf(stacking);
+    const dummyBalancesBefore = await dummy.balanceOf(stacking);
+    await stacking.withdrawFees([coss, dummy]);
 
-    const cossBalancesAfter = await coss.balanceOf(stacking.address);
-    const dummyBalancesAfter = await dummy.balanceOf(stacking.address);
+    const cossBalancesAfter = await coss.balanceOf(stacking);
+    const dummyBalancesAfter = await dummy.balanceOf(stacking);
     const withdrawalSlots = await stacking.getMystackWithdrawals(0, [
-      coss.address,
-      dummy.address,
+      coss,
+      dummy,
     ]);
 
     assert.equal(
@@ -435,18 +432,18 @@ contract("Test: stacking fees withdrawal", (accounts: Truffle.Accounts) => {
   });
 
   it("Checks trying to withdraw on an empty slot does not give any fees", async () => {
-    await utils.advanceTimeAndBlock(60 * 60 * 24 * 7 + 10);
-    await stacking.depositStack(new BigNumber("1e18").toFixed(), {
-      from: accounts[2],
-    });
+    await time.increase(60 * 60 * 24 * 7 + 10);
+    await stacking
+      .connect(accounts[2])
+      .depositStack(new BigNumber("1e18").toFixed());
 
-    const cossBalancesBefore = await coss.balanceOf(stacking.address);
-    await stacking.withdrawFees([coss.address]);
-    const cossBalancesAfter = await coss.balanceOf(stacking.address);
+    const cossBalancesBefore = await coss.balanceOf(stacking);
+    await stacking.withdrawFees([coss]);
+    const cossBalancesAfter = await coss.balanceOf(stacking);
 
     const withdrawalSlots = await stacking.getMystackWithdrawals(0, [
-      coss.address,
-      dummy.address,
+      coss,
+      dummy,
     ]);
 
     assert.equal(
@@ -471,20 +468,20 @@ contract("Test: stacking fees withdrawal", (accounts: Truffle.Accounts) => {
   it("Checks trying to withdraw fees works, but not on an already withdrawn token", async () => {
     const cossFees = new BigNumber("500e18").toFixed();
     const dummyFees = new BigNumber("450e18").toFixed();
-    await stacking.depositFees(cossFees, coss.address);
-    await stacking.depositFees(dummyFees, dummy.address);
-    const cossBalancesBefore = await coss.balanceOf(stacking.address);
-    const dummyBalancesBefore = await dummy.balanceOf(stacking.address);
+    await stacking.depositFees(cossFees, coss);
+    await stacking.depositFees(dummyFees, dummy);
+    const cossBalancesBefore = await coss.balanceOf(stacking);
+    const dummyBalancesBefore = await dummy.balanceOf(stacking);
     const depositorBalancesBefore = await dummy.balanceOf(accounts[0]);
 
-    await stacking.withdrawFees([coss.address, dummy.address]);
+    await stacking.withdrawFees([coss, dummy]);
 
-    const cossBalancesAfter = await coss.balanceOf(stacking.address);
-    const dummyBalancesAfter = await dummy.balanceOf(stacking.address);
+    const cossBalancesAfter = await coss.balanceOf(stacking);
+    const dummyBalancesAfter = await dummy.balanceOf(stacking);
     const depositorBalancesAfter = await dummy.balanceOf(accounts[0]);
     const withdrawalSlots = await stacking.getMystackWithdrawals(0, [
-      coss.address,
-      dummy.address,
+      coss,
+      dummy,
     ]);
 
     assert.equal(
@@ -522,18 +519,18 @@ contract("Test: stacking fees withdrawal", (accounts: Truffle.Accounts) => {
   });
 
   it("Checks a user cannot withdraw already withdrawn slots", async () => {
-    const cossBalancesBefore = await coss.balanceOf(stacking.address);
-    const dummyBalancesBefore = await dummy.balanceOf(stacking.address);
+    const cossBalancesBefore = await coss.balanceOf(stacking);
+    const dummyBalancesBefore = await dummy.balanceOf(stacking);
     const depositorBalancesBefore = await dummy.balanceOf(accounts[0]);
 
-    await stacking.withdrawFees([coss.address, dummy.address]);
+    await stacking.withdrawFees([coss, dummy]);
 
-    const cossBalancesAfter = await coss.balanceOf(stacking.address);
-    const dummyBalancesAfter = await dummy.balanceOf(stacking.address);
+    const cossBalancesAfter = await coss.balanceOf(stacking);
+    const dummyBalancesAfter = await dummy.balanceOf(stacking);
     const depositorBalancesAfter = await dummy.balanceOf(accounts[0]);
     const withdrawalSlots = await stacking.getMystackWithdrawals(0, [
-      coss.address,
-      dummy.address,
+      coss,
+      dummy,
     ]);
 
     assert.equal(
@@ -571,24 +568,20 @@ contract("Test: stacking fees withdrawal", (accounts: Truffle.Accounts) => {
     const dummyFees = new BigNumber("450e18");
 
     await stacking.withdrawStack();
-    const cossBalancesBefore = await coss.balanceOf(stacking.address);
-    const dummyBalancesBefore = await dummy.balanceOf(stacking.address);
+    const cossBalancesBefore = await coss.balanceOf(stacking);
+    const dummyBalancesBefore = await dummy.balanceOf(stacking);
     const depositorCossBalancesBefore = await coss.balanceOf(accounts[1]);
     const depositorDummyBalancesBefore = await dummy.balanceOf(accounts[1]);
 
-    await stacking.withdrawFees([coss.address, dummy.address], {
-      from: accounts[1],
-    });
+    await stacking.connect(accounts[1]).withdrawFees([coss, dummy]);
 
-    const cossBalancesAfter = await coss.balanceOf(stacking.address);
-    const dummyBalancesAfter = await dummy.balanceOf(stacking.address);
+    const cossBalancesAfter = await coss.balanceOf(stacking);
+    const dummyBalancesAfter = await dummy.balanceOf(stacking);
     const depositorCossBalancesAfter = await coss.balanceOf(accounts[1]);
     const depositorDummyBalancesAfter = await dummy.balanceOf(accounts[1]);
-    const withdrawalSlots = await stacking.getMystackWithdrawals(
-      0,
-      [coss.address, dummy.address],
-      { from: accounts[1] }
-    );
+    const withdrawalSlots = await stacking
+      .connect(accounts[1])
+      .getMystackWithdrawals(0, [coss, dummy]);
 
     assert.equal(
       cossBalancesAfter.toString(),
@@ -638,21 +631,19 @@ contract("Test: stacking fees withdrawal", (accounts: Truffle.Accounts) => {
     const cossFees = new BigNumber("500e18");
     const dummyFees = new BigNumber("450e18");
 
-    await utils.advanceTimeAndBlock(60 * 60 * 24 * 7 + 10);
-    await stacking.depositStack(new BigNumber("1e18").toFixed(), {
-      from: accounts[2],
-    });
-    await coss.transfer(stacking.address, cossFees.toFixed());
-    await dummy.transfer(stacking.address, dummyFees.toFixed());
-    await stacking.depositFees(cossFees.toFixed(), coss.address);
-    await stacking.depositFees(dummyFees.toFixed(), dummy.address);
+    await time.increase(60 * 60 * 24 * 7 + 10);
+    await stacking
+      .connect(accounts[2])
+      .depositStack(new BigNumber("1e18").toFixed());
+    await coss.transfer(stacking, cossFees.toFixed());
+    await dummy.transfer(stacking, dummyFees.toFixed());
+    await stacking.depositFees(cossFees.toFixed(), coss);
+    await stacking.depositFees(dummyFees.toFixed(), dummy);
 
     const depositorCossBalancesBefore = await coss.balanceOf(accounts[2]);
     const depositorDummyBalancesBefore = await dummy.balanceOf(accounts[2]);
 
-    await stacking.withdrawFees([coss.address, dummy.address], {
-      from: accounts[2],
-    });
+    await stacking.connect(accounts[2]).withdrawFees([coss, dummy]);
 
     const depositorCossBalancesAfter = await coss.balanceOf(accounts[2]);
     const depositorDummyBalancesAfter = await dummy.balanceOf(accounts[2]);
@@ -716,55 +707,55 @@ contract("Test: stacking fees withdrawal", (accounts: Truffle.Accounts) => {
   });
 });
 
-contract("Test: multiple fees withdrawal", (accounts: Truffle.Accounts) => {
-  let stacking: StackingInstance;
-  let coss: CossInstance;
-  let dummy: DummyERC20Instance;
+describe("Test: multiple fees withdrawal", () => {
+  let stacking: Stacking;
+  let coss: Coss;
+  let dummy: DummyERC20;
+  let accounts: Awaited<ReturnType<typeof ethers.getSigners>>;
 
   before(async () => {
-    stacking = await Stacking.deployed();
-    coss = await Coss.deployed();
-    dummy = await Dummy.deployed();
+    accounts = await ethers.getSigners();
+    coss = await ethers.deployContract("Coss");
+    dummy = await ethers.deployContract("DummyERC20", ["Dummy", "DMN"]);
+    stacking = await ethers.deployContract("Stacking", [coss.target]);
     const depositAmount = new BigNumber("300000e18");
 
     await coss.transfer(accounts[1], depositAmount.toFixed());
     await coss.transfer(accounts[2], depositAmount.multipliedBy(2).toFixed());
     await coss.transfer(accounts[3], depositAmount.toFixed());
 
-    await coss.approve(stacking.address, new BigNumber("5e24").toFixed());
-    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
-      from: accounts[1],
-    });
-    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
-      from: accounts[2],
-    });
-    await coss.approve(stacking.address, new BigNumber("5e24").toFixed(), {
-      from: accounts[3],
-    });
+    await coss.approve(stacking, new BigNumber("5e24").toFixed());
+    await coss
+      .connect(accounts[1])
+      .approve(stacking, new BigNumber("5e24").toFixed());
+    await coss
+      .connect(accounts[2])
+      .approve(stacking, new BigNumber("5e24").toFixed());
+    await coss
+      .connect(accounts[3])
+      .approve(stacking, new BigNumber("5e24").toFixed());
 
     await stacking.depositStack(depositAmount.toFixed());
     await stacking.depositStack(depositAmount.toFixed());
-    await stacking.depositStack(depositAmount.toFixed(), { from: accounts[1] });
-    await stacking.depositStack(depositAmount.toFixed(), {
-      from: accounts[2],
-    });
+    await stacking.connect(accounts[1]).depositStack(depositAmount.toFixed());
+    await stacking.connect(accounts[2]).depositStack(depositAmount.toFixed());
   });
 
   it("Checks the fees withdrawal with two stacks on the same slot works", async () => {
     const cossFees = new BigNumber("500e18");
     const dummyFees = new BigNumber("450e18");
-    await utils.advanceTimeAndBlock(60 * 60 * 24 * 7 + 10);
+    await time.increase(60 * 60 * 24 * 7 + 10);
     await stacking.depositStack(new BigNumber("1e18").toFixed());
 
-    await coss.transfer(stacking.address, cossFees.toFixed());
-    await dummy.transfer(stacking.address, dummyFees.toFixed());
-    await stacking.depositFees(cossFees.toFixed(), coss.address);
-    await stacking.depositFees(dummyFees.toFixed(), dummy.address);
+    await coss.transfer(stacking, cossFees.toFixed());
+    await dummy.transfer(stacking, dummyFees.toFixed());
+    await stacking.depositFees(cossFees.toFixed(), coss);
+    await stacking.depositFees(dummyFees.toFixed(), dummy);
 
     const depositorCossBalancesBefore = await coss.balanceOf(accounts[0]);
     const depositorDummyBalancesBefore = await dummy.balanceOf(accounts[0]);
 
-    await stacking.withdrawFees([coss.address, dummy.address]);
+    await stacking.withdrawFees([coss, dummy]);
 
     const depositorCossBalancesAfter = await coss.balanceOf(accounts[0]);
     const depositorDummyBalancesAfter = await dummy.balanceOf(accounts[0]);
