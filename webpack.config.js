@@ -89,6 +89,10 @@ module.exports = {
             options: {
               appendTsSuffixTo: [/\.vue$/],
               transpileOnly: !("DEV" in process.env),
+              compilerOptions: {
+                module: "ESNext",
+                moduleResolution: "Node10"
+              },
             },
           },
         ],
