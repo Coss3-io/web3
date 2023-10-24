@@ -1,7 +1,7 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
-  content: ["./src/**/*.vue", "./public/index.html"],
+  content: ["./src/**/*.vue", "./src/types/*.ts","./public/index.html"],
   theme: {
     extend: {
       keyframes: {
