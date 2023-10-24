@@ -5,7 +5,7 @@
   >
     <div class="col-span-full">
       <div
-        class="flex gap-2 items-center text-xs font-bold px-4 py-0.5 rounded-full bg-neutral shadow-sm shadow-black"
+        class="flex gap-2 items-center text-md font-bold px-4 py-0.5 rounded-full bg-neutral shadow-sm shadow-black"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -13,7 +13,7 @@
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="w-5 h-5"
+          class="w-6 h-6"
         >
           <path
             stroke-linecap="round"
