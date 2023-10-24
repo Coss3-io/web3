@@ -33,21 +33,21 @@
             v-if="quote in cryptoLogo"
             :src="<string>cryptoLogo[quote]"
             alt="token"
-            class="swap-on w-5 h-5"
+            class="swap-off w-5 h-5"
           />
           <unknownTokenLogo
             v-else
-            class="swap-on fill-secondary h-5 w-5"
+            class="swap-off fill-secondary h-5 w-5"
           ></unknownTokenLogo>
           <img
             v-if="base in cryptoLogo"
             :src="<string>cryptoLogo[base]"
             alt="token"
-            class="swap-off w-5 h-5"
+            class="swap-on w-5 h-5"
           />
           <unknownTokenLogo
             v-else
-            class="swap-off fill-primary h-5 w-5"
+            class="swap-on fill-primary h-5 w-5"
           ></unknownTokenLogo>
         </div>
         <input
@@ -77,21 +77,21 @@
             v-if="base in cryptoLogo"
             :src="<string>cryptoLogo[base]"
             alt="token"
-            class="swap-on w-5 h-5"
+            class="swap-off w-5 h-5"
           />
           <unknownTokenLogo
             v-else
-            class="swap-on fill-primary w-5 h-5"
+            class="swap-off fill-primary w-5 h-5"
           ></unknownTokenLogo>
           <img
             v-if="quote in cryptoLogo"
             :src="<string>cryptoLogo[quote]"
             alt="token"
-            class="swap-off w-5 h-5"
+            class="swap-on w-5 h-5"
           />
           <unknownTokenLogo
             v-else
-            class="swap-off fill-secondary h-5 w-5"
+            class="swap-on fill-secondary h-5 w-5"
           ></unknownTokenLogo>
         </div>
       </div>
