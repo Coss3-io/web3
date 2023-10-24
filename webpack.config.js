@@ -69,9 +69,9 @@ module.exports = {
               postcssOptions: {
                 plugins: [
                   "postcss-import",
-                  "autoprefixer",
+                  "tailwindcss/nesting",
                   "tailwindcss",
-                  "postcss-nesting",
+                  "autoprefixer",
                 ],
               },
             },
@@ -132,7 +132,7 @@ module.exports = {
         nodir: true,
       }),
       safelist: {
-        greedy: [/\-|\:|\[|\//, /fade.*/],
+      greedy: [/\-|\:|\[|\//, /fade.*/],
       },
     }),
     new DefinePlugin({
