@@ -313,7 +313,7 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${lowerBoundValue}%` }"
+                            :style="{ width: `${Math.min(100,lowerBoundValue)}%` }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <unknownTokenLogo
@@ -324,9 +324,9 @@
                               class="w-7 h-7 fill-primary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -lowerBoundValue / 1.15
-                                )}%)`,
-                                left: `${lowerBoundValue}%`,
+                                  -Math.min(100,lowerBoundValue) / 1.15)
+                                }%)`,
+                                left: `${Math.min(100,lowerBoundValue)}%`,
                               }"
                             ></unknownTokenLogo>
                             <img
@@ -338,9 +338,9 @@
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -lowerBoundValue / 1.15
+                                  -Math.min(100,lowerBoundValue) / 1.15
                                 )}%)`,
-                                left: `${lowerBoundValue}%`,
+                                left: `${Math.min(100,lowerBoundValue)}%`,
                               }"
                             />
                           </transition>
@@ -399,7 +399,7 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${upperBoundValue}%` }"
+                            :style="{ width: `${Math.min(upperBoundValue, 100)}%` }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <img
@@ -411,9 +411,9 @@
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -upperBoundValue / 1.15
+                                  -Math.min(100,upperBoundValue) / 1.15
                                 )}%)`,
-                                left: `${upperBoundValue}%`,
+                                left: `${Math.min(100,upperBoundValue)}%`,
                               }"
                             />
                             <unknownTokenLogo
@@ -424,9 +424,9 @@
                               class="w-7 h-7 fill-secondary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -upperBoundValue / 1.15
+                                  -Math.min(100,upperBoundValue / 1.15)
                                 )}%)`,
-                                left: `${upperBoundValue}%`,
+                                left: `${Math.min(100,upperBoundValue)}%`,
                               }"
                             ></unknownTokenLogo>
                           </transition>
@@ -525,7 +525,7 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${selectedStep}%` }"
+                            :style="{ width: `${Math.min(100,selectedStep)}%` }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <svg
@@ -533,9 +533,9 @@
                               class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -selectedStep / 1.15
+                                  -Math.min(100,selectedStep) / 1.15
                                 )}%)`,
-                                left: `${selectedStep}%`,
+                                left: `${Math.min(100,selectedStep)}%`,
                               }"
                               version="1.1"
                               id="Capa_1"
@@ -606,7 +606,7 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${selectedFees}%` }"
+                            :style="{ width: `${Math.min(100,selectedFees)}%` }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <img
@@ -615,9 +615,9 @@
                               class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -selectedFees / 1.15
+                                  -Math.min(100,selectedFees) / 1.15
                                 )}%)`,
-                                left: `${selectedFees}%`,
+                                left: `${Math.min(100,selectedFees)}%`,
                               }"
                             />
                           </transition>
@@ -667,7 +667,7 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${selectedAmount}%` }"
+                            :style="{ width: `${Math.min(100,selectedAmount)}%` }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <img
@@ -676,9 +676,9 @@
                               class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -selectedAmount / 1.15
+                                  -Math.min(100,selectedAmount) / 1.15
                                 )}%)`,
-                                left: `${selectedAmount}%`,
+                                left: `${Math.min(100,selectedAmount)}%`,
                               }"
                             />
                           </transition>
