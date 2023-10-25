@@ -10,10 +10,14 @@
       <div>total</div>
     </div>
     <div
+      ref="sellContainer"
       class="h-full relative flex flex-col-reverse overflow-y-auto overflow-x-hidden custom-scroll gap-0.5 rounded-xl"
     >
       <TransitionGroup name="listSell" tag="div">
-        <div v-for="n in 3" class="flex text-center text-[11px] font-bold">
+        <div
+          v-for="n in (sellOrders.length * 24 < sellContainer?.clientHeight! ? Math.floor((sellContainer?.clientHeight! - sellOrders.length * 24 )/16): 0)"
+          class="flex text-center text-[11px] font-bold h-4 -z-10"
+        >
           <div class="w-1/3">-</div>
           <div class="w-1/3">-</div>
           <div class="w-1/3">-</div>
@@ -41,6 +45,7 @@
       <div class="font-sans">6798</div>
     </div>
     <div
+      ref="buyContainer"
       class="h-full flex relative flex-col overflow-y-auto overflow-x-hidden custom-scroll gap-0.5 rounded-xl rounded-t-md"
     >
       <TransitionGroup name="listBuy" tag="div">
@@ -57,7 +62,10 @@
             <div class="w-1/3">{{ total }}</div>
           </div>
         </div>
-        <div v-for="n in 3" class="flex text-center text-[11px] font-bold">
+        <div
+          v-for="n in (sellOrders.length * 24 < buyContainer?.clientHeight! ? Math.floor((buyContainer?.clientHeight! - sellOrders.length * 24 )/16): 0)"
+          class="flex text-center text-[11px] font-bold h-4 -z-10"
+        >
           <div class="w-1/3">-</div>
           <div class="w-1/3">-</div>
           <div class="w-1/3">-</div>
@@ -72,6 +80,8 @@ import { ref } from "vue";
 const props = defineProps<{
   orderDetails: { price: number; amount: number };
 }>();
+const sellContainer = ref<HTMLDivElement | null>(null);
+const buyContainer = ref<HTMLDivElement | null>(null);
 
 const sellOrders = ref([
   [11788, 44741, 18161],

@@ -32,6 +32,7 @@
     </div>
     <div
       class="h-full flex relative flex-col overflow-y-auto overflow-x-hidden custom-scroll gap-0.5 rounded-lg rounded-t-md"
+      ref="tradeContainer"
     >
       <TransitionGroup name="listBuy" tag="div">
         <div
@@ -44,8 +45,8 @@
             :class="{
               'hover:!bg-green-700/30 greenTrade': buy,
               'hover:!bg-red-700/30 redTrade': !buy,
-              'even': index % 2 == 0,
-              'odd': !(index % 2 == 0),
+              even: index % 2 == 0,
+              odd: !(index % 2 == 0),
             }"
           >
             <div class="w-1/3">{{ price }}</div>
@@ -53,7 +54,10 @@
             <div class="w-1/3">{{ total }}</div>
           </div>
         </div>
-        <div v-for="n in 3" class="flex text-center text-[11px] font-bold">
+        <div
+          class="flex text-center text-[11px] font-bold h-4 -z-10"
+          v-for="n in (sellOrders.length * 24 < tradeContainer?.clientHeight! ? Math.floor((tradeContainer?.clientHeight! - sellOrders.length * 24 )/16): 0)"
+        >
           <div class="w-1/3">-</div>
           <div class="w-1/3">-</div>
           <div class="w-1/3">-</div>
@@ -65,6 +69,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
+const tradeContainer = ref<HTMLDivElement | null>(null);
 const props = defineProps<{
   tradeHistory: Object[];
 }>();
