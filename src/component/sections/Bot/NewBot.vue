@@ -24,7 +24,7 @@
       <div class="grow w-full grid place-items-center overflow-y-auto custom-scroll">
         <div class="w-full">
           <div
-            class="bg-base-300 rounded-xl shadow shadow-black/50 grid grid-cols-12 gap-2 p-2"
+            class="bg-base-300 rounded-xl shadow shadow-black/50 grid grid-cols-12 gap-1.5 p-2"
           >
             <div class="col-span-12 flex justify-center items-center">
               <div
@@ -878,7 +878,7 @@
             <div
               class="col-span-12 p-3 xl:p-0 2xl:p-3 flex flex-col sm:flex-row justify-center items-center gap-3"
             >
-              <button class="btn btn-primary btn-wide">
+              <button class="btn btn-primary btn-wide xl:btn-sm 2xl:btn-md">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -895,7 +895,7 @@
                 </svg>
                 Create
               </button>
-              <button class="btn btn-ghost btn-wide">
+              <button class="btn btn-ghost btn-wide xl:btn-sm 2xl:btn-md">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
