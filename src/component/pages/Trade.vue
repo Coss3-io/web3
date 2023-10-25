@@ -25,7 +25,7 @@
         </div>
       </div>
       <div
-        class="grid grid-cols-12 grid-rows-[min-content_1fr_1fr] h-full overflow-hidden gap-2 col-span-7 bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
+        class="grid grid-cols-12 grid-rows-[min-content_2fr_3fr] h-full overflow-hidden gap-2 col-span-7 bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
       >
         <div class="col-span-full justify-self-start items-start">
           <div
