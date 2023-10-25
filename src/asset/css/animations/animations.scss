@@ -56,13 +56,8 @@
   transform: translate(30px);
 }
 
-.listBuy-enter-active,
-.listSell-enter-active {
-  z-index: 10;
-}
-
 .listBuy-leave-active,
 .listSell-leave-active {
   position: absolute;
-  z-index: 1;
+  z-index: -10;
 }
