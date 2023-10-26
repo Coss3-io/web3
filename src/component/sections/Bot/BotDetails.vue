@@ -3,7 +3,7 @@
     class="w-full h-full grid grid-cols-12 gap-3 grid-rows-[min-content_1fr_min-content]"
   >
     <div
-      class="stats stats-vertical lg:stats-horizontal divide-solid col-span-full sm:col-span-5 lg:col-span-full shadow bg-base-300 shadow-black/50"
+      class="stats stats-vertical lg:stats-horizontal divide-solid col-span-full sm:col-span-5 lg:col-span-full shadow-lg bg-base-300 shadow-black/50"
     >
       <div class="stat place-items-center">
         <div class="stat-figure">
@@ -65,7 +65,7 @@
     </div>
     <div class="col-span-full sm:col-span-7 lg:col-span-5 xl:row-span-2">
       <div
-        class="card bg-base-300 h-full text-neutral-content w-full shadow shadow-black/50 overflow-y-auto custom-scroll"
+        class="card bg-base-300 h-full text-neutral-content w-full shadow-lg shadow-black/50 overflow-y-auto custom-scroll"
       >
         <div
           class="card-body items-center text-center p-5 justify-between max-h-full"
@@ -76,7 +76,7 @@
             Bot #{{ selectedBot?.fees }} Details
           </h2>
           <div
-            class="flex flex-col w-full justify-center bg-neutral rounded-xl p-3 gap-3 font-bold pb-4"
+            class="flex flex-col w-full justify-center bg-neutral shadow-lg shadow-black/50 rounded-xl p-3 gap-3 font-bold pb-4"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -105,7 +105,7 @@
             </div>
             <div class="flex flex-wrap gap-4 justify-evenly w-full">
               <div
-                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow shadow-black/50 relative"
+                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
               >
                 <div class="absolute text-[9px] -bottom-3 font-light">
                   collected
@@ -119,7 +119,7 @@
                 </div>
               </div>
               <div
-                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow shadow-black/50 relative"
+                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
               >
                 <div class="absolute text-[9px] -bottom-3 font-light">
                   volume
@@ -135,7 +135,7 @@
             </div>
           </div>
           <div
-            class="justify-around flex flex-col w-full bg-neutral rounded-xl p-3 gap-3 font-bold pb-4"
+            class="justify-around flex flex-col w-full bg-neutral shadow-lg shadow-black/50 rounded-xl p-3 gap-3 font-bold pb-4"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -164,7 +164,7 @@
             </div>
             <div class="flex flex-wrap gap-4 justify-evenly w-full">
               <div
-                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow shadow-black/50 relative"
+                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
               >
                 <div
                   class="absolute text-[9px] -bottom-3 font-light text-secondary"
@@ -190,7 +190,7 @@
                 </div>
               </div>
               <div
-                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow shadow-black/50 relative"
+                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
               >
                 <div
                   class="absolute text-[9px] -bottom-3 font-light text-secondary"
@@ -218,7 +218,7 @@
             </div>
           </div>
           <div
-            class=" justify-around flex flex-col w-full bg-neutral rounded-xl p-3 gap-3 font-bold pb-4"
+            class=" justify-around flex flex-col w-full bg-neutral shadow-lg shadow-black/50 rounded-xl p-3 gap-3 font-bold pb-4"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -247,7 +247,7 @@
             </div>
             <div class="flex flex-wrap gap-4 justify-center w-full">
               <div
-                class="flex justify-center gap-8 items-center rounded-full bg-base-300 px-4 py-0.5 shadow shadow-black/50"
+                class="flex justify-center gap-8 items-center rounded-full bg-base-300 px-4 py-0.5 shadow-md shadow-black/50"
               >
                 <div class="relative">
                   {{ selectedBot?.lowerBound }}
@@ -286,7 +286,7 @@
             </div>
           </div>
           <div class="card-actions justify-center">
-            <button class="btn btn-neutral mb-1">
+            <button class="btn btn-neutral mb-1 shadow-lg shadow-black/50">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -311,7 +311,7 @@
       class="col-span-full sm:col-span-7 sm:row-start-auto row-start-4 h-80 lg:h-full"
     >
       <div
-        class="h-full w-full rounded-xl bg-base-300 shadow shadow-black/50 flex flex-col p-3"
+        class="h-full w-full rounded-xl bg-base-300 shadow-lg shadow-black/50 flex flex-col p-3"
       >
         <div class="flex px-2 py-1 justify-start items-center">
           <div
@@ -343,7 +343,7 @@
       </div>
     </div>
     <div
-      class="stats xl:grid xl:grid-cols-2 2xl:grid-cols-3 xl:grid-rows-[1fr_min-content] stats-vertical lg:stats-horizontal sm:col-span-5 col-span-full lg:col-span-full xl:col-span-7 shadow bg-base-300 shadow-black/50 relative !overflow-visible"
+      class="stats xl:grid xl:grid-cols-2 2xl:grid-cols-3 xl:grid-rows-[1fr_min-content] stats-vertical lg:stats-horizontal sm:col-span-5 col-span-full lg:col-span-full xl:col-span-7 shadow-lg bg-base-300 shadow-black/50 relative !overflow-visible"
     >
       <span
         v-if="selectedBot?.baseName == 'avax'"

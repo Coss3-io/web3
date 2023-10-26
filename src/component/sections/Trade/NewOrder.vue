@@ -354,13 +354,13 @@
       <transition name="fadeNav">
         <button
           v-if="isBuyOrder"
-          class="btn btn-wide bg-green-700 text-white/70 hover:bg-neutral"
+          class="btn btn-wide bg-green-700 text-white/70 hover:bg-neutral shadow-lg shadow-black/50"
         >
           Buy
         </button>
         <button
           v-else
-          class="btn btn-wide bg-red-700 text-white/70 hover:bg-neutral"
+          class="btn btn-wide bg-red-700 text-white/70 hover:bg-neutral shadow-lg shadow-black/50"
         >
           Sell
         </button>

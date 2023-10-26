@@ -25,7 +25,7 @@
         </div>
       </div>
       <div
-        class="xl:col-span-5 col-span-full flex flex-col overflow-hidden gap-3 bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
+        class="xl:col-span-5 col-span-full flex flex-col overflow-hidden gap-3 bg-base-100 shadow-lg shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
       >
         <div class="flex justify-center xs:justify-between gap-3 flex-wrap">
           <div class="flex gap-3 items-center">
@@ -113,7 +113,7 @@
           </Transition>
         </div>
       </div>
-      <div class="xl:col-span-7 col-span-full xl:min-h-0 min-h-[775px] relative bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]">
+      <div class="xl:col-span-7 col-span-full xl:min-h-0 min-h-[775px] relative bg-base-100 shadow-lg shadow-black/50 rounded-lg pt-3.5 pb-2.5 px-2 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]">
          <div class="relative w-full h-full">
           <router-view
             v-slot="{

@@ -1,6 +1,8 @@
 <template>
   <div class="w-full h-full">
-    <div class="flex flex-col gap-3 items-start h-full overflow-hidden rounded-xl">
+    <div
+      class="flex flex-col gap-3 items-start h-full overflow-hidden rounded-xl"
+    >
       <div
         class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
       >
@@ -21,10 +23,12 @@
 
         <div>New Bot</div>
       </div>
-      <div class="grow w-full grid place-items-center overflow-y-auto custom-scroll">
+      <div
+        class="grow w-full grid place-items-center overflow-y-auto custom-scroll"
+      >
         <div class="w-full">
           <div
-            class="bg-base-300 rounded-xl shadow shadow-black/50 grid grid-cols-12 gap-1.5 p-2"
+            class="bg-base-300 rounded-xl shadow-lg shadow-black/50 grid grid-cols-12 gap-1.5 p-2"
           >
             <div class="col-span-12 flex justify-center items-center">
               <div
@@ -34,7 +38,7 @@
               </div>
             </div>
             <div
-              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
+              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3 shadow-lg shadow-black/50"
             >
               <div
                 class="col-span-12 flex justify-start items-center gap-1 font-bold"
@@ -57,7 +61,7 @@
               </div>
               <div class="col-span-full sm:col-span-6 flex justify-center">
                 <div
-                  class="font-bold rounded-full bg-base-100 w-full h-9 flex gap-1 items-center px-3 hover:bg-base-200 transition-all"
+                  class="font-bold rounded-full bg-base-100 w-full h-9 flex gap-1 items-center px-3 hover:bg-base-200 transition-all shadow-md shadow-black/50"
                 >
                   <div class="dropdown grow group">
                     <label
@@ -147,7 +151,7 @@
               </div>
               <div class="col-span-full sm:col-span-6 flex justify-center">
                 <div
-                  class="font-bold rounded-full bg-base-100 w-full h-9 flex gap-1 items-center px-3 hover:bg-base-200 transition-all"
+                  class="font-bold rounded-full bg-base-100 w-full h-9 flex gap-1 items-center px-3 hover:bg-base-200 transition-all shadow-lg shadow-black/50"
                 >
                   <div class="dropdown grow group">
                     <label
@@ -251,7 +255,7 @@
               </div>
             </div>
             <div
-              class="col-span-12 xl:col-span-6 2xl:col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
+              class="col-span-12 xl:col-span-6 2xl:col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3 shadow-lg shadow-black/50"
             >
               <div
                 class="col-span-12 flex justify-between items-center font-bold"
@@ -290,9 +294,8 @@
               </div>
               <div class="col-span-12 flex justify-center">
                 <div class="grow">
-
                   <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1"
+                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
                       :disabled="selectedBase == undefined ? true : false"
@@ -313,7 +316,9 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${Math.min(100,lowerBoundValue)}%` }"
+                            :style="{
+                              width: `${Math.min(100, lowerBoundValue)}%`,
+                            }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <unknownTokenLogo
@@ -324,9 +329,9 @@
                               class="w-7 h-7 fill-primary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -Math.min(100,lowerBoundValue) / 1.15)
-                                }%)`,
-                                left: `${Math.min(100,lowerBoundValue)}%`,
+                                  -Math.min(100, lowerBoundValue) / 1.15
+                                )}%)`,
+                                left: `${Math.min(100, lowerBoundValue)}%`,
                               }"
                             ></unknownTokenLogo>
                             <img
@@ -338,9 +343,9 @@
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -Math.min(100,lowerBoundValue) / 1.15
+                                  -Math.min(100, lowerBoundValue) / 1.15
                                 )}%)`,
-                                left: `${Math.min(100,lowerBoundValue)}%`,
+                                left: `${Math.min(100, lowerBoundValue)}%`,
                               }"
                             />
                           </transition>
@@ -378,7 +383,7 @@
               <div class="col-span-12 flex justify-center">
                 <div class="grow">
                   <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1"
+                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
                       :disabled="selectedQuote == undefined ? true : false"
@@ -399,7 +404,9 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${Math.min(upperBoundValue, 100)}%` }"
+                            :style="{
+                              width: `${Math.min(upperBoundValue, 100)}%`,
+                            }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <img
@@ -411,22 +418,23 @@
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -Math.min(100,upperBoundValue) / 1.15
+                                  -Math.min(100, upperBoundValue) / 1.15
                                 )}%)`,
-                                left: `${Math.min(100,upperBoundValue)}%`,
+                                left: `${Math.min(100, upperBoundValue)}%`,
                               }"
                             />
                             <unknownTokenLogo
                               v-else-if="
-                                selectedQuote && !(selectedQuote in cryptoDetails)
+                                selectedQuote &&
+                                !(selectedQuote in cryptoDetails)
                               "
                               :key="unknownToken"
                               class="w-7 h-7 fill-secondary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -Math.min(100,upperBoundValue / 1.15)
+                                  -Math.min(100, upperBoundValue / 1.15)
                                 )}%)`,
-                                left: `${Math.min(100,upperBoundValue)}%`,
+                                left: `${Math.min(100, upperBoundValue)}%`,
                               }"
                             ></unknownTokenLogo>
                           </transition>
@@ -435,7 +443,9 @@
                       <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
                           <input
-                            v-if="selectedQuote && selectedQuote in cryptoDetails"
+                            v-if="
+                              selectedQuote && selectedQuote in cryptoDetails
+                            "
                             :key="selectedQuote"
                             v-model="upperBoundValue"
                             type="range"
@@ -463,7 +473,7 @@
               </div>
             </div>
             <div
-              class="col-span-12 xl:col-span-6 2xl:col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
+              class="col-span-12 xl:col-span-6 2xl:col-span-12 p-3 bg-neutral shadow-lg shadow-black/50 rounded-xl grid grid-cols-12 gap-3 xl:gap-2 2xl:gap-3"
             >
               <div
                 class="col-span-12 flex justify-between items-center font-bold"
@@ -500,7 +510,7 @@
               <div class="col-span-12 flex justify-center">
                 <div class="grow">
                   <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1"
+                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
                       :disabled="!(lowerBoundValue && upperBoundValue)"
@@ -525,7 +535,9 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${Math.min(100,selectedStep)}%` }"
+                            :style="{
+                              width: `${Math.min(100, selectedStep)}%`,
+                            }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <svg
@@ -533,9 +545,9 @@
                               class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -Math.min(100,selectedStep) / 1.15
+                                  -Math.min(100, selectedStep) / 1.15
                                 )}%)`,
-                                left: `${Math.min(100,selectedStep)}%`,
+                                left: `${Math.min(100, selectedStep)}%`,
                               }"
                               version="1.1"
                               id="Capa_1"
@@ -581,7 +593,7 @@
               <div class="col-span-12 flex justify-center">
                 <div class="grow">
                   <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1"
+                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
                       :disabled="!(lowerBoundValue && upperBoundValue)"
@@ -606,7 +618,9 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${Math.min(100,selectedFees)}%` }"
+                            :style="{
+                              width: `${Math.min(100, selectedFees)}%`,
+                            }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <img
@@ -615,9 +629,9 @@
                               class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -Math.min(100,selectedFees) / 1.15
+                                  -Math.min(100, selectedFees) / 1.15
                                 )}%)`,
-                                left: `${Math.min(100,selectedFees)}%`,
+                                left: `${Math.min(100, selectedFees)}%`,
                               }"
                             />
                           </transition>
@@ -642,7 +656,7 @@
               <div class="col-span-12 flex justify-center">
                 <div class="grow">
                   <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1"
+                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
                       :disabled="!(lowerBoundValue && upperBoundValue)"
@@ -667,7 +681,9 @@
                         >
                           <div
                             class="h-full"
-                            :style="{ width: `${Math.min(100,selectedAmount)}%` }"
+                            :style="{
+                              width: `${Math.min(100, selectedAmount)}%`,
+                            }"
                           ></div>
                           <transition name="fadeNav" appear>
                             <img
@@ -676,9 +692,9 @@
                               class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
-                                  -Math.min(100,selectedAmount) / 1.15
+                                  -Math.min(100, selectedAmount) / 1.15
                                 )}%)`,
-                                left: `${Math.min(100,selectedAmount)}%`,
+                                left: `${Math.min(100, selectedAmount)}%`,
                               }"
                             />
                           </transition>
@@ -702,7 +718,7 @@
               </div>
             </div>
             <div
-              class="col-span-12 p-3 bg-neutral rounded-xl grid grid-cols-12 gap-3"
+              class="col-span-12 p-3 bg-neutral shadow-lg shadow-black/50 rounded-xl grid grid-cols-12 gap-3"
             >
               <div
                 class="col-span-12 flex justify-start items-center gap-1 font-bold"
@@ -736,7 +752,7 @@
                   </div>
                 </transition>
                 <div
-                  class="font-bold rounded-full bg-base-100 w-full h-9 flex justify-center gap-1 items-center"
+                  class="font-bold rounded-full bg-base-100 shadow-md shadow-black/50 w-full h-9 flex justify-center gap-1 items-center"
                 >
                   <transition name="fadeNav">
                     <div
@@ -805,7 +821,7 @@
                   </div>
                 </transition>
                 <div
-                  class="font-bold rounded-full bg-base-100 w-full h-9 flex justify-center gap-1 items-center"
+                  class="font-bold rounded-full bg-base-100 shadow-md shadow-black/50 w-full h-9 flex justify-center gap-1 items-center"
                 >
                   <transition name="fadeNav">
                     <div
@@ -878,7 +894,7 @@
             <div
               class="col-span-12 p-3 xl:p-0 2xl:p-3 flex flex-col sm:flex-row justify-center items-center gap-3"
             >
-              <button class="btn btn-primary btn-wide xl:btn-sm 2xl:btn-md">
+              <button class="btn btn-primary btn-wide shadow-md shadow-black/50">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -895,7 +911,7 @@
                 </svg>
                 Create
               </button>
-              <button class="btn btn-ghost btn-wide xl:btn-sm 2xl:btn-md">
+              <button class="btn btn-ghost btn-wide hover:shadow-sm shadow-black/50">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
