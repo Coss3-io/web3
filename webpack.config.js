@@ -140,9 +140,9 @@ module.exports = {
     }),
     new NodePolyfillPlugin(),
     new WebpackPwaManifest({
-      name: "your app name",
-      short_name: "your app name",
-      description: "app description",
+      name: "coss3.io",
+      short_name: "coss3.io",
+      description: "decentralised non custodian trading platform",
       background_color: "#ffffff",
       crossorigin: "use-credentials",
       ios: true,
