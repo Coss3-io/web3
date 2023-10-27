@@ -68,17 +68,17 @@
         class="card bg-base-300 h-full text-neutral-content w-full shadow-lg shadow-black/50 overflow-y-auto custom-scroll"
       >
         <div
-          class="card-body items-center text-center p-5 justify-between max-h-full"
+          class="card-body items-center text-center p-5 pb-2 justify-between max-h-full"
         >
           <h2
-            class="card-title text-primary-content bg-neutral shadow shadow-black/50 rounded-full px-4"
+            class="xl:hidden 2xl:block card-title text-primary-content bg-neutral shadow shadow-black/50 rounded-full px-4"
           >
             Bot #{{ selectedBot?.fees }} Details
           </h2>
           <div
-            class="flex flex-col w-full justify-center bg-neutral shadow-lg shadow-black/50 rounded-xl p-3 gap-3 font-bold pb-4"
+            class="grow flex flex-col w-full justify-evenly bg-neutral max-h-28 shadow-lg shadow-black/50 rounded-xl p-3 font-bold pb-4"
           >
-            <div class="flex gap-3 items-center justify-between w-full">
+            <div class="flex items-center justify-between w-full">
               <div class="flex items-center gap-3">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -103,39 +103,41 @@
                 bot fees: {{ selectedBot?.fees }}%
               </div>
             </div>
-            <div class="flex flex-wrap gap-4 justify-evenly w-full">
-              <div
-                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
-              >
-                <div class="absolute text-[9px] -bottom-3 font-light">
-                  collected
+            <div class="grow flex items-center">
+              <div class="flex flex-wrap gap-4 justify-evenly w-full">
+                <div
+                  class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
+                >
+                  <div class="absolute text-[9px] -bottom-3 font-light">
+                    collected
+                  </div>
+                  <div class="flex gap-3 items-center">
+                    {{ selectedBot?.profits }}
+                    <img
+                      class="w-6 h-6"
+                      :src="cryptoDetails[selectedBot!.quoteName].logo"
+                    />
+                  </div>
                 </div>
-                <div class="flex gap-3 items-center">
-                  {{ selectedBot?.profits }}
-                  <img
-                    class="w-6 h-6"
-                    :src="cryptoDetails[selectedBot!.quoteName].logo"
-                  />
-                </div>
-              </div>
-              <div
-                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
-              >
-                <div class="absolute text-[9px] -bottom-3 font-light">
-                  volume
-                </div>
-                <div class="flex items-center gap-3">
-                  {{ selectedBot?.profits }}
-                  <img
-                    class="w-6 h-6"
-                    :src="cryptoDetails[selectedBot!.quoteName].logo"
-                  />
+                <div
+                  class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
+                >
+                  <div class="absolute text-[9px] -bottom-3 font-light">
+                    volume
+                  </div>
+                  <div class="flex items-center gap-3">
+                    {{ selectedBot?.profits }}
+                    <img
+                      class="w-6 h-6"
+                      :src="cryptoDetails[selectedBot!.quoteName].logo"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <div
-            class="justify-around flex flex-col w-full bg-neutral shadow-lg shadow-black/50 rounded-xl p-3 gap-3 font-bold pb-4"
+            class="justify-around flex flex-col grow w-full bg-neutral max-h-28 shadow-lg shadow-black/50 rounded-xl p-3 font-bold pb-4"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -162,63 +164,65 @@
                 + {{ selectedBot?.fees }}%
               </div>
             </div>
-            <div class="flex flex-wrap gap-4 justify-evenly w-full">
-              <div
-                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
-              >
+            <div class="grow flex items-center">
+              <div class="flex flex-wrap gap-4 justify-evenly w-full">
                 <div
-                  class="absolute text-[9px] -bottom-3 font-light text-secondary"
+                  class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
                 >
-                  start USD value
-                </div>
-                <div class="flex gap-3 items-center">
-                  {{ selectedBot?.quote }}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6 stroke-secondary"
+                  <div
+                    class="absolute text-[9px] -bottom-3 font-light text-secondary"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                    start USD value
+                  </div>
+                  <div class="flex gap-3 items-center">
+                    {{ selectedBot?.quote }}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6 stroke-secondary"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-              <div
-                class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
-              >
                 <div
-                  class="absolute text-[9px] -bottom-3 font-light text-secondary"
+                  class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
                 >
-                  USD value
-                </div>
-                <div class="flex items-center gap-3">
-                  {{ selectedBot?.base }}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6 stroke-secondary"
+                  <div
+                    class="absolute text-[9px] -bottom-3 font-light text-secondary"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                    USD value
+                  </div>
+                  <div class="flex items-center gap-3">
+                    {{ selectedBot?.base }}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6 stroke-secondary"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <div
-            class=" justify-around flex flex-col w-full bg-neutral shadow-lg shadow-black/50 rounded-xl p-3 gap-3 font-bold pb-4"
+            class="justify-around grow flex flex-col w-full bg-neutral xl:max-h-32 2xl:max-h-28 shadow-lg shadow-black/50 rounded-xl p-3 font-bold"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -245,48 +249,84 @@
                 price: 4567
               </div>
             </div>
-            <div class="flex flex-wrap gap-4 justify-center w-full">
-              <div
-                class="flex justify-center gap-8 items-center rounded-full bg-base-300 px-4 py-0.5 shadow-md shadow-black/50"
-              >
-                <div class="relative">
-                  {{ selectedBot?.lowerBound }}
-                  <div
-                    class="absolute text-[9px] -bottom-4 font-light whitespace-nowrap -translate-x-2"
-                  >
-                    lower bound
+            <div class="grow flex items-center justify-between">
+              <div class="flex flex-wrap gap-4 justify-evenly w-full">
+                <div
+                  class="flex grow shrink justify-center gap-8 items-center rounded-full bg-base-300 px-4 py-0.5 shadow-md shadow-black/50"
+                >
+                  <div class="relative">
+                    {{ selectedBot?.lowerBound }}
+                    <div
+                      class="absolute text-[9px] -bottom-4 font-light whitespace-nowrap -translate-x-2"
+                    >
+                      lower bound
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
-                    />
-                  </svg>
-                </div>
+                  <div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
+                      />
+                    </svg>
+                  </div>
 
-                <div class="relative">
-                  {{ selectedBot?.upperBound }}
-                  <div
-                    class="absolute text-[9px] -bottom-4 font-light whitespace-nowrap -translate-x-3"
-                  >
-                    upper bound
+                  <div class="relative">
+                    {{ selectedBot?.upperBound }}
+                    <div
+                      class="absolute text-[9px] -bottom-4 font-light whitespace-nowrap -translate-x-3"
+                    >
+                      upper bound
+                    </div>
                   </div>
+                </div>
+                <div
+                  class="flex relative grow shrink items-center rounded-full bg-base-300 px-4 py-0.5 shadow-md shadow-black/50"
+                >
+                  <div
+                    class="absolute text-[9px] font-light -bottom-2.5 left-1/2"
+                  >
+                    step
+                  </div>
+                  <svg
+                    class="w-6 h-6 fill-current rounded-full bg-neutral shadow-md shadow-black/50 p-1"
+                    version="1.1"
+                    id="Capa_1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    width="800px"
+                    height="800px"
+                    viewBox="0 0 515.458 515.458"
+                    xml:space="preserve"
+                  >
+                    <g>
+                      <path
+                        d="M298.794,386.711c27.805,9.522,52.357,15.587,87.633,26.427C372.875,584.374,210.952,516.371,298.794,386.711z
+           M443.366,229.409c-1.826-51.415-10.882-118.86-83.017-108.292c-33.815,8.825-58.8,45.962-70.551,110.035
+          c-6.454,35.229-2.701,84.678,4.912,114.32c6.951,20.889,4.587,19.605,12.058,23.572c28.916,6.514,57.542,13.725,86.693,21.078
+          C423.075,369.209,447.397,258.182,443.366,229.409z M220.752,225.463c7.607-29.646,11.36-79.095,4.909-114.32
+          C213.919,47.067,188.931,9.924,155.11,1.105C82.975-9.463,73.919,57.981,72.093,109.399
+          c-4.031,28.768,20.294,139.802,49.911,160.711c29.149-7.353,57.771-14.558,86.696-21.078
+          C216.162,245.069,213.798,246.352,220.752,225.463z M129.029,293.132c13.547,171.234,175.47,103.231,87.63-26.427
+          C188.854,276.228,164.304,282.292,129.029,293.132z"
+                      />
+                    </g>
+                  </svg>
+                  <div class="grow text-sm font-bold">1234</div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="card-actions justify-center">
-            <button class="btn btn-neutral mb-1 shadow-lg shadow-black/50">
+          <div class="card-actions justify-center 2xl:pb-3 p-0.5">
+            <button class="btn btn-neutral shadow-lg shadow-black/50">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
