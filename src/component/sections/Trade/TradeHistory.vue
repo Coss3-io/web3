@@ -41,7 +41,7 @@
           class="relative w-full min-h-6 z-10 group"
         >
           <div
-            class="flex w-full absolute transition-all duration-500 hover:duration-150 text-center text-[11px] font-bold rounded-md py-1"
+            class="flex w-full font-sans-inherit absolute transition-all duration-500 hover:duration-150 text-center text-[11px] font-bold rounded-md py-1"
             :class="{
               'hover:!bg-green-700/30 greenTrade': buy,
               'hover:!bg-red-700/30 redTrade': !buy,
