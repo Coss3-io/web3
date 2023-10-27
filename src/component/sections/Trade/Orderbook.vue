@@ -28,7 +28,7 @@
           class="relative w-full min-h-6 z-10 group"
         >
           <div
-            class="flex w-full absolute transition-all duration-500 hover:duration-150 hover:!bg-red-700/30 group-even:bg-red-900/10 group-odd:bg-red-700/10 text-center text-[11px] font-bold rounded-md py-1"
+            class="flex w-full font-sans-inherit absolute transition-all duration-500 hover:duration-150 hover:!bg-red-700/30 group-even:bg-red-900/10 group-odd:bg-red-700/10 text-center text-[11px] font-bold rounded-md py-1"
           >
             <div class="w-1/3">{{ price }}</div>
             <div class="w-1/3">{{ amount }}</div>
@@ -55,7 +55,7 @@
           class="relative w-full min-h-6 z-10 group"
         >
           <div
-            class="flex w-full absolute transition-all duration-500 hover:duration-150 hover:!bg-green-700/30 group-even:bg-green-900/10 group-odd:bg-green-600/10 text-center text-[11px] font-bold rounded-md py-1"
+            class="flex w-full font-sans-inherit absolute transition-all duration-500 hover:duration-150 hover:!bg-green-700/30 group-even:bg-green-900/10 group-odd:bg-green-600/10 text-center text-[11px] font-bold rounded-md py-1"
           >
             <div class="w-1/3">{{ price }}</div>
             <div class="w-1/3">{{ amount }}</div>
