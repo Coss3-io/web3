@@ -58,31 +58,47 @@
     </div>
   </div>
   <div
-    class="h-full max-h-72 lg:max-h-full overflow-auto custom-scroll flex flex-col gap-2 p-1"
+    class="h-full max-h-72 lg:max-h-full relative overflow-x-hidden overflow-y-auto custom-scroll flex flex-col p-1"
   >
     <div class="grid grid-cols-4 place-items-center text-[9px]">
-      <div>Token</div>
-      <div>Amount</div>
+      <div @click="addOrder">Token</div>
+      <div @click="delOrder">Amount</div>
       <div>$</div>
       <div>last withdraw (block)</div>
     </div>
-
-    <div
-      v-for="(tokenFee, index) in tokenFees"
-      @click.passive="tokenFee.selected = !tokenFee.selected"
-      :class="{ 'outline-1 outline outline-primary': tokenFee.selected }"
-      class="grid grid-cols-4 place-items-center font-sans-inherit rounded-full bg-neutral hover:bg-base-200 transition-all cursor-pointer py-1 shadow-black/20 shadow-md"
-    >
-      <div><img :src="tokenFee.token" alt="token" class="w-6 h-6" /></div>
-      <div>{{ tokenFee.amount }}</div>
-      <div>${{ tokenFee.$ }}</div>
-      <div>{{ tokenFee.lastWithdraw }}</div>
-    </div>
+    <TransitionGroup name="listSell" tag="div">
+      <div
+        v-for="(tokenFee, index) in tokenFees"
+        :key="`${tokenFee.amount}${tokenFee.$}`"
+        @click.passive="tokenFee.selected = !tokenFee.selected"
+        :class="{ 'outline-1 outline outline-primary': tokenFee.selected }"
+        class="grid my-2 even:bg-neutral/50 grid-cols-4 w-full h-8 place-items-center font-sans-inherit rounded-full bg-neutral hover:bg-base-200 transition-all cursor-pointer py-1 shadow-black/20 shadow-md"
+      >
+        <div><img :src="tokenFee.token" alt="token" class="w-6 h-6" /></div>
+        <div>{{ tokenFee.amount }}</div>
+        <div>${{ tokenFee.$ }}</div>
+        <div>{{ tokenFee.lastWithdraw }}</div>
+      </div>
+    </TransitionGroup>
   </div>
 </template>
 <script setup lang="ts">
 import { usdt, ether, logo } from "../../../asset/images/images";
 import { ref } from "vue";
+
+function delOrder() {
+  tokenFees.value.splice(2, 2);
+}
+
+function addOrder() {
+  tokenFees.value.splice(4, 0, {
+    amount: String(Math.round(Math.random() * 2000)),
+    $: String(Math.round(Math.random() * 2000)),
+    token: usdt,
+    lastWithdraw: 23,
+    selected: false,
+  });
+}
 
 let tokenFees = ref([
   { amount: "1,234", $: "43", token: usdt, lastWithdraw: 23, selected: false },
