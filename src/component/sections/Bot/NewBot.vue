@@ -303,7 +303,7 @@
                       @input="event => lowerBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
                       type="text"
                       placeholder="lower bound"
-                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
                     />
                     <div
                       class="flex bg-base-100 rounded-full items-center grow relative"
@@ -391,7 +391,7 @@
                       @input="event => upperBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
                       type="text"
                       placeholder="upper bound"
-                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
                     />
                     <div
                       class="flex bg-base-100 rounded-full items-center grow relative"
@@ -522,7 +522,7 @@
                       @input="event => selectedStep = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
                       type="text"
                       placeholder="step"
-                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
                     />
                     <div
                       class="flex bg-base-100 rounded-full items-center grow relative"
@@ -605,7 +605,7 @@
                       @input="event => selectedFees = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
                       type="text"
                       placeholder="fees"
-                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
                     />
                     <div
                       class="flex bg-base-100 rounded-full items-center grow relative"
@@ -668,7 +668,7 @@
                       @input="event => selectedAmount = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
                       type="text"
                       placeholder="amount"
-                      class="text-center text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
+                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
                     />
                     <div
                       class="flex bg-base-100 rounded-full items-center grow relative"
@@ -802,7 +802,7 @@
                           class="w-7 h-7"
                         />
                       </div>
-                      <div class="w-7/12 text-center">
+                      <div class="w-7/12 text-center font-sans">
                         {{ lowerBoundValue }}
                       </div>
                     </div>
@@ -883,7 +883,7 @@
                           class="w-7 h-7"
                         />
                       </div>
-                      <div class="w-7/12 text-center">
+                      <div class="w-7/12 text-center font-sans">
                         {{ upperBoundValue }}
                       </div>
                     </div>
