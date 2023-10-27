@@ -64,7 +64,7 @@
         </div>
       </div>
       <div
-        class="flex col-span-5 bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+        class="flex flex-col gap-2 col-span-5 bg-base-100 overflow-hidden shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
       >
         <div class="flex justify-start items-start">
           <div
@@ -88,6 +88,7 @@
             <div>User Orders</div>
           </div>
         </div>
+        <UserOrders :userOrders="userOrders"></UserOrders>
       </div>
     </div>
   </div>
@@ -95,6 +96,7 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import Orderbook from "../sections/Trade/Orderbook.vue";
+import UserOrders from "../sections/Trade/UserOrders.vue";
 import TradeHistory from "../sections/Trade/TradeHistory.vue";
 import NewOrder from "../sections/Trade/NewOrder.vue";
 import BalancesDetails from "../sections/Trade/BalancesDetails.vue";
@@ -103,4 +105,5 @@ const orderDetails = reactive({ price: 0, amount: 0 });
 const tradeHistory = reactive([{ price: 0, amount: 0 }]);
 const newOrder = reactive([{ price: 0, amount: 0 }]);
 const balancesDetails = reactive([{ price: 0, amount: 0 }]);
+const userOrders: Array<number> = [];
 </script>
