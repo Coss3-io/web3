@@ -54,7 +54,7 @@
         >
           {{ base in cryptoTicker ? cryptoTicker[base] : base }}
         </div>
-        <div class="grow text-xs text-center font-bold">13516</div>
+        <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6">
           <img
             v-if="base in cryptoLogo"
@@ -76,7 +76,7 @@
         >
           {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
         </div>
-        <div class="grow text-xs text-center font-bold">13516</div>
+        <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6">
           <img
             v-if="quote in cryptoLogo"
@@ -122,7 +122,7 @@
         >
           {{ base in cryptoTicker ? cryptoTicker[base] : base }}
         </div>
-        <div class="grow text-xs text-center font-bold">13516</div>
+        <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6">
           <img
             v-if="base in cryptoLogo"
@@ -144,7 +144,7 @@
         >
           {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
         </div>
-        <div class="grow text-xs text-center font-bold">13516</div>
+        <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6">
           <img
             v-if="quote in cryptoLogo"
