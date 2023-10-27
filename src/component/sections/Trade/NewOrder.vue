@@ -69,7 +69,7 @@
           ></unknownTokenLogo>
         </div>
         <input
-          class="appearance-none focus:outline-none grow w-full bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
+          class="appearance-none font-sans focus:outline-none grow w-full bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
           type="text"
           placeholder="amount"
         />
@@ -77,7 +77,7 @@
       <div class="rounded-full flex bg-base-100 items-center p-0.5 pl-1.5 h-9 shadow-md shadow-black/50">
         <img :src="dollars" alt="dollars" class="w-6 h-6" />
         <input
-          class="appearance-none grow w-full focus:outline-none bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
+          class="appearance-none font-sans grow w-full focus:outline-none bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
           type="text"
           placeholder="price"
         />
@@ -109,7 +109,7 @@
             <div v-else>Receive</div>
           </transition>
         </div>
-        <div class="grow text-xs"></div>
+        <div class="grow text-xs font-sans font-bold text-center">1234</div>
         <div class="w-6 h-6 swap swap-rotate">
           <input v-model="isBuyOrder" type="checkbox" class="hidden" />
           <img
