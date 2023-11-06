@@ -18,6 +18,7 @@ export { default as price } from "./price.vue";
 export { default as buyLogo } from "./buyLogo.vue";
 export { default as botLogo } from "./botLogo.vue";
 export { default as tradeLogo } from "./tradeLogo.vue";
+export { default as lendingLogo } from "./lendingLogo.vue";
 export { default as sellLogo } from "./sellLogo.vue";
 export { default as filledOrderLogo } from "./filledOrderLogo.vue";
 export { default as cancelledOrderLogo } from "./cancelledOrderLogo.vue";
