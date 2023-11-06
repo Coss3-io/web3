@@ -1,7 +1,7 @@
 <template>
   <div
-    class="grid grid-cols-12 gap-2 gap-y-2.5 items-center justify-items-center grid-rows-[min-content_1fr_min-content] w-full h-full overflow-hidden transition-all p-2 bg-gradient-to-b from-base-300 via-base-300 rounded-lg shadow-lg shadow-black/50"
-    :class="isBuyOrder ? 'to-green-900/5' : 'to-red-900/5'"
+    class="grid grid-cols-12 gap-2 gap-y-2.5 items-center justify-items-center grid-rows-[min-content_1fr_min-content] w-full h-full overflow-hidden transition-all p-2 bg-gradient-to-b from-base-300 via-base-300 rounded-lg"
+    :class="isBuyOrder ? 'to-green-900/30' : 'to-red-900/30'"
   >
     <div class="col-span-full">
       <div
@@ -26,119 +26,9 @@
       </div>
     </div>
     <div
-      class="col-span-6 flex flex-col h-full w-full justify-evenly bg-neutral rounded-xl px-1 max-h-60 shadow-lg shadow-black/50"
+      class="col-span-full sm:col-span-6 max-w-sm items-center flex flex-col gap-4 px-1 py-4 w-full h-full justify-evenly bg-neutral rounded-xl max-h-60 shadow-lg shadow-black/50"
     >
-      <div class="rounded-full flex bg-base-100 p-1 relative shadow-md shadow-black/50">
-        <Transition name="fadeNav">
-          <div
-            v-if="isBuyOrder"
-            :key="base"
-            class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
-          >
-            {{ base in cryptoTicker ? cryptoTicker[base] : base }}
-          </div>
-          <div
-            v-else
-            :key="quote"
-            class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
-          >
-            {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
-          </div>
-        </Transition>
-        <div class="w-7 h-7 swap swap-rotate">
-          <input v-model="isBuyOrder" type="checkbox" class="hidden" />
-          <img
-            v-if="quote in cryptoLogo"
-            :src="<string>cryptoLogo[quote]"
-            alt="token"
-            class="swap-off w-6 h-6"
-          />
-          <unknownTokenLogo
-            v-else
-            class="swap-off fill-secondary h-6 w-6"
-          ></unknownTokenLogo>
-          <img
-            v-if="base in cryptoLogo"
-            :src="<string>cryptoLogo[base]"
-            alt="token"
-            class="swap-on w-6 h-6"
-          />
-          <unknownTokenLogo
-            v-else
-            class="swap-on fill-primary h-6 w-6"
-          ></unknownTokenLogo>
-        </div>
-        <input
-          class="appearance-none font-sans focus:outline-none grow w-full bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
-          type="text"
-          placeholder="amount"
-        />
-      </div>
-      <div class="rounded-full flex bg-base-100 items-center p-0.5 pl-1.5 h-9 shadow-md shadow-black/50">
-        <img :src="dollars" alt="dollars" class="w-6 h-6" />
-        <input
-          class="appearance-none font-sans grow w-full focus:outline-none bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
-          type="text"
-          placeholder="price"
-        />
-      </div>
-      <div
-        class="rounded-full flex bg-base-100 p-1 h-9 items-center relative shadow-md shadow-black/50"
-      >
-      <Transition name="fadeNav">
-          <div
-            v-if="!isBuyOrder"
-            :key="base"
-            class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
-          >
-            {{ base in cryptoTicker ? cryptoTicker[base] : base }}
-          </div>
-          <div
-            v-else
-            :key="quote"
-            class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
-          >
-            {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
-          </div>
-        </Transition>
-        <div
-          class="text-xs relative w-16 h-5 font-bold rounded-full px-2 bg-neutral-content/20 flex items-center justify-center shadow shadow-black/50"
-        >
-          <transition name="fadeNav">
-            <div v-if="isBuyOrder">Pay</div>
-            <div v-else>Receive</div>
-          </transition>
-        </div>
-        <div class="grow text-xs font-sans font-bold text-center">1234</div>
-        <div class="w-6 h-6 swap swap-rotate">
-          <input v-model="isBuyOrder" type="checkbox" class="hidden" />
-          <img
-            v-if="base in cryptoLogo"
-            :src="<string>cryptoLogo[base]"
-            alt="token"
-            class="swap-off w-6 h-6"
-          />
-          <unknownTokenLogo
-            v-else
-            class="swap-off fill-primary w-6 h-6"
-          ></unknownTokenLogo>
-          <img
-            v-if="quote in cryptoLogo"
-            :src="<string>cryptoLogo[quote]"
-            alt="token"
-            class="swap-on w-6 h-6"
-          />
-          <unknownTokenLogo
-            v-else
-            class="swap-on fill-secondary h-6 w-6"
-          ></unknownTokenLogo>
-        </div>
-      </div>
-    </div>
-    <div
-      class="col-span-6 flex flex-col w-full h-full justify-evenly bg-neutral rounded-xl px-1 max-h-60 shadow-lg shadow-black/50"
-    >
-      <div class="form-control relative">
+      <div class="form-control relative max-w-xs m-auto w-full">
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 -translate-x-full"
         >
@@ -211,7 +101,7 @@
           </span>
         </label>
       </div>
-      <div class="form-control relative">
+      <div class="form-control relative max-w-xs m-auto w-full">
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 -translate-x-full"
         >
@@ -276,7 +166,7 @@
           </span>
         </label>
       </div>
-      <div class="form-control relative">
+      <div class="form-control relative max-w-xs m-auto w-full">
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 -translate-x-full"
         >
@@ -349,18 +239,132 @@
       </div>
     </div>
     <div
+      class="col-span-full sm:col-span-6 max-w-sm flex flex-col items-center gap-4 px-1 py-4 h-full w-full justify-evenly bg-neutral rounded-xl max-h-60 shadow-lg shadow-black/50"
+    >
+      <div
+        class="rounded-full flex bg-base-100 p-1 max-w-xs w-full relative shadow-md shadow-black/50"
+      >
+        <Transition name="fadeNav">
+          <div
+            v-if="isBuyOrder"
+            :key="base"
+            class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
+          >
+            {{ base in cryptoTicker ? cryptoTicker[base] : base }}
+          </div>
+          <div
+            v-else
+            :key="quote"
+            class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
+          >
+            {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
+          </div>
+        </Transition>
+        <div class="w-7 h-7 swap swap-rotate">
+          <input v-model="isBuyOrder" type="checkbox" class="hidden" />
+          <img
+            v-if="quote in cryptoLogo"
+            :src="<string>cryptoLogo[quote]"
+            alt="token"
+            class="swap-off w-6 h-6"
+          />
+          <unknownTokenLogo
+            v-else
+            class="swap-off fill-secondary h-6 w-6"
+          ></unknownTokenLogo>
+          <img
+            v-if="base in cryptoLogo"
+            :src="<string>cryptoLogo[base]"
+            alt="token"
+            class="swap-on w-6 h-6"
+          />
+          <unknownTokenLogo
+            v-else
+            class="swap-on fill-primary h-6 w-6"
+          ></unknownTokenLogo>
+        </div>
+        <input
+          class="appearance-none font-sans focus:outline-none grow w-full bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
+          type="text"
+          placeholder="amount"
+        />
+      </div>
+      <div
+        class="rounded-full flex bg-base-100 items-center max-w-xs w-full p-0.5 pl-1.5 h-9 shadow-md shadow-black/50"
+      >
+        <img :src="dollars" alt="dollars" class="w-6 h-6" />
+        <input
+          class="appearance-none font-sans grow w-full focus:outline-none bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
+          type="text"
+          placeholder="price"
+        />
+      </div>
+      <div
+        class="rounded-full flex bg-base-100 max-w-xs w-full p-1 h-9 items-center relative shadow-md shadow-black/50"
+      >
+        <Transition name="fadeNav">
+          <div
+            v-if="!isBuyOrder"
+            :key="base"
+            class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
+          >
+            {{ base in cryptoTicker ? cryptoTicker[base] : base }}
+          </div>
+          <div
+            v-else
+            :key="quote"
+            class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
+          >
+            {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
+          </div>
+        </Transition>
+        <div
+          class="text-xs relative w-16 h-5 font-bold rounded-full px-2 bg-neutral-content/20 flex items-center justify-center shadow shadow-black/50"
+        >
+          <transition name="fadeNav">
+            <div v-if="isBuyOrder">Pay</div>
+            <div v-else>Receive</div>
+          </transition>
+        </div>
+        <div class="grow text-xs font-sans font-bold text-center">1234</div>
+        <div class="w-6 h-6 swap swap-rotate">
+          <input v-model="isBuyOrder" type="checkbox" class="hidden" />
+          <img
+            v-if="base in cryptoLogo"
+            :src="<string>cryptoLogo[base]"
+            alt="token"
+            class="swap-off w-6 h-6"
+          />
+          <unknownTokenLogo
+            v-else
+            class="swap-off fill-primary w-6 h-6"
+          ></unknownTokenLogo>
+          <img
+            v-if="quote in cryptoLogo"
+            :src="<string>cryptoLogo[quote]"
+            alt="token"
+            class="swap-on w-6 h-6"
+          />
+          <unknownTokenLogo
+            v-else
+            class="swap-on fill-secondary h-6 w-6"
+          ></unknownTokenLogo>
+        </div>
+      </div>
+    </div>
+    <div
       class="col-span-full relative w-full h-full flex items-end justify-center min-h-12"
     >
       <transition name="fadeNav">
         <button
           v-if="isBuyOrder"
-          class="btn btn-wide bg-green-700 text-white/70 hover:bg-neutral shadow-lg shadow-black/50"
+          class="btn btn-wide bg-green-700 text-white/70 hover:bg-green-800 shadow-lg shadow-black/50"
         >
           Buy
         </button>
         <button
           v-else
-          class="btn btn-wide bg-red-700 text-white/70 hover:bg-neutral shadow-lg shadow-black/50"
+          class="btn btn-wide bg-red-700 text-white/70 hover:bg-red-800 shadow-lg shadow-black/50"
         >
           Sell
         </button>
@@ -377,10 +381,7 @@ import {
   cryptoNames,
   cryptoTicker,
 } from "../../../types/cryptoSpecs";
-import {
-  unknownTokenLogo,
-  dollars,
-} from "../../../asset/images/images";
+import { unknownTokenLogo, dollars } from "../../../asset/images/images";
 
 const props = defineProps<{
   newOrder: Object[];

@@ -25,7 +25,7 @@ export const orderStatus = {
   Open: "Open",
   All: "All",
   Filled: "Filled",
-  Cancelled: "Cancelled",
+  Cancelled: "Cancel",
 } as const;
 
 export const orderSideBg = {
