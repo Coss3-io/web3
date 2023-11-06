@@ -19,6 +19,7 @@ export { default as buyLogo } from "./buyLogo.vue";
 export { default as botLogo } from "./botLogo.vue";
 export { default as tradeLogo } from "./tradeLogo.vue";
 export { default as fsaLogo } from "./fsaLogo.vue";
+export { default as dashboardLogo } from "./dashboardLogo.vue";
 export { default as lendingLogo } from "./lendingLogo.vue";
 export { default as sellLogo } from "./sellLogo.vue";
 export { default as filledOrderLogo } from "./filledOrderLogo.vue";
