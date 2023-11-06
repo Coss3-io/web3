@@ -25,7 +25,7 @@
       </div>
     </div>
     <div
-      class="col-span-full shadow-lg shadow-black/50 grid grid-cols-2 gap-2 grid-rows-[min-content_1fr] place-items-center w-full p-2.5 bg-neutral rounded-xl h-full max-h-20"
+      class="col-span-full shadow-lg shadow-black/50 grid grid-cols-2 max-w-sm gap-2 grid-rows-[min-content_1fr] place-items-center w-full p-2.5 bg-neutral rounded-xl h-full max-h-20 lg:max-h-24"
     >
       <div
         class="col-span-full flex flex-start gap-2 text-xs font-bold items-center place-self-start"
@@ -50,7 +50,7 @@
         class="rounded-full flex bg-base-100 p-1 items-center relative w-full shadow-md shadow-black/50"
       >
         <div
-          class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
+          class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
           {{ base in cryptoTicker ? cryptoTicker[base] : base }}
         </div>
@@ -72,7 +72,7 @@
         class="rounded-full flex bg-base-100 p-1 items-center relative w-full shadow-md shadow-black/50"
       >
         <div
-          class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
+          class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
           {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
         </div>
@@ -92,7 +92,7 @@
       </div>
     </div>
     <div
-      class="col-span-full shadow-lg shadow-black/50 grid grid-cols-2 gap-2 grid-rows-[min-content_1fr] place-items-center w-full p-2.5 bg-neutral rounded-xl h-full max-h-20"
+      class="col-span-full shadow-lg shadow-black/50 max-w-sm grid grid-cols-2 gap-2 grid-rows-[min-content_1fr] place-items-center w-full p-2.5 bg-neutral rounded-xl h-full max-h-20 lg:max-h-24"
     >
       <div
         class="col-span-full flex flex-start gap-2 text-xs font-bold items-center place-self-start"
@@ -118,7 +118,7 @@
         class="rounded-full flex bg-base-100 p-1 items-center relative w-full shadow-md shadow-black/50"
       >
         <div
-          class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
+          class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
           {{ base in cryptoTicker ? cryptoTicker[base] : base }}
         </div>
@@ -140,7 +140,7 @@
         class="rounded-full flex bg-base-100 p-1 items-center relative w-full shadow-md shadow-black/50"
       >
         <div
-          class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
+          class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
           {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
         </div>
