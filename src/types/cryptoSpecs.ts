@@ -8,7 +8,8 @@ import {
   usdc,
   aave,
   unknownTokenLogo
-} from "../asset/images/images";export type Values<T extends { [key in string]: string }> = T[keyof T];
+} from "../asset/images/images";
+export type Values<T extends { [key in string]: string }> = T[keyof T];
 
 export const cryptoNames = {
   usdt: "usdt",

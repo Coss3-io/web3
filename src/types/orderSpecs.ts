@@ -1,3 +1,4 @@
+import { Component } from "vue";
 import {
   buyLogo,
   sellLogo,
@@ -8,6 +9,7 @@ import {
   filledOrderLogo,
   cancelledOrderLogo,
 } from "../asset/images/images";
+import { Values } from "./cryptoSpecs";
 
 export const orderType = {
   Maker: "Maker",
@@ -25,43 +27,45 @@ export const orderStatus = {
   Open: "Open",
   All: "All",
   Filled: "Filled",
-  Cancelled: "Cancel",
+  Cancel: "Cancel",
 } as const;
 
-export const orderSideBg = {
-  Buy: "!bg-green-700",
-  All: "",
-  Sell: "!bg-red-700",
+export const orderSideBg: { [key in Values<typeof orderSide>]: string } = {
+  [orderSide.Buy]: "!bg-green-700",
+  [orderSide.All]: "",
+  [orderSide.Sell]: "!bg-red-700",
 } as const;
 
-export const orderTypeBg = {
-  Maker: "!bg-neutral",
-  All: "",
-  Taker: "!bg-yellow-700",
+export const orderTypeBg: { [key in Values<typeof orderType>]: string } = {
+  [orderType.Maker]: "!bg-neutral",
+  [orderType.All]: "",
+  [orderType.Taker]: "!bg-yellow-700",
 } as const;
 
-export const orderStatusBg = {
-  Open: "!bg-blue-700",
-  All: "",
-  Filled: "!bg-green-700",
-  Cancelled: "!bg-red-700",
+export const orderStatusBg: { [key in Values<typeof orderStatus>]: string } = {
+  [orderStatus.Open]: "!bg-blue-700",
+  [orderStatus.All]: "",
+  [orderStatus.Filled]: "!bg-green-700",
+  [orderStatus.Cancel]: "!bg-red-700",
 } as const;
 
-export const orderSideLogo = {
-  Buy: buyLogo,
-  All: allLogo,
-  Sell: sellLogo,
+export const orderSideLogo: { [key in Values<typeof orderSide>]: Component } = {
+  [orderSide.Buy]: buyLogo,
+  [orderSide.All]: allLogo,
+  [orderSide.Sell]: sellLogo,
 } as const;
 
-export const orderTypeLogo = {
-  Maker: limitOrderLogo,
-  All: allLogo,
-  Taker: marketOrderLogo,
+export const orderTypeLogo: { [key in Values<typeof orderType>]: Component } = {
+  [orderType.Maker]: limitOrderLogo,
+  [orderType.All]: allLogo,
+  [orderType.Taker]: marketOrderLogo,
 } as const;
 
-export const orderStatusLogo = {
-  Open: openOrderLogo,
-  All: allLogo,
-  Filled: filledOrderLogo,
-  Cancelled: cancelledOrderLogo,
+export const orderStatusLogo: {
+  [key in Values<typeof orderStatus>]: Component;
+} = {
+  [orderStatus.Open]: openOrderLogo,
+  [orderStatus.All]: allLogo,
+  [orderStatus.Filled]: filledOrderLogo,
+  [orderStatus.Cancel]: cancelledOrderLogo,
 } as const;
