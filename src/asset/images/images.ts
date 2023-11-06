@@ -7,6 +7,10 @@ export { default as aave } from "./aave.png";
 export { default as polygon } from "./polygon.png";
 export { default as ether } from "./ether.png";
 export { default as moneyBag } from "./moneyBag.png";
+export { default as ethereumNetworkLogo } from "./ethereumNetworkLogo.png"
+export { default as arbitrumNetworkLogo } from "./arbitrumNetworkLogo.png"
+export { default as optimismNetworkLogo } from "./optimismNetworkLogo.png"
+export { default as polygonNetworkLogo } from "./polygonNetworkLogo.png"
 export { default as dollars } from "./dollars.png";
 export { default as unknownTokenLogo } from "./unknownTokenLogo.vue";
 export { default as limitOrderLogo } from "./limitOrderLogo.vue";

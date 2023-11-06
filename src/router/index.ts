@@ -12,6 +12,7 @@ export enum RouteNames {
   Trade = "Trade",
   NewBot = "New-Bot",
   FSA = "FSA",
+  Dashboard = "Dashboard",
 }
 
 let routes: RouteRecordRaw[] = [
@@ -42,18 +43,18 @@ let routes: RouteRecordRaw[] = [
         path: "",
         name: RouteNames.NewBot,
         component: () =>
-        import(
-          /* webpackPreload: true */ /* webpackChunkName: "newBot" */ "../component/sections/Bot/NewBot.vue"
+          import(
+            /* webpackPreload: true */ /* webpackChunkName: "newBot" */ "../component/sections/Bot/NewBot.vue"
           ),
-        },
-        {
-          path: ":id",
-          name: RouteNames.Bot,
-          component: () =>
-            import(
-              /* webpackPreload: true */ /* webpackChunkName: "botId" */ "../component/sections/Bot/BotDetails.vue"
-            ),
-        },
+      },
+      {
+        path: ":id",
+        name: RouteNames.Bot,
+        component: () =>
+          import(
+            /* webpackPreload: true */ /* webpackChunkName: "botId" */ "../component/sections/Bot/BotDetails.vue"
+          ),
+      },
     ],
   },
   {
@@ -63,6 +64,14 @@ let routes: RouteRecordRaw[] = [
         /* webpackPreload: true */ /* webpackChunkName: "FSA" */ "../component/pages/FSA.vue"
       ),
     name: RouteNames.FSA,
+  },
+  {
+    path: "/dashboard",
+    component: () =>
+      import(
+        /* webpackPreload: true */ /* webpackChunkName: "Dashboard" */ "../component/pages/Dashboard.vue"
+      ),
+    name: RouteNames.Dashboard,
   },
 ];
 
