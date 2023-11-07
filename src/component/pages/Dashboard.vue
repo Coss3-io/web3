@@ -1,7 +1,7 @@
 <template>
   <div class="p-2 w-full">
     <div
-      class="grid grid-cols-12 lg:grid-rows-[min-content_7fr_5fr] bg-base-300 rounded-lg p-5 gap-3 w-full lg:h-[calc(100vh-110px)]"
+      class="grid grid-cols-12 lg:grid-rows-[min-content_1fr_1fr] bg-base-300 rounded-lg p-5 gap-3 w-full lg:h-[calc(100vh-110px)]"
     >
       <div class="col-span-full m-2 flex justify-start gap-3">
         <div class="tooltip" data-tip="click for help">
@@ -11,7 +11,10 @@
           </button>
         </div>
         <div class="dropdown">
-          <label tabindex="0" class="btn btn-ghost m-1 gap-2 items-center w-48 flex-nowrap">
+          <label
+            tabindex="0"
+            class="btn btn-ghost m-1 gap-2 items-center w-48 flex-nowrap"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -26,10 +29,10 @@
                 d="M8.25 4.5l7.5 7.5-7.5 7.5"
               />
             </svg>
-            <div class="grow relative h-full flex items-center justify-evenly">
+            <div class="w-full relative h-full flex">
               <Transition name="fadeNav">
                 <div
-                  class="flex items-center justify-evenly gap-3"
+                  class="flex items-center gap-3 w-full h-full justify-between"
                   :key="selectedNetwork ?? 'Network'"
                 >
                   <img
@@ -37,7 +40,9 @@
                     :src="networkLogo[selectedNetwork!]!"
                     class="w-7 h-7 shadow-lg shadow-black/60 rounded-full"
                   />
-                  {{ selectedNetwork ?? "Network" }}
+                  <div class="w-full">
+                    {{ selectedNetwork ?? "Network" }}
+                  </div>
                 </div>
               </Transition>
             </div>
@@ -69,10 +74,21 @@
           </ul>
         </div>
       </div>
+      <FSA></FSA>
+      <div
+        class="col-span-6 bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+      ></div>
+      <div
+        class="col-span-6 bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
+      ></div>
+      <div
+        class="col-span-6 bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_1.1s_forwards]"
+      ></div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import FSA from "../sections/Dashboard/FSA.vue";
 import { ref } from "vue";
 import { dashboardLogo } from "../../asset/images/images";
 import { networkNames, networkLogo } from "../../types/networkSpecs";

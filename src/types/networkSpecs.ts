@@ -1,4 +1,3 @@
-import { Component } from "vue";
 import { Values } from "./cryptoSpecs";
 import {
   arbitrumNetworkLogo,
