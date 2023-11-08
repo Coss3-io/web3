@@ -168,9 +168,9 @@
       </div>
       <div class="form-control relative max-w-xs m-auto w-full">
         <div
-          class="absolute text-[10px] text-white/20 -top-3 left-1/2 -translate-x-full"
+          class="absolute text-[10px] text-white/20 -top-3 left-1/2 -translate-x-1/2"
         >
-          fees
+          fees <span class="text-white/30 font-bold">(0.1%/-0.05%)</span>
         </div>
         <label
           class="label h-9 justify-evenly gap-3 swap swap-rotate bg-base-100 rounded-full px-0.5 py-0.5 shadow-md shadow-black/50"
