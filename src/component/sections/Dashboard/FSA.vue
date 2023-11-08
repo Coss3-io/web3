@@ -13,45 +13,7 @@
     </div>
     <div class="grow w-full flex flex-col items-center justify-evenly">
       <div class="w-full">
-        <div
-          class="stats shadow-md shadow-black/50 divide-x-2 xl:px-2 stats-vertical bg-primary text-primary-content grid 2xl:grid-cols-3 xl:grid-cols-[auto_1fr_auto] lg:grid-cols-2 md:grid-cols-3 sm:grid-cols-[1fr_1fr] rounded-2xl w-full"
-        >
-          <div
-            class="stat xl:p-3 p-5 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
-          >
-            <div class="stat-title">Your FSA</div>
-            <div class="stat-value xl:text-[30px] 2xl:text-[36px]">
-              $1,520,230
-            </div>
-            <div class="stat-desc">$230 as of last round</div>
-          </div>
-          <div
-            class="stat xl:p-3 p-5 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
-          >
-            <div class="stat-title">Annualised Yield</div>
-            <div class="stat-value xl:text-[30px] 2xl:text-[36px]">23%</div>
-            <div class="stat-desc">~$1,200 earned this year</div>
-          </div>
-          <div
-            class="stat xl:p-3 p-5 xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
-          >
-            <div class="stat-title">Deposited COSS</div>
-            <div
-              class="stat-value flex items-center gap-2 xl:text-[30px] 2xl:text-[36px]"
-            >
-              <img
-                :src="logo"
-                class="p-0.5 w-7 h-7 rounded-full bg-base-200/50 shadow-md shadow-black/30"
-              />
-              104,300
-            </div>
-            <div class="stat-desc">$89,400 (1.2% of total stacked)</div>
-            <div class="stat-actions flex gap-3">
-              <button class="btn btn-sm hover:scale-105">Deposit</button>
-              <button class="btn btn-sm hover:scale-105">Withdraw</button>
-            </div>
-          </div>
-        </div>
+        <UserOverview></UserOverview>
       </div>
       <div class="flex justify-center items-center min-w-[60%] font-bold">
         <div class="alert shadow-md shadow-black/50">
@@ -70,7 +32,7 @@
           </svg>
           <span>~$1200 to be claimed</span>
           <RouterLink :to="{ name: RouteNames.FSA }">
-            <button class="btn btn-primary btn-sm">check</button>
+            <button class="btn btn-primary btn-sm hover:scale-105">check</button>
           </RouterLink>
         </div>
       </div>
@@ -93,8 +55,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import UserOverview from "../FSA/UserOverview.vue";
 import { RouterLink } from "vue-router";
 import { fsaLogo } from "../../../asset/images/images";
-import { logo } from "../../../asset/images/images";
 import { RouteNames } from "../../../router";
 </script>
