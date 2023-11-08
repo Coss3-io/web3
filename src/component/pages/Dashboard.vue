@@ -78,9 +78,7 @@
       <div
         class="col-span-6 bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
       ></div>
-      <div
-        class="col-span-6 bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
-      ></div>
+      <Bot></Bot>
       <div
         class="col-span-6 bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_1.1s_forwards]"
       ></div>
@@ -89,6 +87,7 @@
 </template>
 <script setup lang="ts">
 import FSA from "../sections/Dashboard/FSA.vue";
+import Bot from "../sections/Dashboard/Bot.vue";
 import { ref } from "vue";
 import { dashboardLogo } from "../../asset/images/images";
 import { networkNames, networkLogo } from "../../types/networkSpecs";
