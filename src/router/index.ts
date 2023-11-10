@@ -10,6 +10,7 @@ export enum RouteNames {
   Test = "Test",
   Bot = "Bot",
   Trade = "Trade",
+  Lending = "Lending",
   NewBot = "New-Bot",
   FSA = "FSA",
   Dashboard = "Dashboard",
@@ -72,6 +73,14 @@ let routes: RouteRecordRaw[] = [
         /* webpackPreload: true */ /* webpackChunkName: "Dashboard" */ "../component/pages/Dashboard.vue"
       ),
     name: RouteNames.Dashboard,
+  },
+  {
+    path: "/lending",
+    component: () =>
+      import(
+        /* webpackPreload: true */ /* webpackChunkName: "Lending" */ "../component/pages/Lending.vue"
+      ),
+    name: RouteNames.Lending,
   },
 ];
 
