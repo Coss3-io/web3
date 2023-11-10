@@ -1,6 +1,6 @@
 <template>
   <div
-    class="col-span-6 grid grid-cols-3 grid-row-[min-content_1fr] gap-y-3 gap-x-2 items-start bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
+    class="col-span-6 grid grid-cols-3 grid-rows-[min-content_1fr] gap-y-3 gap-x-2 items-start bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
   >
     <div class="col-span-full flex justify-start">
       <div
@@ -95,7 +95,7 @@
             />
           </svg>
         </div>
-        <div class="stat-title">Total Volume</div>
+        <div class="stat-title">Bot Volume</div>
         <div class="stat-value text-3xl">31K</div>
         <div class="stat-desc">In order $1,200,230</div>
       </div>
@@ -117,7 +117,7 @@
             />
           </svg>
         </div>
-        <div class="stat-title">Total Fees</div>
+        <div class="stat-title">Bot Fees</div>
         <div class="stat-value text-3xl">4,200</div>
         <div class="stat-desc">~22% yield/year</div>
       </div>
