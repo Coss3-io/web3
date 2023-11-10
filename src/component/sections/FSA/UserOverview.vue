@@ -1,46 +1,55 @@
 <template>
   <div
-    class="stats divide-x-2 shadow-md shadow-black/50 xl:px-2 stats-vertical bg-primary text-primary-content grid 2xl:grid-cols-3 xl:grid-cols-[auto_1fr_auto] lg:grid-cols-2 md:grid-cols-3 sm:grid-cols-[1fr_1fr] rounded-2xl w-full"
+    class="stats overflow-hidden divide-x-2 shadow-md shadow-black/50 xl:px-2 stats-vertical bg-primary text-primary-content grid xl:grid-cols-[auto_auto_auto] lg:grid-cols-[auto_auto] md:grid-cols-[auto_auto_auto] sm:grid-cols-[auto_auto] rounded-2xl w-full"
   >
     <div
       class="stat place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
     >
-      <div class="stat-figure text-neutral-content">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-11 h-11"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
-          />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
-          />
-        </svg>
-      </div>
       <div class="stat-title">Your FSA</div>
-      <div class="stat-value xl:text-[30px] 2xl:text-[36px]">$1,520,230</div>
+      <div class="stat-value xl:text-[30px] 2xl:text-[36px] flex items-center w-full justify-center gap-3">
+        <div class="font-sans grow text-center md:text-left lg:text-center xl:text-left">
+          $1,520,230
+        </div>
+        <div class="text-neutral-content justify-self-end">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-full max-h-11"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
+            />
+          </svg>
+        </div>
+      </div>
       <div class="stat-desc">$230 as of last round</div>
     </div>
     <div
       class="stat place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
     >
-      <div class="stat-figure text-neutral-content">
+      <div class="stat-title">Annualised Yield</div>
+      <div class="stat-value xl:text-[30px] 2xl:text-[36px] flex items-center w-full justify-center gap-3">
+        <div class="font-sans grow text-center md:text-left lg:text-center xl:text-left">
+          23%
+        </div>
+        <div class="text-neutral-content">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="w-11 h-11"
+          class="w-full max-h-11"
         >
           <path
             stroke-linecap="round"
@@ -49,12 +58,11 @@
           />
         </svg>
       </div>
-      <div class="stat-title">Annualised Yield</div>
-      <div class="stat-value xl:text-[30px] 2xl:text-[36px]">23%</div>
+      </div>
       <div class="stat-desc">~$1,200 earned this year</div>
     </div>
     <div
-      class="stat xl:p-3 p-5 xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
+      class="stat xl:p-3 p-5 xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 place-items-center md:place-items-start lg:place-items-center xl:place-items-start "
     >
       <div class="stat-title">Deposited COSS</div>
       <div
