@@ -1,6 +1,6 @@
 <template>
   <div
-    class="col-span-6 flex flex-col gap-3 items-start bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-slideIn"
+    class="col-span-full lg:col-span-6 grid grid-cols-[min-content_1fr] grid-rows-[min-content_1fr_min-content] xl:grid-rows-[min-content_1fr] 2xl:grid-rows-[min-content_1fr_min-content] gap-3 items-center bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-slideIn"
   >
     <div class="flex justify-start">
       <div
@@ -11,12 +11,16 @@
         <div>FSA</div>
       </div>
     </div>
-    <div class="grow w-full flex flex-col items-center justify-evenly">
-      <div class="w-full">
-        <UserOverview></UserOverview>
-      </div>
+    <div class="w-full col-span-full">
+      <UserOverview></UserOverview>
+    </div>
+    <div
+      class="col-span-full flex justify-center self-start xl:row-start-1 2xl:row-start-auto xl:col-span-1 2xl:col-span-full xl:col-start-2 2xl:col-start-auto"
+    >
       <div class="flex justify-center items-center min-w-[60%] font-bold">
-        <div class="alert shadow-md shadow-black/50">
+        <div
+          class="alert shadow-md shadow-black/50 grid-flow-col xl:p-2.5 2xl:p-4"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -32,7 +36,9 @@
           </svg>
           <span>~$1200 to be claimed</span>
           <RouterLink :to="{ name: RouteNames.FSA }">
-            <button class="btn btn-primary btn-sm hover:scale-105">check</button>
+            <button class="btn btn-primary btn-sm hover:scale-105">
+              check
+            </button>
           </RouterLink>
         </div>
       </div>
