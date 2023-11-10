@@ -75,23 +75,21 @@
         </div>
       </div>
       <FSA></FSA>
-      <div
-        class="col-span-6 bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
-      ></div>
+      <Lending></Lending>
       <Bot></Bot>
-      <div
-        class="col-span-6 bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_1.1s_forwards]"
-      ></div>
+      <Trade></Trade>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import FSA from "../sections/Dashboard/FSA.vue";
 import Bot from "../sections/Dashboard/Bot.vue";
+import Lending from "../sections/Dashboard/Lending.vue";
 import { ref } from "vue";
 import { dashboardLogo } from "../../asset/images/images";
 import { networkNames, networkLogo } from "../../types/networkSpecs";
 import { Values } from "../../types/cryptoSpecs";
+import Trade from "../sections/Dashboard/Trade.vue";
 
 let networkElement = ref<HTMLInputElement | null>(null);
 let selectedNetwork = ref<null | Values<typeof networkNames>>(null);
