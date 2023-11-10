@@ -1,11 +1,11 @@
 <template>
   <div class="p-2 w-full">
     <div
-      class="grid grid-cols-12 lg:grid-rows-[min-content_1fr_1fr] bg-base-300 rounded-lg p-5 gap-3 w-full lg:h-[calc(100vh-110px)]"
+      class="grid grid-cols-12 grid-rows-[min-content_1fr_auto_1fr_1fr] lg:grid-rows-[min-content_1fr_1fr] bg-base-300 rounded-lg p-5 gap-3 w-full lg:h-[calc(100vh-110px)]"
     >
-      <div class="col-span-full m-2 flex justify-start gap-3">
+      <div class="col-span-full m-2 flex justify-start gap-3 flex-wrap">
         <div class="tooltip" data-tip="click for help">
-          <button class="flex gap-4 btn btn-ghost text-4xl font-bold">
+          <button class="flex gap-4 btn btn-ghost text-4xl font-bold flex-nowrap">
             <dashboardLogo class="w-12 h-12"></dashboardLogo>
             Dashboard
           </button>
