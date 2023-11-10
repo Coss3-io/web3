@@ -16,10 +16,10 @@ b
       class="col-span-full w-full h-full flex flex-col items-center justify-evenly"
     >
       <div
-        class="stats shadow-md shadow-black/50 bg-primary text-primary-content w-full"
+        class="stats shadow-md shadow-black/50 bg-primary text-primary-content w-full grid-cols-3"
       >
-        <div class="stat">
-          <div class="stat-figure text-neutral-content">
+        <div class="stat relative">
+          <div class="stat-figure text-neutral-content absolute">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -39,8 +39,8 @@ b
           <div class="stat-value py-5">$1,520,230</div>
           <div class="stat-desc">$230 in orders</div>
         </div>
-        <div class="stat">
-          <div class="stat-figure text-neutral-content">
+        <div class="stat relative">
+          <div class="stat-figure text-neutral-content absolute">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
