@@ -4,7 +4,7 @@
     class="btn btn-ghost"
     @click="unCheck"
   >
-    <fsaLogo class="w-6 h-6"></fsaLogo>
+    <lendingLogo class="w-6 h-6"></lendingLogo>
     Lending
   </RouterLink>
 </template>
