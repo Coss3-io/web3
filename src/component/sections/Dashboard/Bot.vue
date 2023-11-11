@@ -21,7 +21,7 @@
           profits: 679,
           fees: 1,
         }"
-        class="max-h-56 w-56 grow place-self-center indicator shadow-lg shadow-black/50"
+        class="max-h-56 xl:max-h-full w-56 xl:w-1/3 grow place-self-center indicator shadow-lg shadow-black/50"
       >
         <span
           class="indicator-item top-4 -left-8 badge bg-primary text-primary-content font-bold text-xs gap-1"
@@ -52,7 +52,7 @@
           profits: 45,
           fees: 2,
         }"
-        class="max-h-56 w-56 grow place-self-center indicator shadow-lg shadow-black/50"
+        class="max-h-56 xl:max-h-full w-56 xl:w-1/3 grow place-self-center indicator shadow-lg shadow-black/50"
       >
         <span
           class="indicator-item top-4 -left-8 badge bg-primary text-primary-content font-bold text-xs gap-1"
@@ -76,7 +76,7 @@
       </BotCard>
 
       <div
-        class="stats stats-vertical sm:stats-horizontal md:stats-vertical lg:stats-horizontal bg-primary text-primary-content place-self-center shadow-lg shadow-black/50 w-full max-w-[15rem] sm:max-w-none md:max-w-[15rem] lg:max-w-none"
+        class="stats stats-vertical sm:stats-horizontal md:stats-vertical lg:stats-horizontal xl:stats-vertical bg-primary text-primary-content place-self-center shadow-lg shadow-black/50 w-full max-w-[15rem] sm:max-w-none md:max-w-[15rem] lg:max-w-none xl:w-[30%] xl:grow"
       >
         <div class="stat py-2.5">
           <div class="stat-title">Bot Volume</div>
