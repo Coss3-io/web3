@@ -14,7 +14,7 @@
       <div class="max-w-md opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]">
 
         <h1 class="xs:text-3xl text-2xl lg:text-5xl font-bold">Start earning while sleeping</h1>
-        <p class="lg:py-6 py-3 hidden xs:block">With a unique new decentralized trading experience, coss3.io let's you enjoy brand new web3 features</p>
+        <p class="lg:py-6 py-3 hidden xs:block">With a unique new decentralized trading experience, coss3.io lets you enjoy brand new web3 features</p>
         <div class="flex gap-5 lg:justify-start justify-center py-2">
           <RouterLink :to="{ name: RouteNames.NewBot }" class="btn btn-primary">
             Start now
