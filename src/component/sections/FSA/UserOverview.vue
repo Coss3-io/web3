@@ -37,7 +37,7 @@
     <div
       class="stat place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
     >
-      <div class="stat-title">Annualised Yield</div>
+      <div class="stat-title">Annualized Yield</div>
       <div class="stat-value xl:text-[30px] 2xl:text-[36px] flex items-center w-full justify-center gap-3">
         <div class="font-sans grow text-center md:text-left lg:text-center xl:text-left">
           23%
