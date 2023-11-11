@@ -1,6 +1,6 @@
 <template>
   <div
-    class="col-span-full lg:col-span-6 grid grid-cols-[min-content_1fr] grid-rows-[min-content_1fr_min-content] xl:grid-rows-[min-content_1fr] 2xl:grid-rows-[min-content_1fr_min-content] gap-3 items-center bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-slideIn"
+    class="col-span-full lg:col-span-6 grid grid-cols-[min-content_1fr] grid-rows-[min-content_1fr_min-content] xl:grid-rows-[min-content_1fr] 2xl:grid-rows-[min-content_3fr_2fr] gap-3 items-center bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-slideIn"
   >
     <div class="flex justify-start">
       <div
@@ -15,11 +15,11 @@
       <UserOverview></UserOverview>
     </div>
     <div
-      class="col-span-full flex justify-center self-start xl:row-start-1 2xl:row-start-auto xl:col-span-1 2xl:col-span-full xl:col-start-2 2xl:col-start-auto"
+      class="col-span-full flex justify-center self-center xl:row-start-1 2xl:row-start-auto xl:col-span-1 2xl:col-span-full xl:col-start-2 2xl:col-start-auto"
     >
       <div class="flex justify-center items-center min-w-[60%] font-bold">
         <div
-          class="alert shadow-md shadow-black/50 grid-flow-col xl:p-2.5 2xl:p-4"
+          class="alert shadow-md shadow-black/50 grid-flow-col xl:p-2.5 2xl:p-4 xl:scale-90 2xl:scale-100"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

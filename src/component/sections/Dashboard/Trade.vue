@@ -1,7 +1,7 @@
 b
 <template>
   <div
-    class="col-span-6 grid grid-cols-3 grid-rows-[min-content_1fr] gap-y-3 gap-x-2 items-start bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_1.1s_forwards]"
+    class="col-span-full lg:col-span-6 grid grid-cols-3 grid-rows-[min-content_1fr] gap-y-3 gap-x-2 items-start bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_1.1s_forwards]"
   >
     <div class="col-span-full flex justify-start">
       <div
@@ -16,7 +16,7 @@ b
       class="col-span-full w-full h-full flex flex-col items-center justify-evenly"
     >
       <div
-        class="stats shadow-md shadow-black/50 bg-primary text-primary-content w-full grid-cols-3"
+        class="stats stats-vertical shadow-md shadow-black/50 bg-primary text-primary-content"
       >
         <div class="stat relative">
           <div class="stat-figure text-neutral-content absolute">
