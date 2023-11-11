@@ -5,6 +5,7 @@ build/
 typechain-types/
 artifacts/
 cache/
+dist/
 mnemonic.txt
 testnetMnemonic.txt
 prod.config.js
