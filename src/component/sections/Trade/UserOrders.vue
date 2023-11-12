@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col gap-2 xl:h-full lg:h-[calc(100vh-215px)] h-[calc(100vh-100px)] col-span-full xl:col-span-5 bg-base-100 overflow-hidden shadow-md shadow-black/50 rounded-lg p-2 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+    class="flex flex-col overflow-hidden gap-2 xl:h-full lg:h-[calc(100vh-215px)] h-[calc(100vh-100px)] col-span-full xl:col-span-5 bg-base-100 shadow-md shadow-black/50 rounded-lg p-2 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
   >
     <div class="flex justify-start items-center gap-3 flex-wrap">
       <div
@@ -136,7 +136,7 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-12 md:grid-rows-[min-content_min-content_1fr] grid-rows-[min-content_min-content_min-content_1fr] gap-2 gap-x-0 h-full overflow-hidden rounded-lg"
+      class="grid grid-cols-12 overflow-x-hidden overflow-y-auto custom-scroll md:grid-rows-[min-content_min-content_1fr] grid-rows-[min-content_min-content_min-content_1fr] gap-2 gap-x-0 h-full rounded-lg"
     >
       <div
         class="col-span-full row-start-3 md:row-start-auto flex flex-col justify-center items-center"
@@ -210,10 +210,10 @@
         </div>
       </div>
       <div
-        class="col-span-full h-full pt-2 overflow-hidden flex justify-center"
+        class="col-span-full h-full pt-2 min-h-[11rem] flex justify-center"
       >
         <div
-          class="grid grid-cols-12 overflow-hidden max-w-4xl w-full grid-rows-[min-content_1fr_min-content] h-full bg-base-300 shadow-lg shadow-black/50 rounded-lg px-2 gap-1 py-1 pb-2"
+          class="grid grid-cols-12 max-w-4xl w-full grid-rows-[min-content_1fr_min-content] h-full bg-base-300 shadow-lg shadow-black/50 rounded-lg px-2 gap-1 py-1 pb-2"
         >
           <div
             class="grid grid-cols-[3fr_3fr_3fr_4fr_3fr_3fr] col-span-full place-items-center text-[9px]"
