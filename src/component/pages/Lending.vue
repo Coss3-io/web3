@@ -12,7 +12,7 @@
         </div>
       </div>
       <div
-        class="flex flex-col gap-3 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
+        class="flex flex-col min-h-[24rem] gap-3 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
       >
         <div class="flex justify-start">
           <div
@@ -62,7 +62,7 @@
         </div>
       </div>
       <div
-        class="flex flex-col row-span-2 gap-3 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
+        class="flex flex-col min-h-[24rem] row-span-2 gap-3 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
       >
         <div class="flex justify-start">
           <div
@@ -107,7 +107,7 @@
         </div>
       </div>
       <div
-        class="flex flex-col gap-3 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+        class="flex flex-col min-h-[24rem] gap-3 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
       >
         <div class="flex justify-start">
           <div
