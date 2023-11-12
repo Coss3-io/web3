@@ -12,7 +12,7 @@
         </div>
       </div>
       <div
-        class="grid grid-cols-12 sm:grid-rows-[min-content_min-content_1fr] xl:grid-rows-[min-content_1fr_1fr] col-span-full xl:col-span-7 overflow-hidden gap-2 bg-base-100 shadow-md shadow-black/50 rounded-lg p-2 opacity-0 translate-y-3 animate-slideIn"
+        class="grid grid-cols-12 overflow-x-hidden overflow-y-auto sm:grid-rows-[min-content_min-content_1fr] xl:grid-rows-[min-content_1fr_1fr] col-span-full xl:col-span-7 overflow-hidden gap-2 bg-base-100 shadow-md shadow-black/50 rounded-lg p-2 opacity-0 translate-y-3 animate-slideIn"
       >
         <div class="col-span-full justify-self-start items-start">
           <div
@@ -38,12 +38,12 @@
         </div>
 
         <div
-          class="col-span-full sm:col-span-6 lg:col-span-4 sm:row-span-2 h-[calc(100vh-250px)] xl:h-auto w-full rounded-xl"
+          class="col-span-full sm:col-span-6 lg:col-span-4 sm:row-span-2 h-[calc(100vh-250px)] min-h-full xl:h-auto w-full rounded-xl"
         >
           <Orderbook :orderDetails="orderDetails"></Orderbook>
         </div>
         <div
-          class="col-span-full sm:col-span-6 lg:col-span-4 h-[calc(50vh-125px)] sm:h-[calc(50vh-50px)] lg:h-[calc(50vh-100px)] xl:h-full overflow-hidden w-full rounded-xl"
+          class="col-span-full sm:col-span-6 lg:col-span-4 min-h-full h-[calc(50vh-125px)] sm:h-[calc(50vh-50px)] lg:h-[calc(50vh-100px)] xl:h-full overflow-hidden w-full rounded-xl"
         >
           <TradeHistory :tradeHistory="tradeHistory"></TradeHistory>
         </div>

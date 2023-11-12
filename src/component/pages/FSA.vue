@@ -1,7 +1,7 @@
 <template>
   <div class="p-2 w-full">
     <div
-      class="grid grid-cols-12 lg:grid-rows-[min-content_7fr_5fr] bg-base-300 rounded-lg p-5 gap-3 w-full lg:h-[calc(100vh-110px)]"
+      class="grid grid-cols-12 overflow-x-hidden overflow-y-auto lg:grid-rows-[min-content_7fr_5fr] bg-base-300 rounded-lg p-5 gap-3 w-full lg:h-[calc(100vh-110px)]"
     >
       <div class="col-span-full m-2 flex justify-start">
         <div class="tooltip" data-tip="click for help">
