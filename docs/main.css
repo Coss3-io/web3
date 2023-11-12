@@ -3973,6 +3973,10 @@ img {
     min-height: 0px;
   }
 
+  .lg\:min-h-\[14rem\] {
+    min-height: 14rem;
+  }
+
   .lg\:w-16 {
     width: 4rem;
   }
