@@ -76,7 +76,7 @@
       </BotCard>
 
       <div
-        class="stats stats-vertical sm:stats-horizontal md:stats-vertical lg:stats-horizontal xl:stats-vertical bg-primary text-primary-content place-self-center shadow-lg shadow-black/50 w-full max-w-[15rem] sm:max-w-none md:max-w-[15rem] lg:max-w-none xl:w-[30%] xl:grow"
+        class="stats stats-vertical xl:h-full max-h-96 sm:stats-horizontal md:stats-vertical lg:stats-horizontal xl:stats-vertical bg-primary text-primary-content place-self-center shadow-lg shadow-black/50 w-full max-w-[15rem] sm:max-w-none md:max-w-[15rem] lg:max-w-none xl:w-[30%] xl:grow"
       >
         <div class="stat py-2.5">
           <div class="stat-title">Bot Volume</div>
