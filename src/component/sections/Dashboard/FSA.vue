@@ -1,6 +1,6 @@
 <template>
   <div
-    class="col-span-full lg:col-span-6 grid grid-cols-[min-content_1fr] grid-rows-[min-content_1fr_min-content] xl:grid-rows-[min-content_1fr] 2xl:grid-rows-[min-content_3fr_2fr] gap-3 items-center bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-slideIn"
+    class="col-span-full lg:col-span-6 grid grid-cols-[min-content_1fr] grid-rows-[min-content_1fr_min-content] xl:grid-rows-[min-content_1fr] 2xl:grid-rows-[min-content_3fr_2fr] gap-2 items-center bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-slideIn"
   >
     <div class="flex justify-start">
       <div
@@ -11,7 +11,7 @@
         <div>FSA</div>
       </div>
     </div>
-    <div class="w-full col-span-full">
+    <div class="w-full col-span-full flex justify-center">
       <UserOverview></UserOverview>
     </div>
     <div

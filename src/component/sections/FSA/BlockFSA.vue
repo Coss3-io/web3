@@ -58,15 +58,19 @@
     </div>
   </div>
   <div
+    ref="fsaContainer"
     class="h-full max-h-72 lg:max-h-full relative overflow-x-hidden overflow-y-auto custom-scroll flex flex-col p-1"
   >
-    <div class="grid grid-cols-4 place-items-center text-[9px]">
+    <div
+      class="grid grid-cols-4 place-items-center text-[9px]"
+      ref="titleContainer"
+    >
       <div @click="addOrder">Token</div>
       <div @click="delOrder">Amount</div>
       <div>$</div>
       <div>last withdraw (block)</div>
     </div>
-    <TransitionGroup name="listSell" tag="div">
+    <TransitionGroup name="listBuy" tag="div">
       <div
         v-for="(tokenFee, index) in tokenFees"
         :key="`${tokenFee.amount}${tokenFee.$}`"
@@ -79,12 +83,24 @@
         <div>${{ tokenFee.$ }}</div>
         <div>{{ tokenFee.lastWithdraw }}</div>
       </div>
+      <div
+        v-for="n in (tokenFees.length * 40 < (fsaContainer?.clientHeight! - titleContainer?.clientHeight!) ? Math.floor((fsaContainer?.clientHeight! - tokenFees.length * 40 )/39): 0)"
+        class="flex text-center text-[11px] font-bold h-8 -z-10 overflow-hidden w-full"
+      >
+        <div class="w-1/4">-</div>
+        <div class="w-1/4">-</div>
+        <div class="w-1/4">-</div>
+        <div class="w-1/4">-</div>
+      </div>
     </TransitionGroup>
   </div>
 </template>
 <script setup lang="ts">
 import { usdt, ether, logo } from "../../../asset/images/images";
 import { ref } from "vue";
+
+const fsaContainer = ref<HTMLDivElement | null>(null);
+const titleContainer = ref<HTMLDivElement | null>(null);
 
 function delOrder() {
   tokenFees.value.splice(2, 2);

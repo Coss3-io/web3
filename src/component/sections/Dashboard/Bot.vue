@@ -1,6 +1,6 @@
 <template>
   <div
-    class="col-span-full lg:col-span-6 flex flex-col gap-y-3 gap-x-2 items-start bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
+    class="col-span-full lg:col-span-6 flex flex-col gap-2 items-start bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
   >
     <div class="flex justify-start">
       <div
@@ -11,7 +11,7 @@
         <div>Bot</div>
       </div>
     </div>
-    <div class="flex flex-wrap w-full gap-y-3 gap-x-2 justify-evenly">
+    <div class="flex flex-wrap w-full h-full gap-y-3 gap-x-2 justify-evenly items-center">
       <BotCard
         :bot="{
           base: 7593,
@@ -21,7 +21,7 @@
           profits: 679,
           fees: 1,
         }"
-        class="max-h-56 xl:max-h-full w-56 xl:w-1/3 grow place-self-center indicator shadow-lg shadow-black/50"
+        class="max-h-56 xl:max-h-64 w-56 xl:w-1/3 grow place-self-center indicator shadow-lg shadow-black/50"
       >
         <span
           class="indicator-item top-4 -left-8 badge bg-primary text-primary-content font-bold text-xs gap-1"
@@ -52,7 +52,7 @@
           profits: 45,
           fees: 2,
         }"
-        class="max-h-56 xl:max-h-full w-56 xl:w-1/3 grow place-self-center indicator shadow-lg shadow-black/50"
+        class="max-h-56 xl:max-h-64 w-56 xl:w-1/3 grow place-self-center indicator shadow-lg shadow-black/50"
       >
         <span
           class="indicator-item top-4 -left-8 badge bg-primary text-primary-content font-bold text-xs gap-1"
@@ -76,7 +76,7 @@
       </BotCard>
 
       <div
-        class="stats stats-vertical sm:stats-horizontal md:stats-vertical lg:stats-horizontal xl:stats-vertical bg-primary text-primary-content place-self-center shadow-lg shadow-black/50 w-full max-w-[15rem] sm:max-w-none md:max-w-[15rem] lg:max-w-none xl:w-[30%] xl:grow"
+        class="stats stats-vertical xl:h-full max-h-96 sm:stats-horizontal md:stats-vertical lg:stats-horizontal xl:stats-vertical bg-primary text-primary-content place-self-center shadow-lg shadow-black/50 w-full max-w-[15rem] sm:max-w-none md:max-w-[15rem] lg:max-w-none xl:w-[30%] xl:grow"
       >
         <div class="stat py-2.5">
           <div class="stat-title">Bot Volume</div>
