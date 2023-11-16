@@ -28,8 +28,9 @@
           </span>
         </RouterLink>
       </div>
-      <div class="navbar-end lg:gap-3 xl:gap-6 2xl:gap-14 invisible lg:visible">
+      <div class="navbar-end lg:gap-1 xl:gap-3 2xl:gap-6 invisible lg:visible">
         <DocsButton></DocsButton>
+        <PromoButton></PromoButton>
         <FSAButton></FSAButton>
         <LendingButton></LendingButton>
         <Botbutton></Botbutton>
@@ -44,6 +45,7 @@ import { RouterLink } from "vue-router";
 import { RouteNames } from "../../router";
 import { logo } from "../../asset/images/images";
 import FSAButton from "../buttons/FSA.vue";
+import PromoButton from "../buttons/Promo.vue";
 import LendingButton from "../buttons/Lending.vue";
 import Botbutton from "../buttons/Bot.vue";
 import Tradebutton from "../buttons/Trade.vue";

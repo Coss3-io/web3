@@ -3,9 +3,10 @@
     <li class="menu-title">COSS3.io</li>
     <li class="mb-5"><DashboardButton></DashboardButton></li>
     <li class="mt-5 mb-5"><TradeButton></TradeButton></li>
-    <li class="mt-5 mb-5"><LendingButton></LendingButton></li>
     <li class="mt-5 mb-5"><Botbutton></Botbutton></li>
+    <li class="mt-5 mb-5"><LendingButton></LendingButton></li>
     <li class="mt-5 mb-5"><FSAButton></FSAButton></li>
+    <li class="mt-5 mb-5"><PromoButton></PromoButton></li>
     <li class="mt-5 mb-5"><DocsButton></DocsButton></li>
   </ul>
 </template>
@@ -13,6 +14,7 @@
 import Botbutton from "../buttons/Bot.vue";
 import DashboardButton from "../buttons/Dashboard.vue";
 import FSAButton from "../buttons/FSA.vue";
+import PromoButton from "../buttons/Promo.vue";
 import LendingButton from "../buttons/Lending.vue";
 import TradeButton from "../buttons/Trade.vue";
 import DocsButton from "../buttons/Docs.vue";
