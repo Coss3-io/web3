@@ -1,6 +1,6 @@
 <template>
   <RouterLink
-    :to="{ name: RouteNames.NewBot }"
+    :to="{ name: RouteNames.Promo }"
     class="btn btn-ghost"
     @click="unCheck"
   >
@@ -12,6 +12,7 @@
 import { RouterLink } from "vue-router";
 import { RouteNames } from "../../router";
 import { promoLogo } from "../../asset/images/images";
+
 const unCheck = () => {
   let label = document.getElementById("main-drawer")!;
   if ("checked" in label) {
