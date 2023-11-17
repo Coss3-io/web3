@@ -86,16 +86,31 @@
       <div class="stat-actions flex gap-3">
         <button
           class="btn btn-sm hover:scale-105"
-          @click="modalDialog?.showModal(); depositInput?.blur()"
+          @click="
+            depositModalDialog?.showModal();
+            depositInput?.blur();
+          "
         >
           Deposit
         </button>
-        <button class="btn btn-sm hover:scale-105">Withdraw</button>
+        <button
+          class="btn btn-sm hover:scale-105"
+          @click="
+            wthdrawModalDialog?.showModal();
+            wthdrawInput?.blur();
+          "
+        >
+          Withdraw
+        </button>
       </div>
     </div>
   </div>
   <Teleport to="body">
-    <dialog class="modal" ref="modalDialog" @click="modalDialog?.close()">
+    <dialog
+      class="modal"
+      ref="depositModalDialog"
+      @click="depositModalDialog?.close()"
+    >
       <div class="modal-box shadow-lg shadow-black/50" @click.stop="">
         <h1 class="font-bold text-xl flex gap-2">
           Deposit
@@ -158,6 +173,70 @@
       </div>
     </dialog>
   </Teleport>
+  <Teleport to="body">
+    <dialog
+      class="modal"
+      ref="wthdrawModalDialog"
+      @click="wthdrawModalDialog?.close()"
+    >
+      <div class="modal-box shadow-lg shadow-black/50" @click.stop="">
+        <h1 class="font-bold text-xl flex gap-2">
+          Withdraw
+          <img
+            :src="logo"
+            class="p-0.5 w-7 h-7 rounded-full bg-base-300 shadow-lg shadow-black/50"
+          />
+        </h1>
+        <p class="py-4">
+          Withdrawing coss tokens from the stacking contract is immediate
+        </p>
+        <div
+          class="mt-3 w-full flex justify-between items-center rounded-md bg-base-300 shadow-lg shadow-black/50 relative"
+        >
+          <div
+            class="flex justify-center text-primary-content px-2 bg-primary white-end text-sm font-bold rounded-md py-1 m-2 shadow-lg shadow-black"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+              />
+            </svg>
+          </div>
+          <input
+            v-model="wthdrawAmount"
+            ref="wthdrawInput"
+            type="text"
+            class="appearance-none min-w-0 grow text-center font-bold outline-none rounded-md bg-transparent placeholder:opacity-25 sm:placeholder:text-base placeholder:text-xs"
+            :placeholder="`COSS available: ${3535435}`"
+          />
+          <div class="btn btn-xs btn-primary m-2">max</div>
+        </div>
+        <div class="modal-action justify-center">
+          <form method="dialog">
+            <button
+              class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            >
+              ✕
+            </button>
+          </form>
+          <button
+            class="btn btn-primary white-end hover:scale-105 btn-wide shadow-lg shadow-black/50"
+          >
+            Withdraw
+          </button>
+        </div>
+      </div>
+    </dialog>
+  </Teleport>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
@@ -165,5 +244,9 @@ import { logo } from "../../../asset/images/images";
 
 let depositAmount = ref<null | number>(null);
 let depositInput = ref<HTMLInputElement | null>(null);
-let modalDialog = ref<HTMLDialogElement | null>(null);
+let depositModalDialog = ref<HTMLDialogElement | null>(null);
+
+let wthdrawAmount = ref<null | number>(null);
+let wthdrawInput = ref<HTMLInputElement | null>(null);
+let wthdrawModalDialog = ref<HTMLDialogElement | null>(null);
 </script>
