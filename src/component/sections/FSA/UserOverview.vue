@@ -84,12 +84,86 @@
       </div>
       <div class="stat-desc">$89,400 (1.2% of total stacked)</div>
       <div class="stat-actions flex gap-3">
-        <button class="btn btn-sm hover:scale-105">Deposit</button>
+        <button
+          class="btn btn-sm hover:scale-105"
+          @click="modalDialog?.showModal(); depositInput?.blur()"
+        >
+          Deposit
+        </button>
         <button class="btn btn-sm hover:scale-105">Withdraw</button>
       </div>
     </div>
   </div>
+  <Teleport to="body">
+    <dialog class="modal" ref="modalDialog" @click="modalDialog?.close()">
+      <div class="modal-box shadow-lg shadow-black/50" @click.stop="">
+        <h1 class="font-bold text-xl flex gap-2">
+          Deposit
+          <img
+            :src="logo"
+            class="p-0.5 w-7 h-7 rounded-full bg-base-300 shadow-lg shadow-black/50"
+          />
+        </h1>
+        <p class="py-4">
+          Deposited coss tokens will be taken in account for FSA at
+          <b>the next block start</b>
+          , check
+          <u>the docs</u>
+          for more details
+        </p>
+        <div
+          class="mt-3 w-full flex justify-between items-center rounded-md bg-base-300 shadow-lg shadow-black/50 relative"
+        >
+          <div
+            class="flex justify-center text-primary-content px-2 bg-primary white-end text-sm font-bold rounded-md py-1 m-2 shadow-lg shadow-black"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+              />
+            </svg>
+          </div>
+          <input
+            v-model="depositAmount"
+            ref="depositInput"
+            type="text"
+            class="appearance-none min-w-0 grow text-center font-bold outline-none rounded-md bg-transparent placeholder:opacity-25 sm:placeholder:text-base placeholder:text-xs"
+            :placeholder="`COSS available: ${3535435}`"
+          />
+          <div class="btn btn-xs btn-primary m-2">max</div>
+        </div>
+        <div class="modal-action justify-center">
+          <form method="dialog">
+            <button
+              class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            >
+              ✕
+            </button>
+          </form>
+          <button
+            class="btn btn-primary white-end hover:scale-105 btn-wide shadow-lg shadow-black/50"
+          >
+            Deposit
+          </button>
+        </div>
+      </div>
+    </dialog>
+  </Teleport>
 </template>
 <script setup lang="ts">
+import { ref } from "vue";
 import { logo } from "../../../asset/images/images";
+
+let depositAmount = ref<null | number>(null);
+let depositInput = ref<HTMLInputElement | null>(null);
+let modalDialog = ref<HTMLDialogElement | null>(null);
 </script>

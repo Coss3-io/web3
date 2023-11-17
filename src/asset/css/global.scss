@@ -9,6 +9,14 @@
   font-family: "lucida sans unicode", "lucida grande", sans-serif;
 }
 
+.white-end {
+  @apply bg-gradient-to-b from-transparent via-transparent to-white/20
+}
+
+.black-end {
+  @apply bg-gradient-to-b from-transparent via-transparent to-black/20
+}
+
 .btn {
   @apply content-center;
 }
