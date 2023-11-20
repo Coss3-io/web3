@@ -91,7 +91,7 @@ module.exports = {
               transpileOnly: !("DEV" in process.env),
               compilerOptions: {
                 module: "ESNext",
-                moduleResolution: "Node10"
+                moduleResolution: "bundler",
               },
             },
           },
