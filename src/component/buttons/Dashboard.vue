@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import { dashboardLogo } from "../../asset/images/images";
-import { RouteNames } from "../../router";
+import { RouteNames } from "../../router";  
 
 const unCheck = () => {
   let label = document.getElementById("main-drawer")!;

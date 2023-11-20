@@ -42,7 +42,7 @@
 </template>
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
-import { RouteNames } from "../../router";
+import { RouteNames } from "../../router"; 
 import { logo } from "../../asset/images/images";
 import FSAButton from "../buttons/FSA.vue";
 import PromoButton from "../buttons/Promo.vue";

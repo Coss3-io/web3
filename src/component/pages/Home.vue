@@ -19,6 +19,7 @@
           <RouterLink :to="{ name: RouteNames.NewBot }" class="btn btn-primary">
             Start now
           </RouterLink>
+          <w3m-button />
           <RouterLink :to="{ name: RouteNames.NewBot }" class="btn btn-ghost">
             Learn more
           </RouterLink>

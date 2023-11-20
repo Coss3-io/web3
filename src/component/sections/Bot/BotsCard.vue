@@ -98,4 +98,3 @@ const botsList = [
   },
 ];
 </script>
-../../../types/cryptoSpecs

@@ -85,6 +85,7 @@
       </div>
       <div
         v-for="n in (tokenFees.length * 40 < (fsaContainer?.clientHeight! - titleContainer?.clientHeight!) ? Math.floor((fsaContainer?.clientHeight! - tokenFees.length * 40 )/39): 0)"
+        :key="n"
         class="flex text-center text-[11px] font-bold h-8 -z-10 overflow-hidden w-full"
       >
         <div class="w-1/4">-</div>
