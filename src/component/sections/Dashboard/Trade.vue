@@ -15,16 +15,14 @@
       <div
         class="stats stats-vertical lg:h-full md:stats-horizontal lg:stats-vertical xl:stats-horizontal shadow-md shadow-black/50 bg-primary text-primary-content w-fit max-w-full lg:w-full overflow-hidden"
       >
-        <div class="stat relative sm:border-r-2 md:border-r-0 lg:border-r-2 xl:border-r-0">
+        <div
+          class="stat relative sm:border-r-2 md:border-r-0 lg:border-r-2 xl:border-r-0"
+        >
           <div class="stat-title">Traded Volume</div>
           <div
             class="stat-value py-3 flex items-center w-full justify-center gap-3"
           >
-            <div
-              class="font-sans grow text-left"
-            >
-              $1,520,230
-            </div>
+            <div class="font-sans grow text-left">$1,520,230</div>
             <div class="text-neutral-content">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -49,11 +47,7 @@
           <div
             class="stat-value py-3 flex items-center w-full justify-center gap-3"
           >
-            <div
-              class="font-sans grow text-left"
-            >
-              $1,520
-            </div>
+            <div class="font-sans grow text-left">$1,520</div>
             <div class="text-neutral-content">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -94,14 +88,16 @@
     <div
       class="col-span-full flex justify-center self-center xl:row-start-1 2xl:row-start-auto xl:col-span-1 2xl:col-span-full xl:col-start-2 2xl:col-start-auto"
     >
-      <div class="flex justify-center items-center min-w-[60%] font-bold">
+      <div
+        class="flex justify-center items-center min-w-[60%] font-bold relative"
+      >
         <span
           v-if="rebalance"
-          class="absolute w-3 h-3 rounded-full bg-error top-0 right-0"
+          class="absolute w-3 h-3 rounded-full bg-error top-0 right-0 z-10"
         ></span>
         <span
           v-if="rebalance"
-          class="absolute w-3 h-3 rounded-full bg-error top-0 right-0 border-error animate-ping"
+          class="absolute w-3 h-3 rounded-full bg-error top-0 right-0 border-error animate-ping z-10"
         ></span>
         <div
           class="alert shadow-md shadow-black/50 grid-flow-col xl:p-2.5 2xl:p-4 xl:scale-90 2xl:scale-100"
@@ -144,19 +140,150 @@
               Details
             </button>
           </RouterLink>
-          <button v-else class="btn btn-error btn-sm hover:scale-105">
+          <button
+            v-else
+            class="btn btn-error btn-sm hover:scale-105"
+            onclick="tradeModal.showModal()"
+          >
             Details
           </button>
         </div>
       </div>
     </div>
   </div>
+  <Teleport to="body">
+    <dialog id="tradeModal" class="modal" onclick="tradeModal.close()">
+      <div
+        class="modal-box shadow-lg shadow-black/50 max-h-96 bg-gradient-to-b from-transparent via-transparent to-red-500/10"
+        @click.stop=""
+      >
+        <h1 class="font-bold text-xl flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-8 h-8"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+            />
+          </svg>
+
+          Rebalance
+        </h1>
+        <p class="py-4">
+          To prevent your orders from being deleted please refill your wallet
+          balances, more details on
+          <u>the docs</u>
+        </p>
+        <div
+          class="mt-3 w-full flex justify-between items-center rounded-md bg-base-300 shadow-lg shadow-black/50"
+          v-for="(amount, token, index) in rebalanceList"
+        >
+          <div
+            class="flex justify-center items-center px-1.5 bg-neutral bg-gradient-to-b from-transparent via-transparent to-red-500/20 rounded-md py-1.5 m-2 shadow-lg shadow-black"
+          >
+            <img
+              v-if="token in cryptoNames"
+              :src="(<any>cryptoLogo)[token]"
+              class="w-7 h-7"
+            />
+            <unknownTokenLogo
+              v-else
+              class="h-8 w-8 fill-secondary"
+            ></unknownTokenLogo>
+          </div>
+          <div
+            class="flex flex-wrap gap-1 justify-center items-center grow text-center font-bold font-sans text-xs sm:text-base"
+          >
+            <span class="whitespace-nowrap">Need {{ amount }} additionnal</span>
+            <span
+              class="flex items-center gap-1 justify-center"
+              :class="token in cryptoNames ? '' : 'w-full'"
+            >
+              <span>
+                {{ token }}
+              </span>
+              <label
+                class="ml-2 swap swap-rotate"
+                @click="
+                  copiedIndex = index;
+                  copy(token);
+                "
+                :class="copiedIndex == index ? 'swap-active' : ''"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="swap-off w-4 h-4 sm:w-6 sm:h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
+                  />
+                </svg>
+
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="swap-on w-4 h-4 sm:w-6 sm:h-6 stroke-emerald-600"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75"
+                  />
+                </svg>
+              </label>
+            </span>
+          </div>
+        </div>
+        <div class="modal-action justify-center">
+          <form method="dialog">
+            <button
+              class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            >
+              ✕
+            </button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+  </Teleport>
 </template>
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
-import { tradeLogo } from "../../../asset/images/images";
+import { tradeLogo, unknownTokenLogo } from "../../../asset/images/images";
 import { RouteNames } from "../../../router";
 import { ref } from "vue";
+import { cryptoLogo, cryptoNames } from "../../../types/cryptoSpecs";
 
-let rebalance = ref<boolean>(false);
+let rebalance = ref<boolean>(true);
+let copiedIndex = ref<number | null>(null);
+
+async function copy(text: string) {
+  if (navigator.clipboard) {
+    await navigator.clipboard.writeText(text);
+  }
+}
+const rebalanceList = {
+  [cryptoNames.coss]: 5456,
+  [cryptoNames.bnb]: 26844,
+  [cryptoNames.aave]: 4654,
+  [cryptoNames.usdt]: 75643,
+  "0x55b0A...199B9fA5": 876896,
+  "0x51b0A...199B9fA5": 2508,
+  "0x55b0A...19919fA5": 986987,
+};
 </script>

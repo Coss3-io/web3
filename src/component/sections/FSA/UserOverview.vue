@@ -96,8 +96,8 @@
         <button
           class="btn btn-sm hover:scale-105"
           @click="
-            wthdrawModalDialog?.showModal();
-            wthdrawInput?.blur();
+            withdrawModalDialog?.showModal();
+            withdrawInput?.blur();
           "
         >
           Withdraw
@@ -176,8 +176,8 @@
   <Teleport to="body">
     <dialog
       class="modal"
-      ref="wthdrawModalDialog"
-      @click="wthdrawModalDialog?.close()"
+      ref="withdrawModalDialog"
+      @click="withdrawModalDialog?.close()"
     >
       <div class="modal-box shadow-lg shadow-black/50" @click.stop="">
         <h1 class="font-bold text-xl flex gap-2">
@@ -212,8 +212,8 @@
             </svg>
           </div>
           <input
-            v-model="wthdrawAmount"
-            ref="wthdrawInput"
+            v-model="withdrawAmount"
+            ref="withdrawInput"
             type="text"
             class="appearance-none min-w-0 grow text-center font-bold outline-none rounded-md bg-transparent placeholder:opacity-25 sm:placeholder:text-base placeholder:text-xs"
             :placeholder="`COSS available: ${3535435}`"
@@ -246,7 +246,7 @@ let depositAmount = ref<null | number>(null);
 let depositInput = ref<HTMLInputElement | null>(null);
 let depositModalDialog = ref<HTMLDialogElement | null>(null);
 
-let wthdrawAmount = ref<null | number>(null);
-let wthdrawInput = ref<HTMLInputElement | null>(null);
-let wthdrawModalDialog = ref<HTMLDialogElement | null>(null);
+let withdrawAmount = ref<null | number>(null);
+let withdrawInput = ref<HTMLInputElement | null>(null);
+let withdrawModalDialog = ref<HTMLDialogElement | null>(null);
 </script>
