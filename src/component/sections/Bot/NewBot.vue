@@ -74,7 +74,7 @@
                         viewBox="0 0 24 24"
                         stroke-width="1.5"
                         stroke="currentColor"
-                        class="w-5 h-5 transition-all"
+                        class="w-5 h-5 transition-all focusRotation"
                       >
                         <path
                           stroke-linecap="round"
@@ -164,7 +164,7 @@
                         viewBox="0 0 24 24"
                         stroke-width="1.5"
                         stroke="currentColor"
-                        class="w-5 h-5 transition-all"
+                        class="w-5 h-5 transition-all focusRotation"
                       >
                         <path
                           stroke-linecap="round"
