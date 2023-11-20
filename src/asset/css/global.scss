@@ -72,6 +72,6 @@
   }
 }
 
-label:focus-within > svg {
+label:focus-within > .focusRotation {
   transform: rotate(90deg);
 }
