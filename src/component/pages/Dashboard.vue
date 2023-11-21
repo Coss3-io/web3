@@ -14,7 +14,7 @@
             Dashboard
           </button>
         </div>
-        <div class="flex items-center gap-2 btn btn-ghost" @click.stop="open({'view': 'Account'})">
+        <div class="flex items-center gap-2 btn btn-ghost" @click.stop="open()">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -29,7 +29,7 @@
               d="M8.25 4.5l7.5 7.5-7.5 7.5"
             />
           </svg>
-          <w3m-account-button balance="hide" />
+          <w3m-button balance="hide" />
         </div>
         <div class="flex items-center gap-2 btn btn-ghost" @click.stop="open({'view': 'Networks'})">
           <svg
@@ -59,6 +59,8 @@
 <script setup lang="ts">
 //@ts-ignore
 import { useWeb3Modal } from "@web3modal/wagmi/vue";
+//@ts-ignore
+import { getAccount } from "@wagmi/core";
 import FSA from "../sections/Dashboard/FSA.vue";
 import Bot from "../sections/Dashboard/Bot.vue";
 import Lending from "../sections/Dashboard/Lending.vue";
@@ -67,8 +69,11 @@ import { dashboardLogo } from "../../asset/images/images";
 import { networkNames } from "../../types/networkSpecs";
 import { Values } from "../../types/cryptoSpecs";
 import Trade from "../sections/Dashboard/Trade.vue";
+import { useAccountStore } from "../../store/account";
 
+const accountStore = useAccountStore()
 const { open } = useWeb3Modal()
+let connection = ref(getAccount().isConnected) 
 let networkElement = ref<HTMLInputElement | null>(null);
 let selectedNetwork = ref<null | Values<typeof networkNames>>(null);
 </script>
