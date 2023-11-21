@@ -1,3 +1,5 @@
+//@ts-ignore
+import { getAccount } from "@wagmi/core";
 import {
   RouteRecordRaw,
   Router,
@@ -99,6 +101,9 @@ const router: Router = createRouter({
 });
 
 router.beforeEach((to, from) => {
+  if (!getAccount().isConnected && to.name != RouteNames.Home) {
+    return { name: RouteNames.Home};
+  }
   document.title = `coss3.io | ${String(to.name)}`;
 });
 

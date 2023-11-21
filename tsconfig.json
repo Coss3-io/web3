@@ -37,11 +37,8 @@
   ],
   "include": [
     "./jest-setup.ts",
-    "src/**/*.d.ts",
-    "src/asset/**/*.ts",
-    "src/component/**/*.ts",
-    "src/store/**/*.ts",
-    "src/types/**/*.ts",
+    "src/**/*.ts",
+    "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "./scripts",
