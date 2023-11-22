@@ -16,7 +16,7 @@
 </template>
 <script setup lang="ts">
 //@ts-ignore
-import { watchAccount } from "@wagmi/core";
+import { watchAccount, watchNetwork } from "@wagmi/core";
 //@ts-ignore
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/vue";
 import NavBar from "./component/navigation/NavBar.vue";
@@ -35,13 +35,11 @@ import {
 } from "viem/chains";
 
 const accountStore = useAccountStore();
-// 1. Get projectId
 const projectId = "aced478ee21b257981d650fe8ec77c40";
 
-// 2. Create wagmiConfig
 const metadata = {
   name: "coss3.io",
-  description: "decentralized trading platform",
+  description: "a gasless decentralized trading platform",
   url: "https://web3modal.com",
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
@@ -59,8 +57,12 @@ createWeb3Modal({
 });
 
 watchAccount((account) => {
-  accountStore[AccountActions.BlockchainConnection](account.isConnected);
-  accountStore[AccountActions.UpdateAddress](account.address); 
+  accountStore[AccountActions.UpdateBlockchainConnection](account.isConnected);
+  accountStore[AccountActions.UpdateAddress](account.address);
+});
+
+watchNetwork((network) => {
+  accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
 });
 
 const Suspense = suspense_ as {

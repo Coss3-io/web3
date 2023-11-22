@@ -2,6 +2,7 @@ export type AccountState = {
   blockchainConnected: boolean;
   appConnected: boolean;
   address: string | undefined;
+  networkId: number | undefined;
 };
 
 export const AccountGetters = {
@@ -11,6 +12,7 @@ export const AccountGetters = {
 
 export const AccountActions = {
   UpdateAddress: "UpdateAddress",
-  BlockchainConnection: "BlockchainConnection",
-  AppConnection: "AppConnection",
+  UpdateNetworkId: "UpdateNetworkId",
+  UpdateBlockchainConnection: "UpdateBlockchainConnection",
+  UpdateAppConnection: "UpdateAppConnection",
 } as const;

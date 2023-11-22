@@ -6,16 +6,18 @@ import {
   AccountState,
 } from "../../types/account";
 import {
-  appConnection,
-  blockchainConnection,
+  updateAppConnection,
+  updateBlockchainConnection,
   updateAddress,
+  updateNetworkId,
 } from "./actions";
 
 export const useAccountStore = defineStore("Test", {
   state: (): AccountState => state,
   actions: {
     [AccountActions.UpdateAddress]: updateAddress,
-    [AccountActions.AppConnection]: appConnection,
-    [AccountActions.BlockchainConnection]: blockchainConnection,
+    [AccountActions.UpdateAppConnection]: updateAppConnection,
+    [AccountActions.UpdateBlockchainConnection]: updateBlockchainConnection,
+    [AccountActions.UpdateNetworkId]: updateNetworkId,
   },
 });

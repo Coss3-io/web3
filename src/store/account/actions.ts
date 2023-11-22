@@ -3,7 +3,7 @@ import { useAccountStore } from ".";
 /**
  * @notice Update the account blockchain connection status
  */
-export function blockchainConnection(
+export function updateBlockchainConnection(
   this: ReturnType<typeof useAccountStore>,
   connected: boolean
 ): void {
@@ -13,7 +13,7 @@ export function blockchainConnection(
 /**
  * @notice Update the account app connection status
  */
-export function appConnection(
+export function updateAppConnection(
   this: ReturnType<typeof useAccountStore>,
   connected: boolean
 ): void {
@@ -28,4 +28,14 @@ export function updateAddress(
   address: string | undefined
 ): void {
   this.$state.address = address;
+}
+
+/**
+ * @notice Update the account networkId
+ */
+export function updateNetworkId(
+  this: ReturnType<typeof useAccountStore>,
+  networkId: number | undefined
+): void {
+  this.$state.networkId = networkId;
 }

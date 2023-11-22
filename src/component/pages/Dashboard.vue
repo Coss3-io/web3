@@ -59,8 +59,6 @@
 <script setup lang="ts">
 //@ts-ignore
 import { useWeb3Modal } from "@web3modal/wagmi/vue";
-//@ts-ignore
-import { getAccount } from "@wagmi/core";
 import FSA from "../sections/Dashboard/FSA.vue";
 import Bot from "../sections/Dashboard/Bot.vue";
 import Lending from "../sections/Dashboard/Lending.vue";
@@ -73,7 +71,6 @@ import { useAccountStore } from "../../store/account";
 
 const accountStore = useAccountStore()
 const { open } = useWeb3Modal()
-let connection = ref(getAccount().isConnected) 
 let networkElement = ref<HTMLInputElement | null>(null);
 let selectedNetwork = ref<null | Values<typeof networkNames>>(null);
 </script>

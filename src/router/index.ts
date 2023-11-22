@@ -1,11 +1,10 @@
-//@ts-ignore
-import { getAccount } from "@wagmi/core";
 import {
   RouteRecordRaw,
   Router,
   createRouter,
   createWebHashHistory,
 } from "vue-router";
+import { useAccountStore } from "../store/account";
 
 export enum RouteNames {
   Home = "Home",
@@ -101,8 +100,9 @@ const router: Router = createRouter({
 });
 
 router.beforeEach((to, from) => {
-  if (!getAccount().isConnected && to.name != RouteNames.Home) {
-    return { name: RouteNames.Home};
+  const accountStore = useAccountStore();
+  if ((!accountStore.$state.appConnected) && to.name != RouteNames.Home) {
+    return { name: RouteNames.Home };
   }
   document.title = `coss3.io | ${String(to.name)}`;
 });
