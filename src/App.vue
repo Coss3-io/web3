@@ -1,4 +1,9 @@
 <template>
+  <notifications class="m-2">
+    <template #body="{ item, close }: { item: any, close: any }">
+      <Notification :props="item" :fn="close" />
+    </template>
+  </notifications>
   <input id="main-drawer" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content relative min-h-screen overflow-hidden">
     <NavBar></NavBar>
@@ -22,6 +27,7 @@ import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/vue";
 import NavBar from "./component/navigation/NavBar.vue";
 import SideBar from "./component/navigation/SideBar.vue";
 import Footer from "./component/navigation/Footer.vue";
+import Notification from "./component/navigation/Notification.vue";
 import { useAccountStore } from "./store/account";
 import { AccountActions } from "./types/account";
 import { Suspense as suspense_, SuspenseProps, VNodeProps } from "vue";
