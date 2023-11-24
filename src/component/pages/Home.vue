@@ -37,7 +37,9 @@
           </RouterLink>
           <button
             v-else-if="accountStore.$state.blockchainConnected"
-            @click="accountStore[AccountActions.UpdateAppConnection](true)"
+            @click="
+              Client.login();
+            "
             class="btn btn-primary"
           >
             <svg
@@ -88,7 +90,7 @@ import { RouterLink, onBeforeRouteLeave } from "vue-router";
 import { phone_bg, background } from "../../asset/images/images";
 import { RouteNames } from "../../router";
 import { useAccountStore } from "../../store/account";
-import { AccountActions } from "../../types/account";
+import { Client } from "../../api";
 
 const { open } = useWeb3Modal();
 const accountStore = useAccountStore();
