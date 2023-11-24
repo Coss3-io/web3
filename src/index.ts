@@ -6,8 +6,8 @@ import { createPinia } from 'pinia'
 import Notifications from '@kyvg/vue3-notification'
 
 const app = createApp(App)
-  .use(router)
-  .use(Notifications)
-  .use(createPinia())
+.use(createPinia())
+.use(Notifications)
+.use(router)
 
 app.mount("#app")

@@ -31,6 +31,7 @@ import Notification from "./component/navigation/Notification.vue";
 import { useAccountStore } from "./store/account";
 import { AccountActions } from "./types/account";
 import { Suspense as suspense_, SuspenseProps, VNodeProps } from "vue";
+import { Client } from "./api";
 import {
   mainnet,
   arbitrum,
@@ -42,6 +43,9 @@ import {
 
 const accountStore = useAccountStore();
 const projectId = "aced478ee21b257981d650fe8ec77c40";
+
+Client.accountStore = accountStore;
+Client.checkConnection()
 
 const metadata = {
   name: "coss3.io",
@@ -61,10 +65,10 @@ createWeb3Modal({
     "19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927",
   ],
 });
-
 watchAccount((account) => {
   accountStore[AccountActions.UpdateBlockchainConnection](account.isConnected);
   accountStore[AccountActions.UpdateAddress](account.address);
+  //check that the user is connected to the bakend or not
 });
 
 watchNetwork((network) => {

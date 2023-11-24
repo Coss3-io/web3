@@ -5,6 +5,9 @@ import {
   createWebHashHistory,
 } from "vue-router";
 import { useAccountStore } from "../store/account";
+import { useNotification } from "@kyvg/vue3-notification";
+
+const { notify } = useNotification();
 
 export enum RouteNames {
   Home = "Home",
@@ -101,7 +104,8 @@ const router: Router = createRouter({
 
 router.beforeEach((to, from) => {
   const accountStore = useAccountStore();
-  if ((!accountStore.$state.appConnected) && to.name != RouteNames.Home) {
+  if (!accountStore.$state.appConnected && to.name != RouteNames.Home) {
+    notify({ text: "full log in needed to acces the app", type: "info" });
     return { name: RouteNames.Home };
   }
   document.title = `coss3.io | ${String(to.name)}`;
