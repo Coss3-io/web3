@@ -1,4 +1,5 @@
 export type AccountState = {
+  loading: boolean;
   blockchainConnected: boolean;
   appConnected: boolean;
   address: string | undefined;
@@ -12,6 +13,7 @@ export const AccountGetters = {
 
 export const AccountActions = {
   UpdateAddress: "UpdateAddress",
+  UpdateLoading: "UpdateLoading",
   UpdateNetworkId: "UpdateNetworkId",
   UpdateBlockchainConnection: "UpdateBlockchainConnection",
   UpdateAppConnection: "UpdateAppConnection",

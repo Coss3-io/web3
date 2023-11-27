@@ -31,6 +31,16 @@ export function updateAddress(
 }
 
 /**
+ * @notice Update the account loading status
+ */
+export function updateLoading(
+  this: ReturnType<typeof useAccountStore>,
+  loading: boolean
+): void {
+  this.$state.loading = loading;
+}
+
+/**
  * @notice Update the account networkId
  */
 export function updateNetworkId(
