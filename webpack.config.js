@@ -107,6 +107,13 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: "vue-loader",
+        options: {
+          compilerOptions: {
+            isCustomElement: (tag) => {
+              return tag.startsWith("w3m-");
+            },
+          },
+        },
       },
       {
         test: /\.(png|jpe?g|gif|svg|ttf|woff|woff2)$/i,
@@ -132,7 +139,7 @@ module.exports = {
         nodir: true,
       }),
       safelist: {
-      greedy: [/\-|\:|\[|\//, /fade.*/],
+        greedy: [/\-|\:|\[|\//, /fade.*/],
       },
     }),
     new DefinePlugin({
