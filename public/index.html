@@ -18,7 +18,7 @@
         padding: 0;
       }
 
-      .loading {
+      .initialLoadingSpinner {
         position: absolute;
         width: 70px;
         top: 50%;
@@ -40,7 +40,7 @@
   </head>
   <body>
     <div id="app" class="drawer"></div>
-    <svg class="loading" viewBox="0 0 50 50">
+    <svg class="initialLoadingSpinner" viewBox="0 0 50 50">
       <circle
         cx="25"
         cy="25"
@@ -65,7 +65,7 @@
   <script>
     window.addEventListener("load", async (event) => {
       if (event.target.readyState === "complete") {
-        let e = document.getElementsByClassName("loading")[0];
+        let e = document.getElementsByClassName("initialLoadingSpinner")[0];
         e.parentElement.removeChild(e);
       }
     });

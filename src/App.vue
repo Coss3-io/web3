@@ -45,7 +45,7 @@ const accountStore = useAccountStore();
 const projectId = "aced478ee21b257981d650fe8ec77c40";
 
 Client.accountStore = accountStore;
-Client.checkConnection()
+const connectionCheck = Client.checkConnection();
 
 const metadata = {
   name: "coss3.io",
@@ -65,10 +65,16 @@ createWeb3Modal({
     "19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927",
   ],
 });
-watchAccount((account) => {
+watchAccount(async (account) => {
+  accountStore[AccountActions.UpdateLoading](true)
+  if (accountStore.$state.blockchainConnected && !account.isConnected) {
+      await Client.logout();
+  }
   accountStore[AccountActions.UpdateBlockchainConnection](account.isConnected);
   accountStore[AccountActions.UpdateAddress](account.address);
-  //check that the user is connected to the bakend or not
+  
+  await connectionCheck
+  accountStore[AccountActions.UpdateLoading](false)
 });
 
 watchNetwork((network) => {
