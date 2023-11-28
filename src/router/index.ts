@@ -102,12 +102,7 @@ const router: Router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from) => {
-  const accountStore = useAccountStore();
-  if (!accountStore.$state.appConnected && to.name != RouteNames.Home) {
-    notify({ text: "full log in needed to acces the app", type: "info" });
-    return { name: RouteNames.Home };
-  }
+router.beforeEach((to) => {
   document.title = `coss3.io | ${String(to.name)}`;
 });
 
