@@ -13,7 +13,7 @@ import {
   updateLoading,
 } from "./actions";
 
-export const useAccountStore = defineStore("Test", {
+export const useAccountStore = defineStore("Account", {
   state: (): AccountState => state,
   actions: {
     [AccountActions.UpdateAddress]: updateAddress,
