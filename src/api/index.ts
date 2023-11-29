@@ -2,15 +2,22 @@
 import { signMessage } from "@wagmi/core";
 import { useNotification } from "@kyvg/vue3-notification";
 import { useAccountStore } from "../store/account";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { AccountActions } from "../types/account";
+import { useStackingStore } from "../store/stacking";
+import { StackingActions } from "../types/stacking";
 
 const { notify } = useNotification();
 export class Client {
   private static url = "http://localhost:8000";
   private static loginPath = "/api/login";
   private static takerPath = "/api/taker";
+  private static stakingPath = "/api/stacking";
+  private static feesWithdrawalPath = "/api/fees-withdrawal";
+  private static globalStakingPath = "/api/global-stacking";
+  private static stakingFeesPath = "/api/stacking-fees";
   public static accountStore: ReturnType<typeof useAccountStore>;
+  public static stackingStore: ReturnType<typeof useStackingStore>;
 
   constructor() {}
 
@@ -52,7 +59,6 @@ export class Client {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
-
       Client.accountStore[AccountActions.UpdateLoading](true);
       const result = await originalMethod.apply(this, args);
       Client.accountStore[AccountActions.UpdateLoading](false);
@@ -113,7 +119,30 @@ export class Client {
       });
       console.log(e);
     }
-    Client.accountStore[AccountActions.UpdateAppConnection](success)
+    Client.accountStore[AccountActions.UpdateAppConnection](success);
+    return success;
+  }
+
+  public static async loadPublicStacking(): Promise<boolean> {
+    let success = false;
+    let stacking, fees : AxiosResponse
+    try {
+      [stacking, fees] = await Promise.all([
+        axios.get(this.url + this.globalStakingPath),
+        axios.get(this.url + this.stakingFeesPath),
+      ]);
+      success = true
+    } catch (e) {
+      notify({
+        text: "An error occured during public data request check console",
+        type: "warn",
+      });
+      console.log(e)
+      return success
+    }
+
+    Client.stackingStore[StackingActions.LoadStacks](stacking.data)
+
     return success;
   }
 }

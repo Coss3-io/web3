@@ -6,6 +6,6 @@ import { loadStacks } from "./actions";
 export const useStackingStore = defineStore("Stacking", {
   state: (): StackingState => state,
   actions: {
-    [StackingActions.LoadFees]: loadStacks,
+    [StackingActions.LoadStacks]: loadStacks,
   }
 });
