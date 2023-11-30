@@ -40,11 +40,14 @@ import {
   avalanche,
   optimism,
 } from "viem/chains";
+import { useStackingStore } from "./store/stacking";
 
 const accountStore = useAccountStore();
+const stackingStore = useStackingStore();
 const projectId = "aced478ee21b257981d650fe8ec77c40";
 
 Client.accountStore = accountStore;
+Client.stackingStore = stackingStore;
 const connectionCheck = Client.checkConnection();
 
 const metadata = {
