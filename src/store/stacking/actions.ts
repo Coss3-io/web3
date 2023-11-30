@@ -25,5 +25,16 @@ export function loadStacks(
  */
 export function loadFees(
   this: ReturnType<typeof useStackingStore>,
-  fees: Array<[string, number, number]>
-): void {}
+  fees: Array<{ token: string; amount: string; slot: number }>
+): void {
+  this.$state.public.fees.splice(0, this.$state.public.fees.length);
+
+  let slotObject: { [key in string]: Array<[string, number]> } = {};
+  fees.forEach(({ token, amount, slot }) => {
+    if (!slotObject[slot]) slotObject[slot] = [];
+    slotObject[slot].push([token, parseInt(amount) / ERC20_DIVIDER]);
+  });
+  for (const slot in slotObject) {
+    this.$state.public.fees.push([parseInt(slot), slotObject[slot]]);
+  }
+}

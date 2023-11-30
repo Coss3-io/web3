@@ -9,6 +9,8 @@ export type StackingState = {
 export const StackingGetters = {
     BlockNames: "BlockNames",
     BlockAmount: "BlockAmount",
+    Top5FeesAllTime: "Top5FeesAllTime",
+    Top5FeesLastBlock: "Top5FeesLastBlock",
 } as const;
 
 export const StackingActions = {
