@@ -1,5 +1,6 @@
 <template>
-  <div class="p-2 w-full">
+  <PageSpinner v-if="loading"></PageSpinner>
+  <div v-else class="p-2 w-full">
     <div
       class="grid grid-cols-12 overflow-x-hidden overflow-y-auto lg:grid-rows-[min-content_7fr_5fr] bg-base-300 rounded-lg p-5 gap-3 w-full lg:h-[calc(100vh-110px)]"
     >
@@ -54,7 +55,7 @@
           </div>
         </div>
 
-        <div class="h-full" id="graph3"></div>
+        <div class="h-full" id="stackingGraph"></div>
       </div>
       <div
         class="flex flex-col bg-base-100 h-96 lg:h-full lg:col-span-6 col-span-full rounded-lg p-4 shadow-md shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
@@ -84,8 +85,8 @@
           </div>
         </div>
         <div class="flex md:flex-row flex-col h-full items-center">
-          <div class="w-full h-full" id="graph1"></div>
-          <div class="w-full h-full" id="graph2"></div>
+          <div class="w-full h-full" id="lastBlockGraph"></div>
+          <div class="w-full h-full" id="allTimeBlockGraph"></div>
         </div>
       </div>
     </div>
@@ -94,6 +95,7 @@
 <script setup lang="ts">
 import UserOverview from "../sections/FSA/UserOverview.vue";
 import BlockFSA from "../sections/FSA/BlockFSA.vue";
+import PageSpinner from "../navigation/PageSpinner.vue";
 import * as echarts from "echarts/core";
 import {
   ToolboxComponent,
@@ -108,6 +110,13 @@ import { CanvasRenderer } from "echarts/renderers";
 import { PieChart } from "echarts/charts";
 import { LabelLayout } from "echarts/features";
 import { setGraph } from "../../asset/scripts/utils";
+import { fsaLogo, logo } from "../../asset/images/images";
+import { ref } from "vue";
+import { onUpdated } from "vue";
+import { Client } from "../../api";
+import { StackingGetters } from "../../types/stacking";
+
+let loading = ref<boolean>(true);
 
 echarts.use([
   ToolboxComponent,
@@ -121,10 +130,8 @@ echarts.use([
   CanvasRenderer,
   UniversalTransition,
 ]);
-import { onMounted } from "vue";
-import { fsaLogo, logo } from "../../asset/images/images";
 
-let options1 = {
+let lastBlockGraphOptions = {
   animationDelay: 800,
   title: {
     text: "Last Block",
@@ -185,7 +192,7 @@ let options1 = {
   ],
 };
 
-let options2 = {
+let allTimeBlockGraphOptions = {
   animationDelay: 800,
   title: {
     text: "All Time",
@@ -245,7 +252,8 @@ let options2 = {
     },
   ],
 };
-let options3 = {
+
+let stackingGraphOptions = {
   animationDelay: 500,
   color: ["rgba(163,62,173,1)"],
   backgroundColor: "rgb(255,255,255, 0)",
@@ -327,24 +335,34 @@ let options3 = {
   ],
 };
 
-onMounted(() => {
+onUpdated(() => {
   setGraph(
-    document.getElementById("graph1"),
+    document.getElementById("lastBlockGraph"),
     echarts.getInstanceByDom,
     echarts.init,
-    options1
+    lastBlockGraphOptions
   );
   setGraph(
-    document.getElementById("graph2"),
+    document.getElementById("allTimeBlockGraph"),
     echarts.getInstanceByDom,
     echarts.init,
-    options2
+    allTimeBlockGraphOptions
   );
+
+  stackingGraphOptions.xAxis[0].data =
+    Client.stackingStore[StackingGetters.BlockNames];
+  stackingGraphOptions.series[0].data =
+    Client.stackingStore[StackingGetters.BlockAmount];
   setGraph(
-    document.getElementById("graph3"),
+    document.getElementById("stackingGraph"),
     echarts.getInstanceByDom,
     echarts.init,
-    options3
+    stackingGraphOptions
   );
+});
+
+Client.loadPublicStacking().then((success: boolean) => {
+  if (success) loading.value = false;
+  console.log(Client.stackingStore.$state.public.stacks)
 });
 </script>
