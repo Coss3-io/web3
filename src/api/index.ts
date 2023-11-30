@@ -140,9 +140,8 @@ export class Client {
       console.log(e)
       return success
     }
-
     Client.stackingStore[StackingActions.LoadStacks](stacking.data)
-
+    Client.stackingStore[StackingActions.LoadFees](fees.data)
     return success;
   }
 }
