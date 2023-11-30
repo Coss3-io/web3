@@ -7,7 +7,8 @@ export type StackingState = {
 };
 
 export const StackingGetters = {
-    PublicDataLoaded: "PublicDataLoaded"
+    BlockNames: "BlockNames",
+    BlockAmount: "BlockAmount",
 } as const;
 
 export const StackingActions = {
