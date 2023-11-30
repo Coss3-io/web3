@@ -243,7 +243,7 @@ let allTimeBlockGraphOptions = {
         show: false,
       },
       data: [
-        { value: 1048, name: "COSS" },
+        { value: 1048, name: "Coss" },
         { value: 735, name: "USDC" },
         { value: 580, name: "ETH" },
         { value: 484, name: "ARB" },
@@ -292,6 +292,7 @@ let stackingGraphOptions = {
         "block 7",
       ],
       axisLine: { show: false },
+      triggerEvent: true,
     },
   ],
   yAxis: [
@@ -336,6 +337,8 @@ let stackingGraphOptions = {
 };
 
 onUpdated(() => {
+  lastBlockGraphOptions.series[0].data =
+    Client.stackingStore[StackingGetters.Top5FeesLastBlock];
   setGraph(
     document.getElementById("lastBlockGraph"),
     echarts.getInstanceByDom,
@@ -353,6 +356,7 @@ onUpdated(() => {
     Client.stackingStore[StackingGetters.BlockNames];
   stackingGraphOptions.series[0].data =
     Client.stackingStore[StackingGetters.BlockAmount];
+
   setGraph(
     document.getElementById("stackingGraph"),
     echarts.getInstanceByDom,
@@ -363,6 +367,6 @@ onUpdated(() => {
 
 Client.loadPublicStacking().then((success: boolean) => {
   if (success) loading.value = false;
-  console.log(Client.stackingStore.$state.public.stacks)
+  console.log(Client.stackingStore[StackingGetters.Top5FeesLastBlock]);
 });
 </script>
