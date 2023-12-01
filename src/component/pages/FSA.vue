@@ -13,8 +13,13 @@
         </div>
       </div>
       <div
-        class="flex flex-col gap-3 lg:row-span-2 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
+        class="flex relative flex-col gap-3 lg:row-span-2 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
       >
+      <Transition name="fadeNav">
+        <div v-if="!Client.accountStore.$state.appConnected" class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center">
+          <Dashboard></Dashboard>
+        </div>
+      </Transition>
         <div class="flex justify-start">
           <div
             class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
@@ -117,6 +122,7 @@ import { Client } from "../../api";
 import { StackingGetters } from "../../types/stacking";
 import { displayAddress } from "../../utils";
 import { EXPLORER_URL } from "../../api/settings";
+import Dashboard from "../buttons/Dashboard.vue";
 
 let loading = ref<boolean>(true);
 
