@@ -6,7 +6,7 @@ import {
   StackingGetters,
 } from "../../types/stacking";
 import { loadFees, loadStacks } from "./actions";
-import { blockAmounts, blockNames, top5FeesLastBlock } from "./getters";
+import { blockAmounts, blockNames, top5FeesAllTime, top5FeesLastBlock } from "./getters";
 
 export const useStackingStore = defineStore("Stacking", {
   state: (): StackingState => state,
@@ -18,5 +18,6 @@ export const useStackingStore = defineStore("Stacking", {
     [StackingGetters.BlockNames]: blockNames,
     [StackingGetters.BlockAmount]: blockAmounts,
     [StackingGetters.Top5FeesLastBlock]: top5FeesLastBlock,
+    [StackingGetters.Top5FeesAllTime]: top5FeesAllTime,
   },
 });

@@ -115,6 +115,8 @@ import { ref } from "vue";
 import { onUpdated } from "vue";
 import { Client } from "../../api";
 import { StackingGetters } from "../../types/stacking";
+import { displayAddress } from "../../utils";
+import { EXPLORER_URL } from "../../api/settings";
 
 let loading = ref<boolean>(true);
 
@@ -169,6 +171,7 @@ let lastBlockGraphOptions = {
       type: "pie",
       radius: ["40%", "70%"],
       avoidLabelOverlap: false,
+      triggerEvent: true,
       itemStyle: {
         borderRadius: 5,
         borderColor: "#fff",
@@ -235,6 +238,7 @@ let allTimeBlockGraphOptions = {
         borderColor: "#fff",
         borderWidth: 0,
       },
+      triggerEvent: true,
       label: {
         show: false,
         position: "center",
@@ -292,7 +296,6 @@ let stackingGraphOptions = {
         "block 7",
       ],
       axisLine: { show: false },
-      triggerEvent: true,
     },
   ],
   yAxis: [
@@ -337,20 +340,39 @@ let stackingGraphOptions = {
 };
 
 onUpdated(() => {
-  lastBlockGraphOptions.series[0].data =
-    Client.stackingStore[StackingGetters.Top5FeesLastBlock];
-  setGraph(
+  lastBlockGraphOptions.series[0].data = Client.stackingStore[
+    StackingGetters.Top5FeesLastBlock
+  ].map(({ name, value }) => ({ name: displayAddress(name), value: value }));
+
+  const lastBlockGraph = setGraph(
     document.getElementById("lastBlockGraph"),
     echarts.getInstanceByDom,
     echarts.init,
     lastBlockGraphOptions
   );
-  setGraph(
+
+  lastBlockGraph?.on("click", (target) => {
+    const token =
+      Client.stackingStore[StackingGetters.Top5FeesLastBlock][target.dataIndex].name;
+    window.open(EXPLORER_URL + token, "_blank");
+  });
+
+  allTimeBlockGraphOptions.series[0].data = Client.stackingStore[
+    StackingGetters.Top5FeesAllTime
+  ].map(({ name, value }) => ({ name: displayAddress(name), value: value }));
+
+  const allTimeBlockGraph = setGraph(
     document.getElementById("allTimeBlockGraph"),
     echarts.getInstanceByDom,
     echarts.init,
     allTimeBlockGraphOptions
   );
+
+  allTimeBlockGraph?.on("click", (target) => {
+    const token =
+      Client.stackingStore[StackingGetters.Top5FeesAllTime][target.dataIndex].name;
+    window.open(EXPLORER_URL + token, "_blank");
+  });
 
   stackingGraphOptions.xAxis[0].data =
     Client.stackingStore[StackingGetters.BlockNames];
@@ -367,6 +389,5 @@ onUpdated(() => {
 
 Client.loadPublicStacking().then((success: boolean) => {
   if (success) loading.value = false;
-  console.log(Client.stackingStore[StackingGetters.Top5FeesLastBlock]);
 });
 </script>

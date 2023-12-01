@@ -23,13 +23,34 @@ export function top5FeesLastBlock(
 ): { name: string; value: number }[] {
   const sortedArray = state.public.fees[state.public.fees.length - 1][1]
     .toSorted((first, second) => {
-      if (first[1] > second[1]) return -1;
-      else if (first[1] < second[1]) return 1;
-      else return 0;
+      return second[1] - first[1];
     })
     .slice(0, 5);
-    console.log(sortedArray)
   return sortedArray.map(([token, amount]) => {
-    return { name: displayAddress(token), value: amount };
+    return { name: token, value: amount };
   });
+}
+
+/**
+ * @notice used to compute the top 5 tokens FSA since the beginning
+ */
+export function top5FeesAllTime(
+  state: StackingState
+): { name: string; value: number }[] {
+  const tokens: { [key in string]: number } = {};
+  const response: { name: string; value: number }[] = [];
+
+  state.public.fees.forEach(([value, array]) => {
+    array.forEach(([token, amount]) => {
+      if (token in tokens) {
+        tokens[token] += amount;
+      } else {
+        tokens[token] = amount;
+      }
+    });
+  });
+  return Object.entries(tokens)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
 }
