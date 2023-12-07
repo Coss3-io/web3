@@ -6,10 +6,14 @@ import axios, { AxiosResponse } from "axios";
 import { AccountActions } from "../types/account";
 import { useStackingStore } from "../store/stacking";
 import { StackingActions } from "../types/stacking";
+import { usePriceStore } from "../store/price";
+import { PriceActions } from "../types/price";
 
 const { notify } = useNotification();
 export class Client {
   private static url = "http://localhost:8000";
+  private static coinGeckoAPIUrl = "https://api.coingecko.com/";
+  private static coinGeckoAPIPath = "/api/v3/coins/markets";
   private static loginPath = "/api/login";
   private static takerPath = "/api/taker";
   private static stakingPath = "/api/stacking";
@@ -18,6 +22,7 @@ export class Client {
   private static stakingFeesPath = "/api/stacking-fees";
   public static accountStore: ReturnType<typeof useAccountStore>;
   public static stackingStore: ReturnType<typeof useStackingStore>;
+  public static priceStore: ReturnType<typeof usePriceStore>;
 
   constructor() {}
 
@@ -123,25 +128,58 @@ export class Client {
     return success;
   }
 
+  /**
+   * @notice - Used to load the public stacking data
+   * @returns - Promise<boolean>
+   */
   public static async loadPublicStacking(): Promise<boolean> {
     let success = false;
-    let stacking, fees : AxiosResponse
+    let stacking, fees, coinGeckoPrices: AxiosResponse;
     try {
-      [stacking, fees] = await Promise.all([
+      [stacking, fees, coinGeckoPrices] = await Promise.all([
         axios.get(this.url + this.globalStakingPath),
         axios.get(this.url + this.stakingFeesPath),
+        axios.get(this.coinGeckoAPIUrl + this.coinGeckoAPIPath, {
+          params: { vs_currency: "usd" },
+        }),
       ]);
-      success = true
+      Client.stackingStore[StackingActions.LoadStacks](stacking.data);
+      Client.stackingStore[StackingActions.LoadFees](fees.data);
+      Client.priceStore[PriceActions.LoadPrices](coinGeckoPrices.data);
+      success = true;
     } catch (e) {
       notify({
         text: "An error occured during public data request check console",
         type: "warn",
       });
-      console.log(e)
-      return success
+      console.log(e);
     }
-    Client.stackingStore[StackingActions.LoadStacks](stacking.data)
-    Client.stackingStore[StackingActions.LoadFees](fees.data)
+    return success;
+  }
+  public static async loadUserStacking(): Promise<boolean> {
+    let success = false;
+    let stacking, feesWithdrawal: AxiosResponse;
+
+    try {
+      [stacking, feesWithdrawal] = await Promise.all([
+        axios.get(this.url + this.stakingPath, { withCredentials: true }),
+        axios.get(this.url + this.feesWithdrawalPath, {
+          withCredentials: true,
+        }),
+      ]);
+      Client.stackingStore[StackingActions.LoadUserStacks](stacking.data);
+      Client.stackingStore[StackingActions.LoadUserFeesWithdrawal](
+        feesWithdrawal.data
+      );
+
+      success = true;
+    } catch (e) {
+      notify({
+        text: "An error occured during user data request check console",
+        type: "warn",
+      });
+      console.log(e);
+    }
     return success;
   }
 }
