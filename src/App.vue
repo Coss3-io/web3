@@ -29,6 +29,7 @@ import SideBar from "./component/navigation/SideBar.vue";
 import Footer from "./component/navigation/Footer.vue";
 import Notification from "./component/navigation/Notification.vue";
 import { useAccountStore } from "./store/account";
+import { usePriceStore } from "./store/price";
 import { AccountActions } from "./types/account";
 import { Suspense as suspense_, SuspenseProps, VNodeProps } from "vue";
 import { Client } from "./api";
@@ -44,10 +45,12 @@ import { useStackingStore } from "./store/stacking";
 
 const accountStore = useAccountStore();
 const stackingStore = useStackingStore();
+const priceStore = usePriceStore();
 const projectId = "aced478ee21b257981d650fe8ec77c40";
 
 Client.accountStore = accountStore;
 Client.stackingStore = stackingStore;
+Client.priceStore = priceStore;
 const connectionCheck = Client.checkConnection();
 
 const metadata = {
