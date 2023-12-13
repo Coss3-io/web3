@@ -12,7 +12,11 @@
         <div
           class="font-sans grow text-center md:text-left lg:text-center xl:text-left"
         >
-          $1,520,230
+          ${{
+            displayNumber(
+              dollarsValue(Client.stackingStore[StackingGetters.UserGlobalFSA])
+            ) || "1,520,230"
+          }}
         </div>
         <div class="text-neutral-content justify-self-end">
           <svg
@@ -36,7 +40,14 @@
           </svg>
         </div>
       </div>
-      <div class="stat-desc">$230 as of last round</div>
+      <div class="stat-desc">
+        ${{
+          displayNumber(
+            dollarsValue(Client.stackingStore[StackingGetters.UserLastRoundFSA])
+          ) || "230"
+        }}
+        as of last round
+      </div>
     </div>
     <div
       class="stat place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
@@ -48,7 +59,21 @@
         <div
           class="font-sans grow text-center md:text-left lg:text-center xl:text-left"
         >
-          23%
+          {{
+            Math.round(
+              (dollarsValue(
+                Client.stackingStore[StackingGetters.UserLastRoundFSA]
+              ) /
+                dollarsValue({
+                  [COSS_TOKEN]:
+                    Client.stackingStore.user.stacks[
+                      Client.stackingStore.user.stacks.length - 1
+                    ]?.amount,
+                })) *
+                52 *
+                100
+            )
+          }}%
         </div>
         <div class="text-neutral-content">
           <svg
@@ -67,7 +92,9 @@
           </svg>
         </div>
       </div>
-      <div class="stat-desc">~$1,200 earned this year</div>
+      <div class="stat-desc">~${{ dollarsValue(
+                Client.stackingStore[StackingGetters.UserLastRoundFSA]
+              )*52 }} earning projection</div>
     </div>
     <div
       class="stat xl:p-3 p-5 xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
@@ -80,9 +107,31 @@
           :src="logo"
           class="p-0.5 w-7 h-7 rounded-full bg-base-200/50 shadow-md shadow-black/30"
         />
-        104,300
+        {{
+          displayNumber(
+            Client.stackingStore.user.stacks[
+              Client.stackingStore.user.stacks.length - 1
+            ]?.amount
+          ) || "140,250"
+        }}
       </div>
-      <div class="stat-desc">$89,400 (1.2% of total stacked)</div>
+      <div class="stat-desc">
+        ${{
+          displayNumber(
+            dollarsValue({
+              [COSS_TOKEN]:
+                Client.stackingStore.user.stacks[
+                  Client.stackingStore.user.stacks.length - 1
+                ]?.amount,
+            })
+          ) || "86,250"
+        }}
+        ({{
+          (
+            Client.stackingStore[StackingGetters.UserStackingShare] * 100
+          ).toFixed(2) || 0
+        }}% of total stacked)
+      </div>
       <div class="stat-actions flex gap-3">
         <button
           class="btn btn-sm hover:scale-105"
@@ -241,6 +290,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { logo } from "../../../asset/images/images";
+import { Client } from "../../../api";
+import { COSS_TOKEN } from "../../../api/settings";
+import { StackingGetters } from "../../../types/stacking";
+import { displayNumber, dollarsValue } from "../../../utils";
 
 let depositAmount = ref<null | number>(null);
 let depositInput = ref<HTMLInputElement | null>(null);
