@@ -65,26 +65,32 @@
       class="grid grid-cols-4 place-items-center text-[9px]"
       ref="titleContainer"
     >
-      <div @click="addOrder">Token</div>
-      <div @click="delOrder">Amount</div>
+      <div @click="">Token</div>
+      <div @click="">Amount</div>
       <div>$</div>
       <div>last withdraw (block)</div>
     </div>
     <TransitionGroup name="listBuy" tag="div">
       <div
-        v-for="(tokenFee, index) in tokenFees"
-        :key="`${tokenFee.amount}${tokenFee.$}`"
-        @click.passive="tokenFee.selected = !tokenFee.selected"
-        :class="{ 'outline-1 outline outline-primary': tokenFee.selected }"
+        v-for="(value, token) in Client.stackingStore[
+          StackingGetters.UserAvailableFSA
+        ]"
+        :key="`${value.amount}${value.dollarsValue}`"
+        @click.passive="selectToken(token)"
+        :class="{
+          'outline-1 outline outline-primary': selectedTokens.includes(token),
+        }"
         class="grid my-2 even:bg-neutral/50 grid-cols-4 w-full h-8 place-items-center font-sans-inherit rounded-full bg-neutral hover:bg-base-200 transition-all cursor-pointer py-1 shadow-black/20 shadow-md"
       >
-        <div><img :src="tokenFee.token" alt="token" class="w-6 h-6" /></div>
-        <div>{{ tokenFee.amount }}</div>
-        <div>${{ tokenFee.$ }}</div>
-        <div>{{ tokenFee.lastWithdraw }}</div>
+        <div>
+          <img :src="tokensToImage(token)" alt="token" class="w-6 h-6" />
+        </div>
+        <div>{{ value.amount.toFixed(2) }}</div>
+        <div>${{ value.dollarsValue }}</div>
+        <div>{{ value.lastWithdraw }}</div>
       </div>
       <div
-        v-for="n in (tokenFees.length * 40 < (fsaContainer?.clientHeight! - titleContainer?.clientHeight!) ? Math.floor((fsaContainer?.clientHeight! - tokenFees.length * 40 )/39): 0)"
+        v-for="n in ((Object.entries(Client.stackingStore[StackingGetters.UserAvailableFSA]).length) * 40 < (fsaContainer?.clientHeight! - titleContainer?.clientHeight!) ? Math.floor((fsaContainer?.clientHeight! - (Object.entries(Client.stackingStore[StackingGetters.UserAvailableFSA]).length) * 40 )/39): 0)"
         :key="n"
         class="flex text-center text-[11px] font-bold h-8 -z-10 overflow-hidden w-full"
       >
@@ -97,73 +103,21 @@
   </div>
 </template>
 <script setup lang="ts">
-import { usdt, ether, logo } from "../../../asset/images/images";
 import { ref } from "vue";
+import { Client } from "../../../api";
+import { StackingGetters } from "../../../types/stacking";
+import { tokensToImage } from "../../../utils";
 
 const fsaContainer = ref<HTMLDivElement | null>(null);
 const titleContainer = ref<HTMLDivElement | null>(null);
 
-function delOrder() {
-  tokenFees.value.splice(2, 2);
-}
+let selectedTokens = ref<string[]>([]);
 
-function addOrder() {
-  tokenFees.value.splice(4, 0, {
-    amount: String(Math.round(Math.random() * 2000)),
-    $: String(Math.round(Math.random() * 2000)),
-    token: usdt,
-    lastWithdraw: 23,
-    selected: false,
-  });
+function selectToken(token: string) {
+  if (selectedTokens.value.includes(token)) {
+    selectedTokens.value.splice(selectedTokens.value.indexOf(token), 1);
+  } else {
+    selectedTokens.value.push(token);
+  }
 }
-
-let tokenFees = ref([
-  { amount: "1,234", $: "43", token: usdt, lastWithdraw: 23, selected: false },
-  {
-    amount: "5,234",
-    $: "596",
-    token: ether,
-    lastWithdraw: 23,
-    selected: false,
-  },
-  { amount: "9,234", $: "423", token: logo, lastWithdraw: 23, selected: false },
-  {
-    amount: "5,152,234",
-    $: "98",
-    token: ether,
-    lastWithdraw: 23,
-    selected: false,
-  },
-  {
-    amount: "1,234",
-    $: "1,547",
-    token: usdt,
-    lastWithdraw: 23,
-    selected: false,
-  },
-  { amount: "1,234", $: "284", token: logo, lastWithdraw: 23, selected: false },
-  {
-    amount: "1,234",
-    $: "8433",
-    token: usdt,
-    lastWithdraw: 23,
-    selected: false,
-  },
-  {
-    amount: "1,234",
-    $: "474",
-    token: ether,
-    lastWithdraw: 23,
-    selected: false,
-  },
-  { amount: "1,234", $: "543", token: logo, lastWithdraw: 23, selected: false },
-  {
-    amount: "1,234",
-    $: "215",
-    token: ether,
-    lastWithdraw: 23,
-    selected: false,
-  },
-  { amount: "1,234", $: "894", token: usdt, lastWithdraw: 23, selected: false },
-]);
 </script>
