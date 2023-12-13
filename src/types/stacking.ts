@@ -16,8 +16,14 @@ export const StackingGetters = {
   BlockNames: "BlockNames",
   BlockAmount: "BlockAmount",
   Top5FeesAllTime: "Top5FeesAllTime",
+  UserStackObject: "UserStackObject",
+  PublicStackObject: "PublicStackObject",
+  PublicFeesObject: "PublicFeesObject",
   Top5FeesLastBlock: "Top5FeesLastBlock",
-  UserStackingShare: "UserStackingShare"
+  UserStackingShare: "UserStackingShare",
+  UserGlobalFSA: "UserGlobalFSA",
+  UserLastRoundFSA: "UserLastRoundFSA",
+  UserYearlyFSAYield: "UserYearlyFSAYield",
 } as const;
 
 export const StackingActions = {

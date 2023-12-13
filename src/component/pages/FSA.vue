@@ -15,11 +15,17 @@
       <div
         class="flex relative flex-col gap-3 lg:row-span-2 lg:col-span-6 col-span-full bg-base-100 shadow-md shadow-black/50 rounded-lg p-4 opacity-0 translate-y-3 animate-slideIn"
       >
-      <Transition name="fadeNav">
-        <div v-if="!Client.accountStore.$state.appConnected" class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center">
-          <Dashboard></Dashboard>
-        </div>
-      </Transition>
+        <Transition name="fadeNav">
+          <div
+            v-if="privateLoading"
+            class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
+          >
+            <Dashboard v-if="privateLoading"></Dashboard>
+            <button v-else class="btn btn-primary w-44">
+              <span class="loading loading-spinner"></span>
+            </button>
+          </div>
+        </Transition>
         <div class="flex justify-start">
           <div
             class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
@@ -125,6 +131,7 @@ import { EXPLORER_URL } from "../../api/settings";
 import Dashboard from "../buttons/Dashboard.vue";
 
 let loading = ref<boolean>(true);
+let privateLoading = ref<boolean>(true);
 
 echarts.use([
   ToolboxComponent,
@@ -359,7 +366,8 @@ onUpdated(() => {
 
   lastBlockGraph?.on("click", (target) => {
     const token =
-      Client.stackingStore[StackingGetters.Top5FeesLastBlock][target.dataIndex].name;
+      Client.stackingStore[StackingGetters.Top5FeesLastBlock][target.dataIndex]
+        .name;
     window.open(EXPLORER_URL + token, "_blank");
   });
 
@@ -376,7 +384,8 @@ onUpdated(() => {
 
   allTimeBlockGraph?.on("click", (target) => {
     const token =
-      Client.stackingStore[StackingGetters.Top5FeesAllTime][target.dataIndex].name;
+      Client.stackingStore[StackingGetters.Top5FeesAllTime][target.dataIndex]
+        .name;
     window.open(EXPLORER_URL + token, "_blank");
   });
 
@@ -395,5 +404,9 @@ onUpdated(() => {
 
 Client.loadPublicStacking().then((success: boolean) => {
   if (success) loading.value = false;
+});
+
+Client.loadUserStacking().then((success: boolean) => {
+  if (success) privateLoading.value = false;
 });
 </script>
