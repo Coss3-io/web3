@@ -23,7 +23,8 @@ export const StackingGetters = {
   UserStackingShare: "UserStackingShare",
   UserGlobalFSA: "UserGlobalFSA",
   UserLastRoundFSA: "UserLastRoundFSA",
-  UserYearlyFSAYield: "UserYearlyFSAYield",
+  UserAvailableFSA: "UserAvailableFSA",
+  UserWithdrawalObject: "UserWithdrawalObject",
 } as const;
 
 export const StackingActions = {

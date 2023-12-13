@@ -1,5 +1,6 @@
 import { notify } from "@kyvg/vue3-notification";
 import { StackingState } from "../../types/stacking";
+import { dollarsValue } from "../../utils";
 
 /**
  * @notice used to compute the name of the blocks for the FSA graph
@@ -85,6 +86,24 @@ export function userStacksObject(state: StackingState): {
 }
 
 /**
+ * @notice - used to compute a fees withdrawal object from the user withdrawals
+ * @param state - the stacking state
+ * @returns - the computed withdrawals object
+ */
+export function userFeesWithdrawalObject(state: StackingState): {
+  [key in number]: number;
+} {
+  let result: { [key in string]: number } = {};
+
+  for (const { tokens, slot } of state.user.feesWithdrawal) {
+    for (const token of tokens) {
+      if (!result[token] || result[token] < slot) result[token] = slot;
+    }
+  }
+  return result;
+}
+
+/**
  * @notice - used to compute a stacking object from the public stacks
  * @param state - the stacking state
  * @returns - the computed stack object
@@ -143,6 +162,7 @@ export function computeUserGlobalFSA(
     for (let slot = minSlot; slot <= maxSlot; ++slot) {
       if (userStacks[slot]) userStakedAmount = userStacks[slot];
       if (publicStacks[slot]) publicStakedAmount = publicStacks[slot];
+      if (slot == minSlot) continue;
       if (!globalFees[slot]) continue;
 
       const percent = userStakedAmount / publicStakedAmount;
@@ -150,6 +170,78 @@ export function computeUserGlobalFSA(
         if (!result[token]) result[token] = 0;
         result[token] += percent * amount;
       });
+    }
+  } catch (e: any) {
+    console.log(e);
+    notify({
+      text: "An error occured for FSA calulation check console",
+      type: "warn",
+    });
+  }
+  return result;
+}
+
+/**
+ *
+ * @param publicStacks - the public stack objects
+ * @param userStacks - the user stack object
+ * @param userFeesWithdrawal - the user stack object
+ * @param globalFees - the global fees object
+ * @returns - the object containing the fsa available for the user
+ */
+export function computeUserAvailableFSA(
+  publicStacks: { [key in number]: number },
+  userStacks: { [key in number]: number },
+  userFeesWithdrawal: { [key in string]: number },
+  globalFees: { [key in number]: Array<{ token: string; amount: number }> }
+): {
+  [key in string]: {
+    amount: number;
+    dollarsValue: number;
+    lastWithdraw: number;
+  };
+} {
+  let result: {
+    [key in string]: {
+      amount: number;
+      dollarsValue: number;
+      lastWithdraw: number;
+    };
+  } = {};
+  let userStakedAmount = 0;
+  let publicStakedAmount = 0;
+
+  const userSlots = Object.keys(userStacks).map((value) => Number(value));
+  const minSlot = Math.min(...userSlots);
+  const maxSlot = Math.max(
+    ...Object.keys(globalFees).map((value) => Number(value))
+  );
+
+  try {
+    for (let slot = minSlot; slot <= maxSlot; ++slot) {
+      if (userStacks[slot]) userStakedAmount = userStacks[slot];
+      if (publicStacks[slot]) publicStakedAmount = publicStacks[slot];
+      if (slot == minSlot) continue;
+      if (!globalFees[slot]) continue;
+
+      const percent = userStakedAmount / publicStakedAmount;
+      globalFees[slot].forEach(({ token, amount }) => {
+        if (!result[token])
+          result[token] = { amount: 0, lastWithdraw: 0, dollarsValue: 0 };
+        if (userFeesWithdrawal[token] && userFeesWithdrawal[token] >= slot) {
+          result[token].lastWithdraw = userFeesWithdrawal[token];
+        } else {
+          result[token].amount += percent * amount;
+          result[token].dollarsValue = dollarsValue({
+            [token]: result[token].amount,
+          });
+          if (userFeesWithdrawal[token])
+            result[token].lastWithdraw = userFeesWithdrawal[token];
+        }
+      });
+    }
+    for (const token in result) {
+      if (!result[token].amount) delete result[token];
     }
   } catch (e: any) {
     console.log(e);
