@@ -129,6 +129,11 @@ import BotsCard from "../sections/Bot/BotsCard.vue";
 import { RouterView, RouterLink } from "vue-router";
 import { RouteNames } from "../../router";
 import { botLogo } from "../../asset/images/images";
+import { Client } from "../../api";
 
 let cardView = ref<boolean>(true);
+
+Client.loadUserBots().then(value => {
+
+})
 </script>

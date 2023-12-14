@@ -132,8 +132,8 @@
                       class="dropdown-content z-20 menu p-2 shadow bg-base-100 rounded-box w-52 flex max-h-52 flex-nowrap overflow-auto custom-scroll"
                     >
                       <li
-                        v-for="name of cryptoNames"
-                        @click="() => {selectedBase = <keyof typeof cryptoNames>name; focusBaseLabel!.blur()}"
+                        v-for="name of cryptoTicker"
+                        @click="() => {selectedBase = <Values<typeof cryptoTicker>>name; focusBaseLabel!.blur()}"
                       >
                         <a class="flex gap-1 items-center uppercase">
                           <img
@@ -236,8 +236,8 @@
                       class="dropdown-content z-20 menu p-2 shadow bg-base-100 rounded-box w-52 flex max-h-52 flex-nowrap overflow-auto custom-scroll"
                     >
                       <li
-                        v-for="name of cryptoNames"
-                        @click="() => {selectedQuote = <keyof typeof cryptoNames>name; focusQuoteLabel!.blur()}"
+                        v-for="name of cryptoTicker"
+                        @click="() => {selectedQuote = <Values<typeof cryptoTicker>>name; focusQuoteLabel!.blur()}"
                       >
                         <a class="flex gap-1 items-center uppercase">
                           <img
@@ -280,15 +280,16 @@
                 </div>
                 <div
                   v-if="selectedBase && selectedQuote"
-                  class="relative grow flex justify-end items-center"
+                  class="relative grow flex justify-start items-center mx-3"
                 >
                   <transition appear name="fadeNav">
-                    <div
+                    <input
                       :key="selectedBase + selectedQuote"
-                      class="py-0.5 px-4 text-[11px] sm:text-sm rounded-full badge border border-warning/70 bg-transparent font-sans font-bold text-warning/70"
-                    >
-                      price: {{ selectedQuote }}
-                    </div>
+                      v-model.number="priceValue"
+                      type="number"
+                      class="appearance-none p-0.5 px-2 sm:max-w-none max-w-[7rem] text-center outline-none rounded-full text-sm placeholder:text-white/20 placeholder:font-normal font-sans font-bold bg-base-200 shadow-md shadow-black/50"
+                      placeholder="starting price"
+                    />
                   </transition>
                 </div>
               </div>
@@ -299,8 +300,12 @@
                   >
                     <input
                       :disabled="selectedBase == undefined ? true : false"
-                      :value="lowerBoundValue ? lowerBoundValue : ''"
-                      @input="event => lowerBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                      :value="
+                        lowerBoundValue && priceValue
+                          ? (priceValue * lowerBoundValue) / 100
+                          : ''
+                      "
+                      @input="event => lowerBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value) * 100 / priceValue!: 0"
                       type="text"
                       placeholder="lower bound"
                       class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
@@ -317,7 +322,9 @@
                           <div
                             class="h-full"
                             :style="{
-                              width: `${Math.min(100, lowerBoundValue)}%`,
+                              width: `${
+                                priceValue ? Math.min(100, lowerBoundValue) : 0
+                              }%`,
                             }"
                           ></div>
                           <transition name="fadeNav" appear>
@@ -328,10 +335,18 @@
                               :key="unknownToken"
                               class="w-7 h-7 fill-primary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
-                                transform: `translateX(${String(
-                                  -Math.min(100, lowerBoundValue) / 1.15
-                                )}%)`,
-                                left: `${Math.min(100, lowerBoundValue)}%`,
+                                transform: `translateX(${
+                                  priceValue
+                                    ? String(
+                                        -Math.min(100, lowerBoundValue) / 1.15
+                                      )
+                                    : 0
+                                }%)`,
+                                left: `${
+                                  priceValue
+                                    ? Math.min(100, lowerBoundValue)
+                                    : 0
+                                }%`,
                               }"
                             ></unknownTokenLogo>
                             <img
@@ -342,10 +357,18 @@
                               :src="cryptoDetails[selectedBase].logo"
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
-                                transform: `translateX(${String(
-                                  -Math.min(100, lowerBoundValue) / 1.15
-                                )}%)`,
-                                left: `${Math.min(100, lowerBoundValue)}%`,
+                                transform: `translateX(${
+                                  priceValue
+                                    ? String(
+                                        -Math.min(100, lowerBoundValue) / 1.15
+                                      )
+                                    : 0
+                                }%)`,
+                                left: `${
+                                  priceValue
+                                    ? Math.min(100, lowerBoundValue)
+                                    : 0
+                                }%`,
                               }"
                             />
                           </transition>
@@ -387,8 +410,12 @@
                   >
                     <input
                       :disabled="selectedQuote == undefined ? true : false"
-                      :value="upperBoundValue ? upperBoundValue : ''"
-                      @input="event => upperBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                      :value="
+                        upperBoundValue && priceValue
+                          ? priceValue + (priceValue * upperBoundValue) / 100
+                          : ''
+                      "
+                      @input="event => upperBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? (parseFloat((<HTMLInputElement>event.target).value) - priceValue!) * 100 / priceValue!: 0"
                       type="text"
                       placeholder="upper bound"
                       class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
@@ -405,7 +432,9 @@
                           <div
                             class="h-full"
                             :style="{
-                              width: `${Math.min(upperBoundValue, 100)}%`,
+                              width: `${
+                                priceValue ? Math.min(upperBoundValue, 100) : 0
+                              }%`,
                             }"
                           ></div>
                           <transition name="fadeNav" appear>
@@ -417,10 +446,24 @@
                               :src="cryptoDetails[selectedQuote].logo"
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
-                                transform: `translateX(${String(
-                                  -Math.min(100, upperBoundValue) / 1.15
-                                )}%)`,
-                                left: `${Math.min(100, upperBoundValue)}%`,
+                                transform: `translateX(${
+                                  priceValue
+                                    ? String(
+                                        -Math.min(
+                                          100,
+                                          Math.max(upperBoundValue, 0)
+                                        ) / 1.15
+                                      )
+                                    : 0
+                                }%)`,
+                                left: `${
+                                  priceValue
+                                    ? Math.min(
+                                        100,
+                                        Math.max(upperBoundValue, 0)
+                                      )
+                                    : 0
+                                }%`,
                               }"
                             />
                             <unknownTokenLogo
@@ -431,10 +474,18 @@
                               :key="unknownToken"
                               class="w-7 h-7 fill-secondary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
-                                transform: `translateX(${String(
-                                  -Math.min(100, upperBoundValue / 1.15)
-                                )}%)`,
-                                left: `${Math.min(100, upperBoundValue)}%`,
+                                transform: `translateX(${
+                                  priceValue
+                                    ? String(
+                                        -Math.min(100, upperBoundValue / 1.15)
+                                      )
+                                    : 0
+                                }%)`,
+                                left: `${
+                                  priceValue
+                                    ? Math.min(100, upperBoundValue)
+                                    : 0
+                                }%`,
                               }"
                             ></unknownTokenLogo>
                           </transition>
@@ -499,7 +550,7 @@
                 <div class="relative grow flex justify-end items-center">
                   <transition name="fadeNav" appear>
                     <div
-                      v-if="lowerBoundValue && upperBoundValue"
+                      v-if="lowerBoundValue && upperBoundValue && priceValue"
                       class="py-0.5 px-4 text-[11px] sm:text-sm rounded-full min-w-max badge border border-warning/70 bg-transparent font-sans font-bold text-warning/70"
                     >
                       adviced fees: 2.5%
@@ -513,10 +564,15 @@
                     class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
-                      :disabled="!(lowerBoundValue && upperBoundValue)"
+                      :disabled="
+                        !(lowerBoundValue && upperBoundValue && priceValue)
+                      "
                       :value="
-                        selectedStep && lowerBoundValue && upperBoundValue
-                          ? selectedStep
+                        selectedStep &&
+                        lowerBoundValue &&
+                        upperBoundValue &&
+                        priceValue
+                          ? selectedStep / 25 + '%'
                           : ''
                       "
                       @input="event => selectedStep = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
@@ -541,7 +597,9 @@
                           ></div>
                           <transition name="fadeNav" appear>
                             <svg
-                              v-if="lowerBoundValue && upperBoundValue"
+                              v-if="
+                                lowerBoundValue && upperBoundValue && priceValue
+                              "
                               class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${String(
@@ -577,7 +635,9 @@
                       <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
                           <input
-                            v-if="lowerBoundValue && upperBoundValue"
+                            v-if="
+                              lowerBoundValue && upperBoundValue && priceValue
+                            "
                             v-model="selectedStep"
                             type="range"
                             min="0"
@@ -596,10 +656,15 @@
                     class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
-                      :disabled="!(lowerBoundValue && upperBoundValue)"
+                      :disabled="
+                        !(lowerBoundValue && upperBoundValue && priceValue)
+                      "
                       :value="
-                        selectedFees && lowerBoundValue && upperBoundValue
-                          ? selectedFees
+                        selectedFees &&
+                        lowerBoundValue &&
+                        upperBoundValue &&
+                        priceValue
+                          ? selectedFees / 10 + '%'
                           : ''
                       "
                       @input="event => selectedFees = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
@@ -624,7 +689,9 @@
                           ></div>
                           <transition name="fadeNav" appear>
                             <img
-                              v-if="lowerBoundValue && upperBoundValue"
+                              v-if="
+                                lowerBoundValue && upperBoundValue && priceValue
+                              "
                               :src="moneyBag"
                               class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
@@ -640,7 +707,9 @@
                       <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
                           <input
-                            v-if="lowerBoundValue && upperBoundValue"
+                            v-if="
+                              lowerBoundValue && upperBoundValue && priceValue
+                            "
                             v-model="selectedFees"
                             type="range"
                             min="0"
@@ -659,9 +728,14 @@
                     class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
-                      :disabled="!(lowerBoundValue && upperBoundValue)"
+                      :disabled="
+                        !(lowerBoundValue && upperBoundValue && priceValue)
+                      "
                       :value="
-                        selectedAmount && lowerBoundValue && upperBoundValue
+                        selectedAmount &&
+                        lowerBoundValue &&
+                        upperBoundValue &&
+                        priceValue
                           ? selectedAmount
                           : ''
                       "
@@ -687,7 +761,9 @@
                           ></div>
                           <transition name="fadeNav" appear>
                             <img
-                              v-if="lowerBoundValue && upperBoundValue"
+                              v-if="
+                                lowerBoundValue && upperBoundValue && priceValue
+                              "
                               :src="dollars"
                               class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
@@ -703,7 +779,9 @@
                       <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
                           <input
-                            v-if="lowerBoundValue && upperBoundValue"
+                            v-if="
+                              lowerBoundValue && upperBoundValue && priceValue
+                            "
                             v-model="selectedAmount"
                             type="range"
                             min="0"
@@ -894,7 +972,9 @@
             <div
               class="col-span-12 p-3 xl:p-0 2xl:p-3 flex flex-col sm:flex-row justify-center items-center gap-3"
             >
-              <button class="btn btn-primary btn-wide shadow-md shadow-black/50">
+              <button
+                class="btn btn-primary btn-wide shadow-md shadow-black/50"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -911,7 +991,9 @@
                 </svg>
                 Create
               </button>
-              <button class="btn btn-ghost btn-wide hover:shadow-sm shadow-black/50">
+              <button
+                class="btn btn-ghost btn-wide hover:shadow-sm shadow-black/50"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -936,9 +1018,10 @@
   </div>
 </template>
 <script setup lang="ts">
+import type { Values } from "../../../types/cryptoSpecs";
 import {
   cryptoRange,
-  cryptoNames,
+  cryptoTicker,
   unknownToken,
 } from "../../../types/cryptoSpecs";
 import {
@@ -954,29 +1037,44 @@ import {
   moneyBag,
   dollars,
 } from "../../../asset/images/images";
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { nameToToken } from "../../../utils";
 
 const cryptoDetails = {
-  [cryptoNames.polygon]: { bg: "border border-purple-600", logo: polygon },
-  [cryptoNames.avax]: { bg: "border border-red-600", logo: avax },
-  [cryptoNames.bnb]: { bg: "border border-yellow-600", logo: bnb },
-  [cryptoNames.usdc]: { bg: "border border-blue-600", logo: usdc },
-  [cryptoNames.usdt]: { bg: "border border-emerald-600", logo: usdt },
-  [cryptoNames.ether]: { bg: "border border-gray-600", logo: ether },
-  [cryptoNames.coss]: { bg: "border border-blue-600", logo: logo },
-  [cryptoNames.aave]: { bg: "border border-purple-500", logo: aave },
+  [cryptoTicker.matic]: { bg: "border border-purple-600", logo: polygon },
+  [cryptoTicker.avax]: { bg: "border border-red-600", logo: avax },
+  [cryptoTicker.bnb]: { bg: "border border-yellow-600", logo: bnb },
+  [cryptoTicker.usdc]: { bg: "border border-blue-600", logo: usdc },
+  [cryptoTicker.usdt]: { bg: "border border-emerald-600", logo: usdt },
+  [cryptoTicker.ether]: { bg: "border border-gray-600", logo: ether },
+  [cryptoTicker.coss]: { bg: "border border-blue-600", logo: logo },
+  [cryptoTicker.aave]: { bg: "border border-purple-500", logo: aave },
 };
 
 let focusBaseLabel = ref<HTMLInputElement | null>(null);
 let focusQuoteLabel = ref<HTMLInputElement | null>(null);
 
-let selectedBase = ref<keyof typeof cryptoNames>();
-let selectedQuote = ref<keyof typeof cryptoNames>();
+let selectedBase = ref<Values<typeof cryptoTicker>>();
+let selectedQuote = ref<Values<typeof cryptoTicker>>();
 
 let lowerBoundValue = ref<number>(0);
 let upperBoundValue = ref<number>(0);
+let priceValue = ref<number | undefined>();
+
+watch(lowerBoundValue, (newValue, oldValue) => {
+  if (!priceValue.value && newValue) lowerBoundValue.value = 0;
+});
+
+watch(upperBoundValue, (newValue, oldValue) => {
+  if (!priceValue.value && newValue) upperBoundValue.value = 0;
+});
 
 let selectedStep = ref<number>(0);
 let selectedFees = ref<number>(0);
 let selectedAmount = ref<number>(0);
+
+async function createBot() {
+  const base = nameToToken(selectedBase.value!);
+  const quote = nameToToken(selectedQuote.value!);
+}
 </script>

@@ -20,9 +20,14 @@ export class Client {
   private static feesWithdrawalPath = "/api/fees-withdrawal";
   private static globalStakingPath = "/api/global-stacking";
   private static stakingFeesPath = "/api/stacking-fees";
+  private static botDataPath = "/api/bot";
   public static accountStore: ReturnType<typeof useAccountStore>;
   public static stackingStore: ReturnType<typeof useStackingStore>;
   public static priceStore: ReturnType<typeof usePriceStore>;
+
+  public static publicStackingLoaded: boolean = false;
+  public static userStackingLoaded: boolean = false;
+  public static userBotsLoaded: boolean = false;
 
   constructor() {}
 
@@ -133,6 +138,8 @@ export class Client {
    * @returns - Promise<boolean>
    */
   public static async loadPublicStacking(): Promise<boolean> {
+    if (this.publicStackingLoaded) return true;
+
     let success = false;
     let stacking, fees, coinGeckoPrices: AxiosResponse;
     try {
@@ -147,6 +154,7 @@ export class Client {
       Client.stackingStore[StackingActions.LoadFees](fees.data);
       Client.priceStore[PriceActions.LoadPrices](coinGeckoPrices.data);
       success = true;
+      this.publicStackingLoaded = true;
     } catch (e) {
       notify({
         text: "An error occured during public data request check console",
@@ -157,6 +165,8 @@ export class Client {
     return success;
   }
   public static async loadUserStacking(): Promise<boolean> {
+    if (this.userStackingLoaded) return true;
+
     let success = false;
     let stacking, feesWithdrawal: AxiosResponse;
 
@@ -173,9 +183,53 @@ export class Client {
       );
 
       success = true;
+      this.userStackingLoaded = true;
     } catch (e) {
       notify({
         text: "An error occured during user data request check console",
+        type: "warn",
+      });
+      console.log(e);
+    }
+    return success;
+  }
+
+  /**
+   * @notice - Function used to retrieve the user bots
+   * @returns - The succes or the failiure of the bot retrieval
+   */
+  public static async loadUserBots(): Promise<boolean> {
+    if (this.userBotsLoaded) return true;
+
+    let success = false;
+    let botsList: AxiosResponse;
+
+    try {
+      botsList = await axios.get(this.url + this.botDataPath, {
+        withCredentials: true,
+      });
+      success = true;
+      console.log(botsList.data);
+      this.userBotsLoaded = true;
+    } catch (e) {
+      notify({
+        text: "An error occured during user bot data request check console",
+        type: "warn",
+      });
+      console.log(e);
+    }
+    return success;
+  }
+
+  public static async createUserBot(data: Object): Promise<boolean> {
+    let success = false;
+    let botsList: AxiosResponse;
+    try {
+      botsList = await axios.post(this.url + this.botDataPath, data);
+      success = true;
+    } catch (e) {
+      notify({
+        text: "An error occured during bot creation check console",
         type: "warn",
       });
       console.log(e);
