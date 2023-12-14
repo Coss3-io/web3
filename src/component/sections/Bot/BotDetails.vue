@@ -386,11 +386,11 @@
       class="stats xl:grid xl:grid-cols-2 2xl:grid-cols-3 xl:grid-rows-[1fr_min-content] stats-vertical lg:stats-horizontal sm:col-span-5 col-span-full lg:col-span-full xl:col-span-7 shadow-lg bg-base-300 shadow-black/50 relative !overflow-visible"
     >
       <span
-        v-if="selectedBot?.baseName == 'avax'"
+        v-if="selectedBot?.baseName.toLowerCase() == 'avax'"
         class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0"
       ></span>
       <span
-        v-if="selectedBot?.baseName == 'avax'"
+        v-if="selectedBot?.baseName.toLowerCase() == 'avax'"
         class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0 border-red-500 animate-ping"
       ></span>
       <div
@@ -464,7 +464,7 @@
       </div>
 
       <div
-        v-if="selectedBot?.baseName == 'avax'"
+        v-if="selectedBot?.baseName.toLowerCase() == 'avax'"
         class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 2xl:col-span-1 xl:col-start-1 xl:col-span-2 place-items-center xl:!border-t-[1px] xl:!border-solid grid-cols-[1fr_max-content] xl:grid-cols-2 2xl:grid-cols-[1fr_max-content]"
       >
         <div class="stat-figure text-secondary xl:justify-self-center">
@@ -530,7 +530,7 @@ import {
   bnb,
   logo,
 } from "../../../asset/images/images";
-import { cryptoNames } from "../../../types/cryptoSpecs";
+import { cryptoTicker } from "../../../types/cryptoSpecs";
 import { useRoute } from "vue-router";
 import { onBeforeMount } from "vue";
 import * as echarts from "echarts/core";
@@ -603,17 +603,17 @@ let option = {
 };
 
 const cryptoDetails = {
-  [cryptoNames.polygon]: {
+  [cryptoTicker.matic]: {
     bg: "text-purple-600",
     logo: polygon,
     color: "#a347d1",
   },
-  [cryptoNames.avax]: { bg: "text-red-600", logo: avax, color: "#de2c2c" },
-  [cryptoNames.bnb]: { bg: "text-yellow-600", logo: bnb, color: "#edda0c" },
-  [cryptoNames.usdc]: { bg: "text-blue-600", logo: usdc, color: "#009dff" },
-  [cryptoNames.usdt]: { bg: "text-emerald-600", logo: usdt, color: "#00c41d" },
-  [cryptoNames.ether]: { bg: "text-gray-400", logo: ether, color: "#b6bfb7" },
-  [cryptoNames.coss]: { bg: "text-blue-600", logo: logo, color: "#25e5fa" },
+  [cryptoTicker.avax]: { bg: "text-red-600", logo: avax, color: "#de2c2c" },
+  [cryptoTicker.bnb]: { bg: "text-yellow-600", logo: bnb, color: "#edda0c" },
+  [cryptoTicker.usdc]: { bg: "text-blue-600", logo: usdc, color: "#009dff" },
+  [cryptoTicker.usdt]: { bg: "text-emerald-600", logo: usdt, color: "#00c41d" },
+  [cryptoTicker.ether]: { bg: "text-gray-400", logo: ether, color: "#b6bfb7" },
+  [cryptoTicker.coss]: { bg: "text-blue-600", logo: logo, color: "#25e5fa" },
 };
 
 let selectedBot = ref<(typeof botsList)[0]>();
@@ -621,8 +621,8 @@ const botsList = [
   {
     base: 7593,
     quote: 384,
-    baseName: cryptoNames.ether,
-    quoteName: cryptoNames.usdc,
+    baseName: cryptoTicker.ether,
+    quoteName: cryptoTicker.usdc,
     profits: 679,
     fees: 1,
     lowerBound: 1582,
@@ -631,8 +631,8 @@ const botsList = [
   {
     base: 123,
     quote: 456,
-    baseName: cryptoNames.coss,
-    quoteName: cryptoNames.usdt,
+    baseName: cryptoTicker.coss,
+    quoteName: cryptoTicker.usdt,
     profits: 789,
     fees: 1,
     lowerBound: 4572,
@@ -641,8 +641,8 @@ const botsList = [
   {
     base: 34,
     quote: 535,
-    baseName: cryptoNames.avax,
-    quoteName: cryptoNames.usdc,
+    baseName: cryptoTicker.avax,
+    quoteName: cryptoTicker.usdc,
     profits: 4,
     fees: 3,
     lowerBound: 4852,
@@ -651,8 +651,8 @@ const botsList = [
   {
     base: 86,
     quote: 78,
-    baseName: cryptoNames.bnb,
-    quoteName: cryptoNames.usdt,
+    baseName: cryptoTicker.bnb,
+    quoteName: cryptoTicker.usdt,
     profits: 2,
     fees: 4,
     lowerBound: 8542,
@@ -661,8 +661,8 @@ const botsList = [
   {
     base: 86,
     quote: 78,
-    baseName: cryptoNames.polygon,
-    quoteName: cryptoNames.usdc,
+    baseName: cryptoTicker.matic,
+    quoteName: cryptoTicker.usdc,
     profits: 2,
     fees: 5,
     lowerBound: 156,
@@ -672,8 +672,8 @@ const botsList = [
   {
     base: 86,
     quote: 78,
-    baseName: cryptoNames.polygon,
-    quoteName: cryptoNames.usdc,
+    baseName: cryptoTicker.matic,
+    quoteName: cryptoTicker.usdc,
     profits: 2,
     fees: 5,
     lowerBound: 568,
@@ -682,8 +682,8 @@ const botsList = [
   {
     base: 488,
     quote: 535,
-    baseName: cryptoNames.avax,
-    quoteName: cryptoNames.usdc,
+    baseName: cryptoTicker.avax,
+    quoteName: cryptoTicker.usdc,
     profits: 4,
     fees: 3,
     lowerBound: 7865,
@@ -692,8 +692,8 @@ const botsList = [
   {
     base: 86,
     quote: 78,
-    baseName: cryptoNames.bnb,
-    quoteName: cryptoNames.usdt,
+    baseName: cryptoTicker.bnb,
+    quoteName: cryptoTicker.usdt,
     profits: 2,
     fees: 4,
     lowerBound: 485,
@@ -702,8 +702,8 @@ const botsList = [
   {
     base: 5024,
     quote: 453,
-    baseName: cryptoNames.coss,
-    quoteName: cryptoNames.usdt,
+    baseName: cryptoTicker.coss,
+    quoteName: cryptoTicker.usdt,
     profits: 45,
     fees: 2,
     lowerBound: 438,
@@ -712,8 +712,8 @@ const botsList = [
   {
     base: 488,
     quote: 535,
-    baseName: cryptoNames.avax,
-    quoteName: cryptoNames.usdc,
+    baseName: cryptoTicker.avax,
+    quoteName: cryptoTicker.usdc,
     profits: 4,
     fees: 3,
     lowerBound: 45578,
@@ -744,4 +744,3 @@ onMounted(() => {
   );
 });
 </script>
-../../../types/cryptoNames

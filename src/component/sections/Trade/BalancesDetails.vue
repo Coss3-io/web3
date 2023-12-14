@@ -165,11 +165,10 @@
 import {
   cryptoLogo,
   cryptoTicker,
-  cryptoNames,
 } from "../../../types/cryptoSpecs";
 import { unknownTokenLogo } from "../../../asset/images/images";
 
-const base = cryptoNames.ether;
+const base = cryptoTicker.ether;
 const quote = "0xabc...def";
 
 const props = defineProps<{

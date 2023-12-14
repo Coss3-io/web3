@@ -16,8 +16,8 @@
         :bot="{
           base: 7593,
           quote: 384,
-          baseName: cryptoNames.ether,
-          quoteName: cryptoNames.usdc,
+          baseName: cryptoTicker.ether,
+          quoteName: cryptoTicker.usdc,
           profits: 679,
           fees: 1,
         }"
@@ -47,8 +47,8 @@
         :bot="{
           base: 5024,
           quote: 453,
-          baseName: cryptoNames.coss,
-          quoteName: cryptoNames.usdt,
+          baseName: cryptoTicker.coss,
+          quoteName: cryptoTicker.usdt,
           profits: 45,
           fees: 2,
         }"
@@ -151,7 +151,7 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import { botLogo } from "../../../asset/images/images";
-import { cryptoNames } from "../../../types/cryptoSpecs";
+import { cryptoTicker } from "../../../types/cryptoSpecs";
 import BotCard from "../Bot/BotCard.vue";
 import { RouteNames } from "../../../router";
 </script>

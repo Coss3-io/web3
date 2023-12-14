@@ -378,7 +378,6 @@ import {
   cryptoLogo,
   cryptoBg,
   cryptoBorder,
-  cryptoNames,
   cryptoTicker,
 } from "../../../types/cryptoSpecs";
 import { unknownTokenLogo, dollars } from "../../../asset/images/images";
@@ -388,7 +387,7 @@ const props = defineProps<{
 }>();
 
 const base = "0xabc...def";
-const quote = cryptoNames.avax;
+const quote = cryptoTicker.avax;
 const isBuyOrder = ref(true);
 const isMakerOrder = ref(true);
 const isQuoteFeesOrder = ref(true);

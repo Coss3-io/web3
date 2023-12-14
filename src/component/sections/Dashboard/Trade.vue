@@ -188,7 +188,7 @@
             class="flex justify-center items-center px-1.5 bg-neutral bg-gradient-to-b from-transparent via-transparent to-red-500/20 rounded-md py-1.5 m-2 shadow-lg shadow-black"
           >
             <img
-              v-if="token in cryptoNames"
+              v-if="token in cryptoTicker"
               :src="(<any>cryptoLogo)[token]"
               class="w-7 h-7"
             />
@@ -203,7 +203,7 @@
             <span class="whitespace-nowrap">Need {{ amount }} additionnal</span>
             <span
               class="flex items-center gap-1 justify-center"
-              :class="token in cryptoNames ? '' : 'w-full'"
+              :class="token in cryptoTicker ? '' : 'w-full'"
             >
               <span>
                 {{ token }}
@@ -267,7 +267,7 @@ import { RouterLink } from "vue-router";
 import { tradeLogo, unknownTokenLogo } from "../../../asset/images/images";
 import { RouteNames } from "../../../router";
 import { ref } from "vue";
-import { cryptoLogo, cryptoNames } from "../../../types/cryptoSpecs";
+import { cryptoLogo, cryptoTicker } from "../../../types/cryptoSpecs";
 
 let rebalance = ref<boolean>(true);
 let copiedIndex = ref<number | null>(null);
@@ -278,10 +278,10 @@ async function copy(text: string) {
   }
 }
 const rebalanceList = {
-  [cryptoNames.coss]: 5456,
-  [cryptoNames.bnb]: 26844,
-  [cryptoNames.aave]: 4654,
-  [cryptoNames.usdt]: 75643,
+  [cryptoTicker.coss]: 5456,
+  [cryptoTicker.bnb]: 26844,
+  [cryptoTicker.aave]: 4654,
+  [cryptoTicker.usdt]: 75643,
   "0x55b0A...199B9fA5": 876896,
   "0x51b0A...199B9fA5": 2508,
   "0x55b0A...19919fA5": 986987,

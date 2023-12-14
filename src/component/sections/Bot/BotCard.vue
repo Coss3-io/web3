@@ -74,7 +74,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Values, cryptoNames } from "../../../types/cryptoSpecs";
+import { Values, cryptoTicker } from "../../../types/cryptoSpecs";
 import {
   usdt,
   ether,
@@ -87,22 +87,22 @@ import {
 } from "../../../asset/images/images";
 
 const cryptoDetails = {
-  [cryptoNames.polygon]: { bg: "border border-purple-600", logo: polygon },
-  [cryptoNames.avax]: { bg: "border border-red-600", logo: avax },
-  [cryptoNames.bnb]: { bg: "border border-yellow-600", logo: bnb },
-  [cryptoNames.usdc]: { bg: "border border-blue-600", logo: usdc },
-  [cryptoNames.usdt]: { bg: "border border-emerald-600", logo: usdt },
-  [cryptoNames.ether]: { bg: "border border-gray-600", logo: ether },
-  [cryptoNames.coss]: { bg: "border border-blue-600", logo: logo },
-  [cryptoNames.aave]: { bg: "border border-fuchsia-600", logo: logo },
+  [cryptoTicker.matic]: { bg: "border border-purple-600", logo: polygon },
+  [cryptoTicker.avax]: { bg: "border border-red-600", logo: avax },
+  [cryptoTicker.bnb]: { bg: "border border-yellow-600", logo: bnb },
+  [cryptoTicker.usdc]: { bg: "border border-blue-600", logo: usdc },
+  [cryptoTicker.usdt]: { bg: "border border-emerald-600", logo: usdt },
+  [cryptoTicker.ether]: { bg: "border border-gray-600", logo: ether },
+  [cryptoTicker.coss]: { bg: "border border-blue-600", logo: logo },
+  [cryptoTicker.aave]: { bg: "border border-fuchsia-600", logo: logo },
 };
 
 const props = defineProps<{
   bot: {
     base: number;
     quote: number;
-    baseName: Values<typeof cryptoNames>;
-    quoteName: Values<typeof cryptoNames>;
+    baseName: Values<typeof cryptoTicker>;
+    quoteName: Values<typeof cryptoTicker>;
     profits: number;
     fees: number;
   };
