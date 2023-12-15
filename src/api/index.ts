@@ -239,9 +239,8 @@ export class Client {
         encodedData,
         signer.address.toLowerCase(),
       ]);
+      
       data["signature"] = signature;
-      console.log("|" + encodedData + "|"); // 0x1666e90aa9c38ca3f2f805b4e02aa9ff051762e9 <-- no checksum
-      console.log("|" + data.address + "|"); //0x1666e90AA9c38cA3f2F805B4E02AA9fF051762E9
       botsList = await axios.post(this.url + this.botDataPath, data);
       success = true;
     } catch (e) {

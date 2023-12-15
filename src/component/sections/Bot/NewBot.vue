@@ -1192,8 +1192,6 @@ async function createBot() {
         data.replace_order,
       ]
     )
-  console.log(encodedData);
-
   await Client.createUserBot(data, encodedData);
 }
 </script>
