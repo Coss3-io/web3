@@ -299,7 +299,7 @@
                     class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
-                      :disabled="selectedBase == undefined ? true : false"
+                      :disabled="selectedQuote == undefined ? true : false"
                       :value="
                         lowerBoundValue && priceValue
                           ? (priceValue * lowerBoundValue) / 100
@@ -330,10 +330,11 @@
                           <transition name="fadeNav" appear>
                             <unknownTokenLogo
                               v-if="
-                                selectedBase && !(selectedBase in cryptoDetails)
+                                selectedQuote &&
+                                !(selectedQuote in cryptoDetails)
                               "
                               :key="unknownToken"
-                              class="w-7 h-7 fill-primary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
+                              class="w-7 h-7 fill-secondary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${
                                   priceValue
@@ -351,10 +352,10 @@
                             ></unknownTokenLogo>
                             <img
                               v-else-if="
-                                selectedBase && selectedBase in cryptoDetails
+                                selectedQuote && selectedQuote in cryptoDetails
                               "
-                              :key="selectedBase"
-                              :src="cryptoDetails[selectedBase].logo"
+                              :key="selectedQuote"
+                              :src="cryptoDetails[selectedQuote].logo"
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${
@@ -377,25 +378,27 @@
                       <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
                           <input
-                            v-if="selectedBase && selectedBase in cryptoDetails"
-                            :key="selectedBase"
+                            v-if="
+                              selectedQuote && selectedQuote in cryptoDetails
+                            "
+                            :key="selectedQuote"
                             v-model="lowerBoundValue"
                             type="range"
                             min="0"
                             max="100"
                             class="range range-sm w-full absolute"
-                            :class="cryptoRange[selectedBase]"
+                            :class="cryptoRange[selectedQuote]"
                           />
                           <input
                             v-else-if="
-                              selectedBase && !(selectedBase in cryptoDetails)
+                              selectedQuote && !(selectedQuote in cryptoDetails)
                             "
                             :key="unknownToken"
                             v-model="lowerBoundValue"
                             type="range"
                             min="0"
                             max="100"
-                            class="range range-sm w-full range-primary absolute"
+                            class="range range-sm w-full range-secondary absolute"
                           />
                         </transition>
                       </div>
@@ -409,7 +412,7 @@
                     class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
                     <input
-                      :disabled="selectedQuote == undefined ? true : false"
+                      :disabled="selectedBase == undefined ? true : false"
                       :value="
                         upperBoundValue && priceValue
                           ? priceValue + (priceValue * upperBoundValue) / 100
@@ -440,10 +443,10 @@
                           <transition name="fadeNav" appear>
                             <img
                               v-if="
-                                selectedQuote && selectedQuote in cryptoDetails
+                                selectedBase && selectedBase in cryptoDetails
                               "
-                              :key="selectedQuote"
-                              :src="cryptoDetails[selectedQuote].logo"
+                              :key="selectedBase"
+                              :src="cryptoDetails[selectedBase].logo"
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${
@@ -468,11 +471,10 @@
                             />
                             <unknownTokenLogo
                               v-else-if="
-                                selectedQuote &&
-                                !(selectedQuote in cryptoDetails)
+                                selectedBase && !(selectedBase in cryptoDetails)
                               "
                               :key="unknownToken"
-                              class="w-7 h-7 fill-secondary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
+                              class="w-7 h-7 fill-primary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${
                                   priceValue
@@ -494,27 +496,25 @@
                       <div class="relative w-full h-5">
                         <transition name="fadeNav" appear>
                           <input
-                            v-if="
-                              selectedQuote && selectedQuote in cryptoDetails
-                            "
-                            :key="selectedQuote"
+                            v-if="selectedBase && selectedBase in cryptoDetails"
+                            :key="selectedBase"
                             v-model="upperBoundValue"
                             type="range"
                             min="0"
                             max="100"
                             class="range range-sm w-full absolute"
-                            :class="cryptoRange[selectedQuote]"
+                            :class="cryptoRange[selectedBase]"
                           />
                           <input
                             v-else-if="
-                              selectedQuote && !(selectedQuote in cryptoDetails)
+                              selectedBase && !(selectedBase in cryptoDetails)
                             "
                             :key="unknownToken"
                             v-model="upperBoundValue"
                             type="range"
                             min="0"
                             max="100"
-                            class="range range-sm range-secondary w-full absolute"
+                            class="range range-sm range-primary w-full absolute"
                           />
                         </transition>
                       </div>
@@ -575,7 +575,7 @@
                           ? selectedStep / 25 + '%'
                           : ''
                       "
-                      @input="event => selectedStep = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                      @input="event => selectedStep = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value)*25: 0"
                       type="text"
                       placeholder="step"
                       class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
@@ -667,7 +667,7 @@
                           ? selectedFees / 10 + '%'
                           : ''
                       "
-                      @input="event => selectedFees = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
+                      @input="event => selectedFees = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value)*10: 0"
                       type="text"
                       placeholder="fees"
                       class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
@@ -881,7 +881,7 @@
                         />
                       </div>
                       <div class="w-7/12 text-center font-sans">
-                        {{ lowerBoundValue }}
+                        {{ baseNeeded }}
                       </div>
                     </div>
                   </transition>
@@ -962,7 +962,7 @@
                         />
                       </div>
                       <div class="w-7/12 text-center font-sans">
-                        {{ upperBoundValue }}
+                        {{ quoteNeeded }}
                       </div>
                     </div>
                   </transition>
@@ -1037,7 +1037,7 @@ import {
   moneyBag,
   dollars,
 } from "../../../asset/images/images";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { nameToToken } from "../../../utils";
 
 const cryptoDetails = {
@@ -1072,6 +1072,48 @@ watch(upperBoundValue, (newValue, oldValue) => {
 let selectedStep = ref<number>(0);
 let selectedFees = ref<number>(0);
 let selectedAmount = ref<number>(0);
+
+const upperBoundPrice = computed(() => {
+  const price =
+    priceValue.value! + (priceValue.value! * upperBoundValue.value) / 100;
+  return price ? price : 0;
+});
+
+const lowerBoundPrice = computed(() => {
+  const price = (priceValue.value! * lowerBoundValue.value) / 100;
+  return price ? price : 0;
+});
+
+const baseNeeded = computed(() => {
+  const absoluteStep = (priceValue.value! * selectedStep.value) / 25 / 100;
+  const range = upperBoundPrice.value - priceValue.value!;
+  const numOrders = Math.floor(range / absoluteStep);
+  return numOrders ? (numOrders * selectedAmount.value).toFixed(10) : 0;
+});
+
+const quoteNeeded = computed(() => {
+  if (
+    !(
+      priceValue.value &&
+      selectedStep.value &&
+      lowerBoundPrice.value &&
+      selectedAmount.value
+    )
+  )
+    return 0;
+
+  const absoluteStep = (priceValue.value! * selectedStep.value) / 25 / 100;
+  let counter = 0;
+  let price = priceValue.value!;
+  let amountNeeded = 0;
+
+  while (counter < 5000 && price >= lowerBoundPrice.value) {
+    amountNeeded += selectedAmount.value * price
+    price -= absoluteStep;
+    ++counter;
+  }
+  return amountNeeded.toFixed(10)
+});
 
 async function createBot() {
   const base = nameToToken(selectedBase.value!);
