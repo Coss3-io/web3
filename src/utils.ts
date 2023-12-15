@@ -1,6 +1,9 @@
+//@ts-ignore
+import { getWalletClient } from "@wagmi/core";
 import { COSS_TOKEN } from "./api/settings";
 import { aave, avax, bnb, ether, usdc, usdt } from "./asset/images/images";
 import { usePriceStore } from "./store/price";
+import { BrowserProvider, JsonRpcSigner } from "ethers";
 
 /**
  * @notice - used to display the beginning and the end of an address only
@@ -75,4 +78,37 @@ export function tokensToImage(token: string): string {
     "0x4bbeEB066eD09B7AEd07bF39EEe0460DFa261520": aave,
   };
   return images[token];
+}
+
+export function nameToToken(name: string): string {
+  let names: { [key in string]: string } = {
+    USDC: "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525",
+    USDT: "0x4BBEeB066ed09b7aEd07BF39EEE0460dFA261523",
+    ETH: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524",
+    AVAX: "0x4BBeeB066ed09B7AeD07bf39EeE0460dfA261522",
+    BNB: "0x4bbeEB066ED09b7Aed07Bf39EeE0460DFA261521",
+    AAVE: "0x4bbeEB066eD09B7AEd07bF39EEe0460DFa261520",
+  };
+
+  return names[name.toUpperCase()];
+}
+
+/**
+ * @notice - Function used to sign message for on chain verification
+ * @param networkId - wallet's actual id
+ * @param networkName - wallet's actual name
+ * @returns - The signer object
+ */
+export async function getSigner(
+  networkId: number,
+  networkName: string
+): Promise<false | JsonRpcSigner> {
+  const wallet = await getWalletClient();
+  if (!wallet) return false;
+  const network = {
+    chainId: networkId,
+    name: networkName,
+  };
+  const provider = new BrowserProvider(wallet.transport, network);
+  return new JsonRpcSigner(provider, wallet.account.address);
 }

@@ -11,6 +11,7 @@ import {
   updateAddress,
   updateNetworkId,
   updateLoading,
+  updateNetworkName,
 } from "./actions";
 
 export const useAccountStore = defineStore("Account", {
@@ -20,6 +21,7 @@ export const useAccountStore = defineStore("Account", {
     [AccountActions.UpdateAppConnection]: updateAppConnection,
     [AccountActions.UpdateBlockchainConnection]: updateBlockchainConnection,
     [AccountActions.UpdateNetworkId]: updateNetworkId,
+    [AccountActions.UpdateNetworkName]: updateNetworkName,
     [AccountActions.UpdateLoading]: updateLoading,
   },
 });

@@ -974,6 +974,7 @@
             >
               <button
                 class="btn btn-primary btn-wide shadow-md shadow-black/50"
+                @click="createBot"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1039,6 +1040,9 @@ import {
 } from "../../../asset/images/images";
 import { computed, ref, watch } from "vue";
 import { nameToToken } from "../../../utils";
+import { Client } from "../../../api";
+import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
 
 const cryptoDetails = {
   [cryptoTicker.matic]: { bg: "border border-purple-600", logo: polygon },
@@ -1084,10 +1088,13 @@ const lowerBoundPrice = computed(() => {
   return price ? price : 0;
 });
 
+const absoluteStep = computed(() => {
+  return (priceValue.value! * selectedStep.value) / 25 / 100;
+});
+
 const baseNeeded = computed(() => {
-  const absoluteStep = (priceValue.value! * selectedStep.value) / 25 / 100;
   const range = upperBoundPrice.value - priceValue.value!;
-  const numOrders = Math.floor(range / absoluteStep);
+  const numOrders = Math.floor(range / absoluteStep.value);
   return numOrders ? (numOrders * selectedAmount.value).toFixed(10) : 0;
 });
 
@@ -1102,21 +1109,91 @@ const quoteNeeded = computed(() => {
   )
     return 0;
 
-  const absoluteStep = (priceValue.value! * selectedStep.value) / 25 / 100;
   let counter = 0;
   let price = priceValue.value!;
   let amountNeeded = 0;
 
   while (counter < 5000 && price >= lowerBoundPrice.value) {
-    amountNeeded += selectedAmount.value * price
-    price -= absoluteStep;
+    amountNeeded += selectedAmount.value * price;
+    price -= absoluteStep.value;
     ++counter;
   }
-  return amountNeeded.toFixed(10)
+  return amountNeeded.toFixed(10);
 });
 
 async function createBot() {
-  const base = nameToToken(selectedBase.value!);
-  const quote = nameToToken(selectedQuote.value!);
+  const multiplicator = new BigNumber("1e18");
+  const data = {
+    address: Client.accountStore.$state.address,
+    amount: new BigNumber(selectedAmount.value)
+      .multipliedBy(multiplicator)
+      .toFixed(),
+    price: new BigNumber(priceValue.value!)
+      .multipliedBy(multiplicator)
+      .toFixed(),
+    step: new BigNumber(absoluteStep.value)
+      .multipliedBy(multiplicator)
+      .toFixed(),
+    maker_fees: String(Math.floor((selectedFees.value / 25) * 10)),
+    upper_bound: new BigNumber(upperBoundPrice.value)
+      .multipliedBy(multiplicator)
+      .toFixed(),
+    lower_bound: new BigNumber(lowerBoundPrice.value)
+      .multipliedBy(multiplicator)
+      .toFixed(),
+    base_token: nameToToken(selectedBase.value!),
+    quote_token: nameToToken(selectedQuote.value!),
+    expiry: String(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 1000),
+    is_buyer: false,
+    replace_order: true,
+  };
+  console.log([
+    data.address,
+    data.amount,
+    data.price,
+    data.step,
+    data.maker_fees,
+    data.upper_bound,
+    data.lower_bound,
+    data.base_token,
+    data.quote_token,
+    data.expiry,
+    data.is_buyer ? 0 : 1,
+    data.replace_order,
+  ]);
+  const encodedData = ethers
+    .solidityPacked(
+      [
+        "address",
+        "uint256",
+        "uint256",
+        "uint256",
+        "uint256",
+        "uint256",
+        "uint256",
+        "address",
+        "address",
+        "uint64",
+        "uint8",
+        "bool",
+      ],
+      [
+        data.address,
+        data.amount,
+        data.price,
+        data.step,
+        data.maker_fees,
+        data.upper_bound,
+        data.lower_bound,
+        data.base_token,
+        data.quote_token,
+        data.expiry,
+        data.is_buyer ? 0 : 1,
+        data.replace_order,
+      ]
+    )
+  console.log(encodedData);
+
+  await Client.createUserBot(data, encodedData);
 }
 </script>

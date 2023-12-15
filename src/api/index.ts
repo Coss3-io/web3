@@ -8,6 +8,7 @@ import { useStackingStore } from "../store/stacking";
 import { StackingActions } from "../types/stacking";
 import { usePriceStore } from "../store/price";
 import { PriceActions } from "../types/price";
+import { getSigner } from "../utils";
 
 const { notify } = useNotification();
 export class Client {
@@ -221,10 +222,26 @@ export class Client {
     return success;
   }
 
-  public static async createUserBot(data: Object): Promise<boolean> {
+  public static async createUserBot(
+    data: { [key in string]: any },
+    encodedData: string
+  ): Promise<boolean> {
     let success = false;
     let botsList: AxiosResponse;
+    const signer = await getSigner(
+      this.accountStore.$state.networkId!,
+      this.accountStore.$state.networkName!
+    );
+
     try {
+      if (!signer) throw new Error("The signer couldn't be loaded properly");
+      const signature = await signer.provider.send("personal_sign", [
+        encodedData,
+        signer.address.toLowerCase(),
+      ]);
+      data["signature"] = signature;
+      console.log("|" + encodedData + "|"); // 0x1666e90aa9c38ca3f2f805b4e02aa9ff051762e9 <-- no checksum
+      console.log("|" + data.address + "|"); //0x1666e90AA9c38cA3f2F805B4E02AA9fF051762E9
       botsList = await axios.post(this.url + this.botDataPath, data);
       success = true;
     } catch (e) {

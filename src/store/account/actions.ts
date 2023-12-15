@@ -49,3 +49,13 @@ export function updateNetworkId(
 ): void {
   this.$state.networkId = networkId;
 }
+
+/**
+ * @notice Update the account networkName
+ */
+export function updateNetworkName(
+  this: ReturnType<typeof useAccountStore>,
+  networkName: string | undefined
+): void {
+  this.$state.networkName = networkName;
+}

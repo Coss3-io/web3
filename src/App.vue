@@ -85,6 +85,7 @@ watchAccount(async (account) => {
 
 watchNetwork((network) => {
   accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
+  accountStore[AccountActions.UpdateNetworkName](network.chain?.name);
 });
 
 const Suspense = suspense_ as {

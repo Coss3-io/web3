@@ -5,5 +5,6 @@ export const state: AccountState = {
   blockchainConnected: false,
   appConnected: false,
   address: undefined,
-  networkId: undefined
+  networkId: undefined,
+  networkName: undefined
 };
