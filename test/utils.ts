@@ -16,6 +16,7 @@ export type Order = {
   quoteToken: AddressLike;
   owner: AddressLike;
   expiry: string;
+  chainId: string;
   side: number;
   replaceOrder: boolean;
 };
@@ -51,6 +52,7 @@ export function encodeOrder(order: Order): string {
       "address",
       "address",
       "uint64",
+      "uint64",
       "uint8",
       "bool",
     ],
@@ -65,6 +67,7 @@ export function encodeOrder(order: Order): string {
       order.baseToken,
       order.quoteToken,
       order.expiry,
+      order.chainId,
       order.side,
       order.replaceOrder,
     ]

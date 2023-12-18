@@ -5,7 +5,6 @@ import { Coss, Dex, Stacking, DummyERC20 } from "../typechain-types";
 import { encodeOrder, sign } from "./utils";
 
 BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_DOWN });
-
 const fees = new BigNumber("1e15");
 const side = {
   BUY: 0,
@@ -58,6 +57,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks creating a round maker sell quote fees trade works", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -72,6 +72,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target.toString().toLocaleLowerCase(),
       owner: accounts[1].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -185,6 +186,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks creating the same order with different owner works", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -199,6 +201,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[7].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -316,6 +319,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks a regular order cannot be created twice", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -330,6 +334,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -347,6 +352,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks an order with a wrong signature cannot be created", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -360,6 +366,7 @@ describe("Test: basic dex testing function", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999998",
       side: side.SELL,
       replaceOrder: false,
@@ -378,6 +385,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks an order with a to high taker amount cannot be created", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -392,6 +400,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999998",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -409,6 +418,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks an order with a conflicting base token detail cannot be created", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -423,6 +433,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999998",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -440,6 +451,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks an order with a conflicting quote token detail cannot be created", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -454,6 +466,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999998",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -472,6 +485,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks an order with a conflicting side cannot be crated", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -486,6 +500,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999998",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -503,6 +518,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks an order with an expiry into the past cannot be used", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -517,6 +533,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "10",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -534,6 +551,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks creating a round maker sell base fees trade works", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -548,6 +566,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: String(Math.floor(Date.now() / 1000 + 3600)),
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -651,6 +670,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks creating a part maker sell base fees trade works", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -665,6 +685,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: String(Math.floor(Date.now() / 1000 + 3601)),
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -780,6 +801,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks creating a part maker buy quote fees trade works", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -794,6 +816,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: String(Math.floor(Date.now() / 1000 + 3600)),
+      chainId: chainId.toString(),
       side: side.BUY,
       replaceOrder: false,
     };
@@ -910,6 +933,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks creating a round maker buy quote fees trade works", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -924,6 +948,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: String(Math.floor(Date.now() / 1000 + 3612)),
+      chainId: chainId.toString(),
       side: side.BUY,
       replaceOrder: false,
     };
@@ -1028,6 +1053,7 @@ describe("Test: basic dex testing function", () => {
   });
 
   it("Checks creating a round maker buy base fees trade works", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1042,6 +1068,7 @@ describe("Test: basic dex testing function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: String(Math.floor(Date.now() / 1000 + 3604)),
+      chainId: chainId.toString(),
       side: side.BUY,
       replaceOrder: false,
     };
@@ -1172,6 +1199,7 @@ describe("Test: Basic replacement order functions", () => {
   });
 
   it("Checks a replacement order with zero bounds does not work", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1186,6 +1214,7 @@ describe("Test: Basic replacement order functions", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: true,
     };
@@ -1203,6 +1232,7 @@ describe("Test: Basic replacement order functions", () => {
   });
 
   it("Checks a replacement order with price above the bounds does not work", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1217,6 +1247,7 @@ describe("Test: Basic replacement order functions", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: true,
     };
@@ -1234,6 +1265,7 @@ describe("Test: Basic replacement order functions", () => {
   });
 
   it("Checks a replacement order BUY on BUY without previous sell does not work", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1248,6 +1280,7 @@ describe("Test: Basic replacement order functions", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: true,
     };
@@ -1266,6 +1299,7 @@ describe("Test: Basic replacement order functions", () => {
   });
 
   it("Checks a replacement order SELL on SELL without previous buy does not work", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1280,6 +1314,7 @@ describe("Test: Basic replacement order functions", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: true,
     };
@@ -1297,6 +1332,7 @@ describe("Test: Basic replacement order functions", () => {
   });
 
   it("Checks a replacement order works SELL -> BUY", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1311,6 +1347,7 @@ describe("Test: Basic replacement order functions", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: true,
     };
@@ -1432,6 +1469,7 @@ describe("Test: Basic replacement order functions", () => {
   });
 
   it("Checks a replacement order works BUY -> SELL", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1445,6 +1483,7 @@ describe("Test: Basic replacement order functions", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: true,
@@ -1577,6 +1616,7 @@ describe("Test: Basic replacement order functions", () => {
 
   it("Checks a replacement order works SELL -> SELL", async () => {
     const newMult = "2";
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1590,6 +1630,7 @@ describe("Test: Basic replacement order functions", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: true,
@@ -1744,6 +1785,7 @@ describe("Test: Basic replacement order functions", () => {
 
   it("Checks a replacement order works BUY -> BUY", async () => {
     const newMult = "8";
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1757,6 +1799,7 @@ describe("Test: Basic replacement order functions", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: true,
@@ -1942,6 +1985,7 @@ describe("Testing maker fees behaviour", () => {
   });
 
   it("Testing the negative fixed maker fees on a sell order", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -1955,6 +1999,7 @@ describe("Testing maker fees behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: true,
@@ -2083,6 +2128,7 @@ describe("Testing maker fees behaviour", () => {
   });
 
   it("Testing the negative fixed maker fees on a buy order", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -2096,6 +2142,7 @@ describe("Testing maker fees behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: true,
@@ -2224,6 +2271,7 @@ describe("Testing maker fees behaviour", () => {
   });
 
   it("Testing the negative relative maker fees on a sell order", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -2237,6 +2285,7 @@ describe("Testing maker fees behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: true,
@@ -2370,6 +2419,7 @@ describe("Testing maker fees behaviour", () => {
   });
 
   it("Testing the negative relative maker fees on a buy order", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -2383,6 +2433,7 @@ describe("Testing maker fees behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: true,
@@ -2516,6 +2567,7 @@ describe("Testing maker fees behaviour", () => {
   });
 
   it("Testing we can take only part of a replacement buy order", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -2529,6 +2581,7 @@ describe("Testing maker fees behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999998",
       side: side.SELL,
       replaceOrder: true,
@@ -2662,6 +2715,7 @@ describe("Testing maker fees behaviour", () => {
   });
 
   it("Testing we can take only part of a replacement sell order", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -2675,6 +2729,7 @@ describe("Testing maker fees behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999998",
       side: side.SELL,
       replaceOrder: true,
@@ -2808,6 +2863,7 @@ describe("Testing maker fees behaviour", () => {
   });
 
   it("Checks on an only sell orders replacement with maker fees, the first buy is not takable", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -2821,6 +2877,7 @@ describe("Testing maker fees behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: true,
@@ -2840,6 +2897,7 @@ describe("Testing maker fees behaviour", () => {
   });
 
   it("Checks on an only buy orders replacement with maker fees, the first sell is not takable", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -2853,6 +2911,7 @@ describe("Testing maker fees behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: true,
@@ -2915,6 +2974,7 @@ describe("Testing batch orders behaviour", () => {
   });
 
   it("Checking batch order execution on regular orders works with trade not optimizd function", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -2928,6 +2988,7 @@ describe("Testing batch orders behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: false,
@@ -3072,6 +3133,7 @@ describe("Testing batch orders behaviour", () => {
   });
 
   it("Checking batch order execution on regular orders works with trade function", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -3085,6 +3147,7 @@ describe("Testing batch orders behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "999999999999999",
       side: side.SELL,
       replaceOrder: false,
@@ -3226,6 +3289,7 @@ describe("Testing batch orders behaviour", () => {
   });
 
   it("Checking batch order execution on replacement orders works with trade not optimizd function", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -3239,6 +3303,7 @@ describe("Testing batch orders behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "99999999999999988",
       side: side.SELL,
       replaceOrder: true,
@@ -3426,6 +3491,7 @@ describe("Testing batch orders behaviour", () => {
   });
 
   it("Checking batch order execution on replacement orders works with trade function", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -3439,6 +3505,7 @@ describe("Testing batch orders behaviour", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "99999999999999987",
       side: side.SELL,
       replaceOrder: true,
@@ -3659,6 +3726,7 @@ describe("Testing orders cancellation function", () => {
   });
 
   it("Checks someone else than the owner cannot cancel an order", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -3672,6 +3740,7 @@ describe("Testing orders cancellation function", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: false,
@@ -3684,6 +3753,7 @@ describe("Testing orders cancellation function", () => {
   });
 
   it("Checks order cancellation works", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -3698,6 +3768,7 @@ describe("Testing orders cancellation function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: false,
     };
@@ -3717,6 +3788,7 @@ describe("Testing orders cancellation function", () => {
   });
 
   it("Checks we can't take an cancelled order", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -3730,6 +3802,7 @@ describe("Testing orders cancellation function", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: false,
@@ -3749,6 +3822,7 @@ describe("Testing orders cancellation function", () => {
   });
 
   it("Checks we can't cancel an already cancelled order", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -3762,6 +3836,7 @@ describe("Testing orders cancellation function", () => {
       baseToken: coss.target,
       quoteToken: dummy.target,
       owner: accounts[1].address,
+      chainId: chainId.toString(),
       expiry: "9999999999999999",
       side: side.SELL,
       replaceOrder: false,
@@ -3774,6 +3849,7 @@ describe("Testing orders cancellation function", () => {
   });
 
   it("Checks the replacement order cancellation works", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
@@ -3788,6 +3864,7 @@ describe("Testing orders cancellation function", () => {
       quoteToken: dummy.target,
       owner: accounts[1].address,
       expiry: "9999999999999999",
+      chainId: chainId.toString(),
       side: side.SELL,
       replaceOrder: true,
     };
