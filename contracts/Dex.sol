@@ -29,6 +29,7 @@ struct Order {
     ERC20 quoteToken;
     address owner;
     uint64 expiry;
+    uint64 chainId;
     Side side;
     bool replaceOrder;
 }
@@ -206,10 +207,16 @@ contract Dex {
                 orders[i].baseToken,
                 orders[i].quoteToken,
                 orders[i].expiry,
+                orders[i].chainId,
                 orders[i].side,
                 orders[i].replaceOrder
             );
             uint orderHash = uint(keccak256(data));
+            uint256 chainId;
+            assembly {
+                chainId := chainid()
+            }
+            require(chainId == chainId);
             require(orders[i].owner == msg.sender);
             require(!cancelledOrders[orderHash]);
             cancelledOrders[orderHash] = true;
@@ -374,9 +381,16 @@ contract Dex {
             order.baseToken,
             order.quoteToken,
             order.expiry,
+            order.chainId,
             order.side,
             order.replaceOrder
         );
+
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+        require(chainId == chainId);
 
         uint orderHash = uint(keccak256(data));
         if (order.replaceOrder) {
