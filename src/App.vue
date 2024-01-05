@@ -51,7 +51,6 @@ const projectId = "aced478ee21b257981d650fe8ec77c40";
 Client.accountStore = accountStore;
 Client.stackingStore = stackingStore;
 Client.priceStore = priceStore;
-const connectionCheck = Client.checkConnection();
 
 const metadata = {
   name: "coss3.io",
@@ -79,13 +78,13 @@ watchAccount(async (account) => {
   accountStore[AccountActions.UpdateBlockchainConnection](account.isConnected);
   accountStore[AccountActions.UpdateAddress](account.address);
   
-  await connectionCheck
   accountStore[AccountActions.UpdateLoading](false)
 });
 
 watchNetwork((network) => {
   accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
   accountStore[AccountActions.UpdateNetworkName](network.chain?.name);
+  Client.checkConnection();
 });
 
 const Suspense = suspense_ as {

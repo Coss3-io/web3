@@ -72,7 +72,7 @@
                 })) *
                 52 *
                 100
-            )
+            ) || 0
           }}%
         </div>
         <div class="text-neutral-content">
@@ -112,7 +112,7 @@
             Client.stackingStore.user.stacks[
               Client.stackingStore.user.stacks.length - 1
             ]?.amount
-          ) || "140,250"
+          ) || "0"
         }}
       </div>
       <div class="stat-desc">
@@ -124,7 +124,7 @@
                   Client.stackingStore.user.stacks.length - 1
                 ]?.amount,
             })
-          ) || "86,250"
+          ) || "0"
         }}
         ({{
           (

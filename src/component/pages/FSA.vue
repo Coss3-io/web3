@@ -129,6 +129,12 @@ import { StackingGetters } from "../../types/stacking";
 import { displayAddress } from "../../utils";
 import { EXPLORER_URL } from "../../api/settings";
 import Dashboard from "../buttons/Dashboard.vue";
+import { useAccountStore } from "../../store/account";
+import { computed } from "vue";
+import { watch } from "vue";
+
+const accountStore = useAccountStore();
+const networkId = computed(() => accountStore.$state.networkId);
 
 let loading = ref<boolean>(true);
 let privateLoading = ref<boolean>(true);
@@ -402,11 +408,20 @@ onUpdated(() => {
   );
 });
 
-Client.loadPublicStacking().then((success: boolean) => {
-  if (success) loading.value = false;
-});
+function loadStacking() {
+  Client.loadPublicStacking().then((success: boolean) => {
+    if (success) loading.value = false;
+  });
+  Client.loadUserStacking().then((success: boolean) => {
+    if (success) privateLoading.value = false;
+  });
+}
 
-Client.loadUserStacking().then((success: boolean) => {
-  if (success) privateLoading.value = false;
-});
+if (networkId.value) {
+  loadStacking();
+} else {
+  watch(networkId, (newValue) => {
+    if (newValue) loadStacking();
+  });
+}
 </script>

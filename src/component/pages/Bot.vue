@@ -95,13 +95,22 @@
         </div>
         <div class="pt-4 relative overflow-hidden xl:h-full h-80 lg:h-96">
           <Transition name="fadeNav">
-            <div v-if="cardView" class="w-full h-full overflow-auto custom-scroll"><BotsCard></BotsCard></div>
-            <div v-else class="w-full h-full overflow-auto custom-scroll"><BotsList></BotsList></div>
+            <div
+              v-if="cardView"
+              class="w-full h-full overflow-auto custom-scroll"
+            >
+              <BotsCard></BotsCard>
+            </div>
+            <div v-else class="w-full h-full overflow-auto custom-scroll">
+              <BotsList></BotsList>
+            </div>
           </Transition>
         </div>
       </div>
-      <div class="xl:col-span-7 col-span-full xl:min-h-0 min-h-[775px] relative bg-base-100 shadow-lg shadow-black/50 rounded-lg pt-3.5 pb-2.5 px-2 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]">
-         <div class="relative w-full h-full">
+      <div
+        class="xl:col-span-7 col-span-full xl:min-h-0 min-h-[775px] relative bg-base-100 shadow-lg shadow-black/50 rounded-lg pt-3.5 pb-2.5 px-2 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
+      >
+        <div class="relative w-full h-full">
           <router-view
             v-slot="{
               Component,
@@ -130,10 +139,20 @@ import { RouterView, RouterLink } from "vue-router";
 import { RouteNames } from "../../router";
 import { botLogo } from "../../asset/images/images";
 import { Client } from "../../api";
+import { useAccountStore } from "../../store/account";
+import { computed } from "vue";
+import { watch } from "vue";
+
+const accountStore = useAccountStore();
+const networkId = computed(() => accountStore.$state.networkId);
+
+if (networkId.value) {
+  Client.loadUserBots();
+} else {
+  watch(networkId, (newValue) => {
+    if (newValue) Client.loadUserBots();
+  });
+}
 
 let cardView = ref<boolean>(true);
-
-Client.loadUserBots().then(value => {
-
-})
 </script>

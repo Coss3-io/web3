@@ -22,6 +22,7 @@ export function blockAmounts(state: StackingState): number[] {
 export function top5FeesLastBlock(
   state: StackingState
 ): { name: string; value: number }[] {
+  if (!state.public.fees.length) return []
   const sortedArray = state.public.fees[state.public.fees.length - 1].fees
     .toSorted((first, second) => {
       return second.amount - first.amount;

@@ -56,11 +56,13 @@ export const useStackingStore = defineStore("Stacking", {
     [StackingGetters.UserLastRoundFSA](): { [key in string]: number } {
       const userShare = this[StackingGetters.UserStackingShare];
       let result: { [key in string]: number } = {};
-      this.public.fees[this.public.fees.length - 1].fees.forEach(
-        ({ token, amount }) => {
-          result[token] = amount * userShare;
-        }
-      );
+      if (this.public.fees.length) {
+        this.public.fees[this.public.fees.length - 1].fees.forEach(
+          ({ token, amount }) => {
+            result[token] = amount * userShare;
+          }
+        );
+      }
       return result;
     },
     [StackingGetters.UserAvailableFSA](): {

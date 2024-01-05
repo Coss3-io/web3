@@ -13,8 +13,10 @@ import { getSigner } from "../utils";
 const { notify } = useNotification();
 export class Client {
   private static url = "http://localhost:8000";
+
   private static coinGeckoAPIUrl = "https://api.coingecko.com/";
   private static coinGeckoAPIPath = "/api/v3/coins/markets";
+
   private static loginPath = "/api/login";
   private static takerPath = "/api/taker";
   private static stakingPath = "/api/stacking";
@@ -39,6 +41,7 @@ export class Client {
     try {
       let response = await axios.get(this.url + this.takerPath, {
         params: {
+          chain_id: this.accountStore.$state.networkId,
           base_token: "0x0000000000000000000000000000000000000000",
           quote_token: "0x0000000000000000000000000000000000000000",
         },
@@ -145,8 +148,12 @@ export class Client {
     let stacking, fees, coinGeckoPrices: AxiosResponse;
     try {
       [stacking, fees, coinGeckoPrices] = await Promise.all([
-        axios.get(this.url + this.globalStakingPath),
-        axios.get(this.url + this.stakingFeesPath),
+        axios.get(this.url + this.globalStakingPath, {
+          params: { chain_id: this.accountStore.$state.networkId },
+        }),
+        axios.get(this.url + this.stakingFeesPath, {
+          params: { chain_id: this.accountStore.$state.networkId },
+        }),
         axios.get(this.coinGeckoAPIUrl + this.coinGeckoAPIPath, {
           params: { vs_currency: "usd" },
         }),
@@ -173,9 +180,13 @@ export class Client {
 
     try {
       [stacking, feesWithdrawal] = await Promise.all([
-        axios.get(this.url + this.stakingPath, { withCredentials: true }),
+        axios.get(this.url + this.stakingPath, {
+          withCredentials: true,
+          params: { chain_id: this.accountStore.$state.networkId },
+        }),
         axios.get(this.url + this.feesWithdrawalPath, {
           withCredentials: true,
+          params: { chain_id: this.accountStore.$state.networkId },
         }),
       ]);
       Client.stackingStore[StackingActions.LoadUserStacks](stacking.data);
@@ -208,9 +219,11 @@ export class Client {
     try {
       botsList = await axios.get(this.url + this.botDataPath, {
         withCredentials: true,
+        params: {
+          chain_id: this.accountStore.$state.networkId,
+        },
       });
       success = true;
-      console.log(botsList.data);
       this.userBotsLoaded = true;
     } catch (e) {
       notify({
@@ -239,7 +252,7 @@ export class Client {
         encodedData,
         signer.address.toLowerCase(),
       ]);
-      
+
       data["signature"] = signature;
       botsList = await axios.post(this.url + this.botDataPath, data);
       success = true;
