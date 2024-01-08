@@ -42,6 +42,7 @@ import {
   optimism,
 } from "viem/chains";
 import { useStackingStore } from "./store/stacking";
+import { StackingActions } from "./types/stacking";
 
 const accountStore = useAccountStore();
 const stackingStore = useStackingStore();
@@ -71,17 +72,18 @@ createWeb3Modal({
   ],
 });
 watchAccount(async (account) => {
-  accountStore[AccountActions.UpdateLoading](true)
+  accountStore[AccountActions.Reset]()
+  stackingStore[StackingActions.Reset]()
   if (accountStore.$state.blockchainConnected && !account.isConnected) {
       await Client.logout();
   }
   accountStore[AccountActions.UpdateBlockchainConnection](account.isConnected);
   accountStore[AccountActions.UpdateAddress](account.address);
-  
-  accountStore[AccountActions.UpdateLoading](false)
+  accountStore[AccountActions.UpdateLoaded](true)
 });
 
 watchNetwork((network) => {
+  stackingStore[StackingActions.Reset]()
   accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
   accountStore[AccountActions.UpdateNetworkName](network.chain?.name);
   Client.checkConnection();
