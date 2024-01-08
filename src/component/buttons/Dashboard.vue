@@ -1,5 +1,5 @@
 <template>
-    <button v-if="accountStore.$state.loading" class="btn btn-primary w-44">
+    <button v-if="!accountStore.$state.loaded" class="btn btn-primary w-44">
       <span class="loading loading-spinner"></span>
     </button>
     <button
