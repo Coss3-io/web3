@@ -1043,6 +1043,7 @@ import { nameToToken } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
+import { notify } from "@kyvg/vue3-notification";
 
 const cryptoDetails = {
   [cryptoTicker.matic]: { bg: "border border-purple-600", logo: polygon },
@@ -1092,10 +1093,13 @@ const absoluteStep = computed(() => {
   return (priceValue.value! * selectedStep.value) / 25 / 100;
 });
 
-const baseNeeded = computed(() => {
+const numOrders = computed(() => {
   const range = upperBoundPrice.value - priceValue.value!;
-  const numOrders = Math.floor(range / absoluteStep.value);
-  return numOrders ? (numOrders * selectedAmount.value).toFixed(10) : 0;
+  return Math.floor(range / absoluteStep.value);
+});
+
+const baseNeeded = computed(() => {
+  return numOrders ? (numOrders.value * selectedAmount.value).toFixed(10) : 0;
 });
 
 const quoteNeeded = computed(() => {
@@ -1114,7 +1118,7 @@ const quoteNeeded = computed(() => {
   let amountNeeded = 0;
 
   while (counter < 5000 && price >= lowerBoundPrice.value) {
-    amountNeeded += selectedAmount.value * price;
+    amountNeeded += Number((selectedAmount.value * price).toFixed(10));
     price -= absoluteStep.value;
     ++counter;
   }
@@ -1122,6 +1126,12 @@ const quoteNeeded = computed(() => {
 });
 
 async function createBot() {
+  if (numOrders.value > 5000) {
+    notify({
+      text: "Can't create more than 5000 at once, increase order size",
+      type: "warn",
+    });
+  }
   const multiplicator = new BigNumber("1e18");
   const data = {
     address: Client.accountStore.$state.address,
@@ -1134,10 +1144,11 @@ async function createBot() {
     step: new BigNumber(absoluteStep.value)
       .multipliedBy(multiplicator)
       .toFixed(),
-    maker_fees: String(Math.floor((selectedFees.value / 25) * 10)),
+    maker_fees: String(Math.floor((selectedFees.value ) * 10)),
     upper_bound: new BigNumber(upperBoundPrice.value)
       .multipliedBy(multiplicator)
       .toFixed(),
+    chain_id: Client.accountStore.$state.networkId,
     lower_bound: new BigNumber(lowerBoundPrice.value)
       .multipliedBy(multiplicator)
       .toFixed(),
@@ -1158,40 +1169,47 @@ async function createBot() {
     data.base_token,
     data.quote_token,
     data.expiry,
+    Client.accountStore.$state.networkId,
     data.is_buyer ? 0 : 1,
     data.replace_order,
   ]);
-  const encodedData = ethers
-    .solidityPacked(
-      [
-        "address",
-        "uint256",
-        "uint256",
-        "uint256",
-        "uint256",
-        "uint256",
-        "uint256",
-        "address",
-        "address",
-        "uint64",
-        "uint8",
-        "bool",
-      ],
-      [
-        data.address,
-        data.amount,
-        data.price,
-        data.step,
-        data.maker_fees,
-        data.upper_bound,
-        data.lower_bound,
-        data.base_token,
-        data.quote_token,
-        data.expiry,
-        data.is_buyer ? 0 : 1,
-        data.replace_order,
-      ]
-    )
-  await Client.createUserBot(data, encodedData);
+  const encodedData = ethers.solidityPacked(
+    [
+      "address",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "address",
+      "address",
+      "uint64",
+      "uint64",
+      "uint8",
+      "bool",
+    ],
+    [
+      data.address,
+      data.amount,
+      data.price,
+      data.step,
+      data.maker_fees,
+      data.upper_bound,
+      data.lower_bound,
+      data.base_token,
+      data.quote_token,
+      data.expiry,
+      Client.accountStore.$state.networkId,
+      data.is_buyer ? 0 : 1,
+      data.replace_order,
+    ]
+  );
+  if (await Client.createUserBot(data, encodedData)){
+    notify({
+      text:"Bot created successfully",
+      type:"success"
+    })
+  };
 }
 </script>
