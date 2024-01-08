@@ -1,6 +1,6 @@
 import type { StackingState } from "../../types/stacking";
 
 export const state: StackingState = {
-  public: { fees: [], stacks: [] },
-  user: { stacks: [], feesWithdrawal: [] },
+  public: { loaded: false, fees: [], stacks: [] },
+  user: { loaded: false, stacks: [], feesWithdrawal: [] },
 };

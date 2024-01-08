@@ -10,6 +10,7 @@ import {
   loadStacks,
   loadUserFeesWithdrawal,
   loadUserStacking,
+  reset,
 } from "./actions";
 import {
   blockAmounts,
@@ -29,6 +30,7 @@ export const useStackingStore = defineStore("Stacking", {
   state: (): StackingState => state,
   actions: {
     [StackingActions.LoadStacks]: loadStacks,
+    [StackingActions.Reset]: reset,
     [StackingActions.LoadFees]: loadFees,
     [StackingActions.LoadUserStacks]: loadUserStacking,
     [StackingActions.LoadUserFeesWithdrawal]: loadUserFeesWithdrawal,

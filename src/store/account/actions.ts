@@ -33,11 +33,11 @@ export function updateAddress(
 /**
  * @notice Update the account loading status
  */
-export function updateLoading(
+export function updateLoaded(
   this: ReturnType<typeof useAccountStore>,
-  loading: boolean
+  loaded: boolean
 ): void {
-  this.$state.loading = loading;
+  this.$state.loaded = loaded;
 }
 
 /**
@@ -58,4 +58,17 @@ export function updateNetworkName(
   networkName: string | undefined
 ): void {
   this.$state.networkName = networkName;
+}
+
+/**
+ * @notice - Used to reset de stacking store
+ * @param this - The stacking store
+ */
+export function reset(this: ReturnType<typeof useAccountStore>): void {
+  this.$state.loaded = false;
+  this.$state.blockchainConnected = false;
+  this.$state.appConnected = false;
+  this.$state.address = undefined;
+  this.$state.networkId = undefined;
+  this.$state.networkName = undefined;
 }

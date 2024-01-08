@@ -1,5 +1,6 @@
 export type StackingState = {
   public: {
+    loaded: boolean,
     stacks: Array<{ amount: number; slot: number }>;
     fees: Array<{
       slot: number;
@@ -7,6 +8,7 @@ export type StackingState = {
     }>;
   };
   user: {
+    loaded: boolean,
     stacks: Array<{ amount: number; slot: number }>;
     feesWithdrawal: Array<{ slot: number; tokens: Array<string> }>;
   };
@@ -32,4 +34,5 @@ export const StackingActions = {
   LoadUserStacks: "LoadUserStacks",
   LoadFees: "LoadFees",
   LoadUserFeesWithdrawal: "LoadUserFeesWithdrawal",
+  Reset: "Reset"
 } as const;

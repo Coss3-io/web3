@@ -92,3 +92,19 @@ export function loadUserFeesWithdrawal(
   result.push(slotObject);
   this.$state.user.feesWithdrawal = result;
 }
+
+/**
+ * @notice - Used to reset de stacking store
+ * @param this - The stacking store
+ */
+export function reset(this: ReturnType<typeof useStackingStore>): void {
+  this.$state.public.loaded = false;
+  this.$state.public.fees.splice(0, this.$state.public.fees.length);
+  this.$state.public.stacks.splice(0, this.$state.public.stacks.length);
+  this.$state.user.loaded = false;
+  this.$state.user.stacks.splice(0, this.$state.user.stacks.length);
+  this.$state.user.feesWithdrawal.splice(
+    0,
+    this.$state.user.feesWithdrawal.length
+  );
+}

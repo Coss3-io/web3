@@ -10,18 +10,20 @@ import {
   updateBlockchainConnection,
   updateAddress,
   updateNetworkId,
-  updateLoading,
+  updateLoaded,
   updateNetworkName,
+  reset,
 } from "./actions";
 
 export const useAccountStore = defineStore("Account", {
   state: (): AccountState => state,
   actions: {
+    [AccountActions.Reset]: reset,
     [AccountActions.UpdateAddress]: updateAddress,
     [AccountActions.UpdateAppConnection]: updateAppConnection,
     [AccountActions.UpdateBlockchainConnection]: updateBlockchainConnection,
     [AccountActions.UpdateNetworkId]: updateNetworkId,
     [AccountActions.UpdateNetworkName]: updateNetworkName,
-    [AccountActions.UpdateLoading]: updateLoading,
+    [AccountActions.UpdateLoaded]: updateLoaded,
   },
 });
