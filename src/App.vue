@@ -79,14 +79,14 @@ watchAccount(async (account) => {
   }
   accountStore[AccountActions.UpdateBlockchainConnection](account.isConnected);
   accountStore[AccountActions.UpdateAddress](account.address);
-  accountStore[AccountActions.UpdateLoaded](true)
 });
 
-watchNetwork((network) => {
+watchNetwork(async (network) => {
   stackingStore[StackingActions.Reset]()
   accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
   accountStore[AccountActions.UpdateNetworkName](network.chain?.name);
-  Client.checkConnection();
+  await Client.checkConnection();
+  accountStore[AccountActions.UpdateLoaded](true)
 });
 
 const Suspense = suspense_ as {
