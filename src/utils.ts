@@ -4,6 +4,7 @@ import { COSS_TOKEN } from "./api/settings";
 import { aave, avax, bnb, ether, usdc, usdt } from "./asset/images/images";
 import { usePriceStore } from "./store/price";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
+import BigNumber from "bignumber.js";
 
 /**
  * @notice - used to display the beginning and the end of an address only
@@ -111,4 +112,13 @@ export async function getSigner(
   };
   const provider = new BrowserProvider(wallet.transport, network);
   return new JsonRpcSigner(provider, wallet.account.address);
+}
+
+/**
+ * @notice - Used to convert a big number to a regular number
+ * @param number - The 18 decmals number to divide
+ * @returns - The floatting point number
+ */
+export function unBigNumberify(number: string): number {
+  return Number(new BigNumber(number).dividedBy("1e18"));
 }

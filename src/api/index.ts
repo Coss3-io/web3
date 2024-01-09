@@ -9,6 +9,9 @@ import { StackingActions } from "../types/stacking";
 import { usePriceStore } from "../store/price";
 import { PriceActions } from "../types/price";
 import { getSigner } from "../utils";
+import { useBotStore } from "../store/bot";
+import { BotActions, BotState } from "../types/bot";
+import BigNumber from "bignumber.js";
 
 const { notify } = useNotification();
 export class Client {
@@ -24,13 +27,11 @@ export class Client {
   private static globalStakingPath = "/api/global-stacking";
   private static stakingFeesPath = "/api/stacking-fees";
   private static botDataPath = "/api/bot";
+
   public static accountStore: ReturnType<typeof useAccountStore>;
   public static stackingStore: ReturnType<typeof useStackingStore>;
   public static priceStore: ReturnType<typeof usePriceStore>;
-
-  public static publicStackingLoaded: boolean = false;
-  public static userStackingLoaded: boolean = false;
-  public static userBotsLoaded: boolean = false;
+  public static botStore: ReturnType<typeof useBotStore>;
 
   constructor() {}
 
@@ -73,9 +74,9 @@ export class Client {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
-      Client.accountStore[AccountActions.UpdateLoading](true);
+      Client.accountStore[AccountActions.UpdateLoaded](false);
       const result = await originalMethod.apply(this, args);
-      Client.accountStore[AccountActions.UpdateLoading](false);
+      Client.accountStore[AccountActions.UpdateLoaded](true);
       return result;
     };
 
@@ -142,7 +143,7 @@ export class Client {
    * @returns - Promise<boolean>
    */
   public static async loadPublicStacking(): Promise<boolean> {
-    if (this.publicStackingLoaded) return true;
+    if (this.stackingStore.$state.public.loaded) return true;
 
     let success = false;
     let stacking, fees, coinGeckoPrices: AxiosResponse;
@@ -162,7 +163,7 @@ export class Client {
       Client.stackingStore[StackingActions.LoadFees](fees.data);
       Client.priceStore[PriceActions.LoadPrices](coinGeckoPrices.data);
       success = true;
-      this.publicStackingLoaded = true;
+      this.stackingStore.$state.public.loaded = true;
     } catch (e) {
       notify({
         text: "An error occured during public data request check console",
@@ -173,7 +174,7 @@ export class Client {
     return success;
   }
   public static async loadUserStacking(): Promise<boolean> {
-    if (this.userStackingLoaded) return true;
+    if (this.stackingStore.$state.user.loaded) return true;
 
     let success = false;
     let stacking, feesWithdrawal: AxiosResponse;
@@ -195,7 +196,7 @@ export class Client {
       );
 
       success = true;
-      this.userStackingLoaded = true;
+      this.stackingStore.$state.user.loaded = true;
     } catch (e) {
       notify({
         text: "An error occured during user data request check console",
@@ -211,7 +212,7 @@ export class Client {
    * @returns - The succes or the failiure of the bot retrieval
    */
   public static async loadUserBots(): Promise<boolean> {
-    if (this.userBotsLoaded) return true;
+    if (this.botStore.loaded) return true;
 
     let success = false;
     let botsList: AxiosResponse;
@@ -224,7 +225,10 @@ export class Client {
         },
       });
       success = true;
-      this.userBotsLoaded = true;
+      botsList.data.forEach((bot: BotState["bots"][0]) => {
+        this.botStore[BotActions.AddBot](bot);
+      });
+      this.botStore.loaded = true;
     } catch (e) {
       notify({
         text: "An error occured during user bot data request check console",
@@ -237,10 +241,12 @@ export class Client {
 
   public static async createUserBot(
     data: { [key in string]: any },
+    baseNeeded: string,
+    quoteNeeded: string,
     encodedData: string
   ): Promise<boolean> {
     let success = false;
-    let botsList: AxiosResponse;
+    let response: AxiosResponse;
     const signer = await getSigner(
       this.accountStore.$state.networkId!,
       this.accountStore.$state.networkName!
@@ -254,7 +260,7 @@ export class Client {
       ]);
 
       data["signature"] = signature;
-      botsList = await axios.post(this.url + this.botDataPath, data);
+      response = await axios.post(this.url + this.botDataPath, data);
       success = true;
     } catch (e) {
       notify({
@@ -263,6 +269,26 @@ export class Client {
       });
       console.log(e);
     }
+    this.botStore[BotActions.AddBot]({
+      address: data.address,
+      base_token: data.base_token,
+      chain_id: data.chain_id,
+      fees_earned: 0,
+      base_token_amount: new BigNumber(baseNeeded)
+        .multipliedBy("1e18")
+        .toNumber(),
+      lower_bound: data.lower_bound,
+      maker_fees: data.maker_fees,
+      price: data.price,
+      quote_token: data.quote_token,
+      quote_token_amount: new BigNumber(quoteNeeded)
+        .multipliedBy("1e18")
+        .toNumber(),
+      step: data.step,
+      timestamp: Math.floor(Date.now() / 1000),
+      expiry: Number(data.expiry),
+      upper_bound: data.upper_bound,
+    });
     return success;
   }
 }

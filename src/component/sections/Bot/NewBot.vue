@@ -1205,7 +1205,7 @@ async function createBot() {
       data.replace_order,
     ]
   );
-  if (await Client.createUserBot(data, encodedData)){
+  if (await Client.createUserBot(data, String(baseNeeded.value), String(quoteNeeded.value), encodedData)){
     notify({
       text:"Bot created successfully",
       type:"success"
