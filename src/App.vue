@@ -43,15 +43,19 @@ import {
 } from "viem/chains";
 import { useStackingStore } from "./store/stacking";
 import { StackingActions } from "./types/stacking";
+import { useBotStore } from "./store/bot";
+import { BotActions } from "./types/bot";
 
 const accountStore = useAccountStore();
 const stackingStore = useStackingStore();
 const priceStore = usePriceStore();
+const botStore = useBotStore();
 const projectId = "aced478ee21b257981d650fe8ec77c40";
 
 Client.accountStore = accountStore;
 Client.stackingStore = stackingStore;
 Client.priceStore = priceStore;
+Client.botStore = botStore;
 
 const metadata = {
   name: "coss3.io",
@@ -74,6 +78,7 @@ createWeb3Modal({
 watchAccount(async (account) => {
   accountStore[AccountActions.Reset]()
   stackingStore[StackingActions.Reset]()
+  botStore[BotActions.Reset]()
   if (accountStore.$state.blockchainConnected && !account.isConnected) {
       await Client.logout();
   }
@@ -83,6 +88,7 @@ watchAccount(async (account) => {
 
 watchNetwork(async (network) => {
   stackingStore[StackingActions.Reset]()
+  botStore[BotActions.Reset]()
   accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
   accountStore[AccountActions.UpdateNetworkName](network.chain?.name);
   await Client.checkConnection();
