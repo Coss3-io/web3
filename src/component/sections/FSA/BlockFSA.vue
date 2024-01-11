@@ -72,7 +72,7 @@
     </div>
     <TransitionGroup name="listBuy" tag="div">
       <div
-        v-for="(value, token) in Client.stackingStore[
+        v-for="(value, token, index) in Client.stackingStore[
           StackingGetters.UserAvailableFSA
         ]"
         :key="`${value.amount}${value.dollarsValue}`"
@@ -83,7 +83,12 @@
         class="grid my-2 even:bg-neutral/50 grid-cols-4 w-full h-8 place-items-center font-sans-inherit rounded-full bg-neutral hover:bg-base-200 transition-all cursor-pointer py-1 shadow-black/20 shadow-md"
       >
         <div>
-          <img :src="tokensToImage(token)" alt="token" class="w-6 h-6" />
+          <img
+            v-if="tokenToName(token, Client.accountStore.$state.networkId!) in cryptoTicker"
+            :src="cryptoLogo[<'USDT'>tokenToName(token, Client.accountStore.$state.networkId!)]"
+            alt="token"
+            class="w-6 h-6"
+          />
         </div>
         <div>{{ value.amount.toFixed(2) }}</div>
         <div>${{ value.dollarsValue }}</div>
@@ -106,7 +111,8 @@
 import { ref } from "vue";
 import { Client } from "../../../api";
 import { StackingGetters } from "../../../types/stacking";
-import { tokensToImage } from "../../../utils";
+import { cryptoLogo, cryptoTicker } from "../../../types/cryptoSpecs";
+import { tokenToName } from "../../../utils";
 
 const fsaContainer = ref<HTMLDivElement | null>(null);
 const titleContainer = ref<HTMLDivElement | null>(null);

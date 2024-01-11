@@ -109,7 +109,7 @@
                           >
                             {{ selectedBase }}
                             <img
-                              :src="cryptoDetails[selectedBase].logo"
+                              :src="cryptoLogo[selectedBase]"
                               class="w-7 h-7"
                             />
                           </div>
@@ -137,7 +137,7 @@
                       >
                         <a class="flex gap-1 items-center uppercase">
                           <img
-                            :src="cryptoDetails[name].logo"
+                            :src="cryptoLogo[name]"
                             class="w-7 h-7"
                           />
                           <div class="grow text-center">
@@ -199,7 +199,7 @@
                           >
                             {{ selectedQuote }}
                             <img
-                              :src="cryptoDetails[selectedQuote].logo"
+                              :src="cryptoLogo[selectedQuote]"
                               class="w-7 h-7"
                             />
                           </div>
@@ -241,7 +241,7 @@
                       >
                         <a class="flex gap-1 items-center uppercase">
                           <img
-                            :src="cryptoDetails[name].logo"
+                            :src="cryptoLogo[name]"
                             class="w-7 h-7"
                           />
                           <div class="grow text-center">
@@ -355,7 +355,7 @@
                                 selectedQuote && selectedQuote in cryptoDetails
                               "
                               :key="selectedQuote"
-                              :src="cryptoDetails[selectedQuote].logo"
+                              :src="cryptoLogo[selectedQuote]"
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${
@@ -446,7 +446,7 @@
                                 selectedBase && selectedBase in cryptoDetails
                               "
                               :key="selectedBase"
-                              :src="cryptoDetails[selectedBase].logo"
+                              :src="cryptoLogo[selectedBase]"
                               class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
                               :style="{
                                 transform: `translateX(${
@@ -855,7 +855,7 @@
                           <img
                             v-else
                             :key="selectedBase"
-                            :src="cryptoDetails[selectedBase].logo"
+                            :src="cryptoLogo[selectedBase]"
                             class="w-7 h-7"
                           />
                         </transition>
@@ -876,7 +876,7 @@
                         <img
                           v-else
                           :key="selectedBase"
-                          :src="cryptoDetails[selectedBase].logo"
+                          :src="cryptoLogo[selectedBase]"
                           class="w-7 h-7"
                         />
                       </div>
@@ -922,7 +922,7 @@
                           <img
                             v-else
                             :key="selectedQuote"
-                            :src="cryptoDetails[selectedQuote].logo"
+                            :src="cryptoLogo[selectedQuote]"
                             class="w-7 h-7"
                           />
                         </transition>
@@ -957,7 +957,7 @@
                         <img
                           v-else
                           :key="selectedQuote"
-                          :src="cryptoDetails[selectedQuote].logo"
+                          :src="cryptoLogo[selectedQuote]"
                           class="w-7 h-7"
                         />
                       </div>
@@ -1021,6 +1021,7 @@
 <script setup lang="ts">
 import type { Values } from "../../../types/cryptoSpecs";
 import {
+cryptoLogo,
   cryptoRange,
   cryptoTicker,
   unknownToken,
@@ -1152,8 +1153,8 @@ async function createBot() {
     lower_bound: new BigNumber(lowerBoundPrice.value)
       .multipliedBy(multiplicator)
       .toFixed(),
-    base_token: nameToToken(selectedBase.value!),
-    quote_token: nameToToken(selectedQuote.value!),
+    base_token: nameToToken(selectedBase.value!, Client.accountStore.$state.networkId!),
+    quote_token: nameToToken(selectedQuote.value!, Client.accountStore.$state.networkId!),
     expiry: String(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 1000),
     is_buyer: false,
     replace_order: true,

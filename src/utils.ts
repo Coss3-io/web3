@@ -5,6 +5,12 @@ import { aave, avax, bnb, ether, usdc, usdt } from "./asset/images/images";
 import { usePriceStore } from "./store/price";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import BigNumber from "bignumber.js";
+import {
+  Values,
+  cryptoLogo,
+  cryptoTicker,
+  namesToToken,
+} from "./types/cryptoSpecs";
 
 /**
  * @notice - used to display the beginning and the end of an address only
@@ -66,32 +72,32 @@ export function dollarsValue(tokens: { [key in string]: number }): number {
   return Math.round($value * 100) / 100;
 }
 /**
- * @notice - Used to map token names to token images
- * @returns - String
+ * @notice - Used to map token addresses to token names if applicable
+ * @returns - The token name corresponding to the token on the specified chain
  */
-export function tokensToImage(token: string): string {
-  let images: { [key in string]: string } = {
-    "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525": usdc,
-    "0x4BBEeB066ed09b7aEd07BF39EEE0460dFA261523": usdt,
-    "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524": ether,
-    "0x4BBeeB066ed09B7AeD07bf39EeE0460dfA261522": avax,
-    "0x4bbeEB066ED09b7Aed07Bf39EeE0460DFA261521": bnb,
-    "0x4bbeEB066eD09B7AEd07bF39EEe0460DFa261520": aave,
-  };
-  return images[token];
+export function tokenToName(token: string, chainId: number | string): string {
+  var ret: { [key in string]: string } = {};
+  for (var key in namesToToken[chainId]) {
+    ret[namesToToken[chainId][<Values<typeof cryptoTicker>>key]] = key;
+  }
+  if (token in ret) {
+    return ret[token]
+  } else {
+    return displayAddress(token)
+  }
 }
 
-export function nameToToken(name: string): string {
-  let names: { [key in string]: string } = {
-    USDC: "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525",
-    USDT: "0x4BBEeB066ed09b7aEd07BF39EEE0460dFA261523",
-    ETH: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524",
-    AVAX: "0x4BBeeB066ed09B7AeD07bf39EeE0460dfA261522",
-    BNB: "0x4bbeEB066ED09b7Aed07Bf39EeE0460DFA261521",
-    AAVE: "0x4bbeEB066eD09B7AEd07bF39EEe0460DFa261520",
-  };
-
-  return names[name.toUpperCase()];
+/**
+ *
+ * @param name - the name of the token as a ticker
+ * @param chainId - the chain id to retrieve the address from
+ * @returns - the token address on the specified chain
+ */
+export function nameToToken(
+  name: Values<typeof cryptoTicker>,
+  chainId: string | number
+): string {
+  return namesToToken[chainId][name].toUpperCase();
 }
 
 /**

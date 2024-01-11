@@ -13,6 +13,8 @@ export { default as optimismNetworkLogo } from "./optimismNetworkLogo.png"
 export { default as polygonNetworkLogo } from "./polygonNetworkLogo.png"
 export { default as dollars } from "./dollars.png";
 export { default as unknownTokenLogo } from "./unknownTokenLogo.vue";
+export { default as unknownPrimaryTokenLogo } from "./unknownPrimaryTokenLogo.vue";
+export { default as unknownSecondaryTokenLogo } from "./unknownSecondaryTokenLogo.vue";
 export { default as limitOrderLogo } from "./limitOrderLogo.vue";
 export { default as marketOrderLogo } from "./marketOrderLogo.vue";
 export { default as orderArrow } from "./orderArrow.vue";
