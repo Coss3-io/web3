@@ -96,12 +96,28 @@
         <div class="pt-4 relative overflow-hidden xl:h-full h-80 lg:h-96">
           <Transition name="fadeNav">
             <div
-              v-if="cardView"
+              v-if="!Client.botStore.$state.loaded"
+              class="w-full h-full rounded-lg"
+            >
+              <div
+                class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
+              >
+                <button class="btn btn-primary btn-square">
+                  <span class="loading loading-spinner"></span>
+                </button>
+              </div>
+              <BotsCard></BotsCard>
+            </div>
+            <div
+              v-else-if="!Client.botStore.$state.loaded && cardView"
               class="w-full h-full overflow-auto custom-scroll"
             >
               <BotsCard></BotsCard>
             </div>
-            <div v-else class="w-full h-full overflow-auto custom-scroll">
+            <div
+              v-else-if="!Client.botStore.$state.loaded && !cardView"
+              class="w-full h-full overflow-auto custom-scroll"
+            >
               <BotsList></BotsList>
             </div>
           </Transition>
@@ -150,7 +166,9 @@ if (networkId.value) {
   Client.loadUserBots();
 } else {
   watch(networkId, (newValue) => {
-    if (newValue) Client.loadUserBots();
+    if (newValue) {
+      Client.loadUserBots();
+    }
   });
 }
 

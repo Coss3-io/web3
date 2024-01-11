@@ -12,7 +12,22 @@
       class="flex gap-3 justify-center p-5 items-center bg-base-300 rounded-t-xl"
     >
       <div class="flex shrink">
-        <img :src="cryptoDetails[bot.baseName].logo" class="h-auto w-10" />
+        <img
+          v-if="tokenToName(bot.baseToken, chainId) in cryptoTicker"
+          :src="cryptoLogo[<'USDT'>tokenToName(bot.baseToken, chainId)]"
+          alt="token"
+          class="h-auto w-10"
+        />
+        <img
+          v-else
+          :src="
+            index % 2
+              ? cryptoLogo[cryptoTicker.primaryUnknown]
+              : cryptoLogo[cryptoTicker.secondaryUnknown]
+          "
+          alt="token"
+          class="w-10 h-auto"
+        />
       </div>
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +44,22 @@
         />
       </svg>
       <div class="shrink">
-        <img :src="cryptoDetails[bot.quoteName].logo" class="h-auto w-10" />
+        <img
+          v-if="tokenToName(bot.quoteToken, chainId) in cryptoTicker"
+          :src="cryptoLogo[<'USDT'>tokenToName(bot.quoteToken, chainId)]"
+          alt="token"
+          class="h-auto w-10"
+        />
+        <img
+          v-else
+          :src="
+            index % 2
+              ? cryptoLogo[cryptoTicker.primaryUnknown]
+              : cryptoLogo[cryptoTicker.secondaryUnknown]
+          "
+          alt="token"
+          class="w-10 h-auto"
+        />
       </div>
     </div>
     <div class="card-body !pt-1">
@@ -47,7 +77,22 @@
             <div
               class="flex grow gap-2 items-center p-1 px-2 rounded-full bg-base-300 shadow-sm shadow-black/50"
             >
-              <img :src="cryptoDetails[bot.baseName].logo" class="w-5 h-5" />
+              <img
+                v-if="tokenToName(bot.baseToken, chainId) in cryptoTicker"
+                :src="cryptoLogo[<'USDT'>tokenToName(bot.baseToken, chainId)]"
+                alt="token"
+                class="h-5 w-5"
+              />
+              <img
+                v-else
+                :src="
+                  index % 2
+                    ? cryptoLogo[cryptoTicker.primaryUnknown]
+                    : cryptoLogo[cryptoTicker.secondaryUnknown]
+                "
+                alt="token"
+                class="w-5 h-5"
+              />
               <div class="grow text-center font-sans font-bold">
                 {{ bot.base }}
               </div>
@@ -55,7 +100,22 @@
             <div
               class="flex grow gap-2 font-sans font-bold items-center p-1 px-2 bg-base-300 rounded-full shadow-lg shadow-black/50"
             >
-              <img :src="cryptoDetails[bot.quoteName].logo" class="w-5 h-5" />
+            <img
+                v-if="tokenToName(bot.quoteToken, chainId) in cryptoTicker"
+                :src="cryptoLogo[<'USDT'>tokenToName(bot.quoteToken, chainId)]"
+                alt="token"
+                class="h-5 w-5"
+              />
+              <img
+                v-else
+                :src="
+                  index % 2
+                    ? cryptoLogo[cryptoTicker.primaryUnknown]
+                    : cryptoLogo[cryptoTicker.secondaryUnknown]
+                "
+                alt="token"
+                class="w-5 h-5"
+              />
               <div class="grow text-center font-sans font-bold">
                 {{ bot.quote }}
               </div>
@@ -66,15 +126,30 @@
         <div
           class="flex justify-center font-bold font-sans gap-2 bg-base-300 w-full px-2 p-1 ronded-full border border-white/50 shadow-lg shadow-black/50 rounded-full"
         >
-          fees: {{ bot.profits }}
-          <img :src="cryptoDetails[bot.quoteName].logo" class="w-5 h-5" />
+          fees: {{ bot.fees_earned }}
+          <img
+                v-if="tokenToName(bot.quoteToken, chainId) in cryptoTicker"
+                :src="cryptoLogo[<'USDT'>tokenToName(bot.quoteToken, chainId)]"
+                alt="token"
+                class="h-5 w-5"
+              />
+              <img
+                v-else
+                :src="
+                  index % 2
+                    ? cryptoLogo[cryptoTicker.primaryUnknown]
+                    : cryptoLogo[cryptoTicker.secondaryUnknown]
+                "
+                alt="token"
+                class="w-5 h-5"
+              />ƒ
         </div>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { Values, cryptoTicker } from "../../../types/cryptoSpecs";
+import { Values, cryptoTicker, cryptoLogo } from "../../../types/cryptoSpecs";
 import {
   usdt,
   ether,
@@ -85,6 +160,7 @@ import {
   usdc,
   aave,
 } from "../../../asset/images/images";
+import { tokenToName } from "../../../utils";
 
 const cryptoDetails = {
   [cryptoTicker.matic]: { bg: "border border-purple-600", logo: polygon },
@@ -101,10 +177,12 @@ const props = defineProps<{
   bot: {
     base: number;
     quote: number;
-    baseName: Values<typeof cryptoTicker>;
-    quoteName: Values<typeof cryptoTicker>;
-    profits: number;
+    baseToken: string;
+    quoteToken: string;
+    fees_earned: number;
     fees: number;
   };
+  chainId: number;
+  index: number;
 }>();
 </script>

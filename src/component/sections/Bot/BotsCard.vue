@@ -13,6 +13,8 @@
               String($route.params.id) == String(index),
           }"
           :bot="bot"
+          :chainId="Client.accountStore.$state.networkId!"
+          :index="index"
         ></BotCard>
       </RouterLink>
     </div>
@@ -36,6 +38,8 @@
             fees_earned: bot.fees_earned,
             fees: bot.maker_fees
           }"
+          :chainId="Client.accountStore.$state.networkId!"
+          :index="index"
         ></BotCard>
       </RouterLink>
     </div>
