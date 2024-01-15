@@ -1,5 +1,5 @@
 <template>
-  <svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" class="w-7 h-7 fill-seondary">
+  <svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" class="w-7 h-7 fill-secondary">
     <path
       id="path"
       style="opacity: 1; vector-effect: none; fill-opacity: 1"
