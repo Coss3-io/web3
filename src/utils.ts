@@ -7,6 +7,8 @@ import { BrowserProvider, JsonRpcSigner } from "ethers";
 import BigNumber from "bignumber.js";
 import {
   Values,
+  chainIds,
+  chainNames,
   cryptoLogo,
   cryptoTicker,
   namesToToken,
@@ -77,14 +79,23 @@ export function dollarsValue(tokens: { [key in string]: number }): number {
  */
 export function tokenToName(token: string, chainId: number | string): string {
   var ret: { [key in string]: string } = {};
-  for (var key in namesToToken[chainId]) {
-    ret[namesToToken[chainId][<Values<typeof cryptoTicker>>key]] = key;
+  const chainName = chainIdToName(Number(chainId));
+  for (var key in namesToToken[chainName]) {
+    ret[namesToToken[chainName][<Values<typeof cryptoTicker>>key]] = key;
   }
   if (token in ret) {
-    return ret[token]
+    return ret[token];
   } else {
-    return displayAddress(token)
+    return displayAddress(token);
   }
+}
+
+function chainIdToName(chainId: number): Values<typeof chainNames> {
+  var ret: { [key in string]: string } = {};
+  for (var key in chainIds) {
+    ret[chainIds[<Values<typeof cryptoTicker>>key]] = key;
+  }
+  return ret[chainId];
 }
 
 /**
