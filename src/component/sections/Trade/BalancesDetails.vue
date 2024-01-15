@@ -168,7 +168,7 @@ import {
 } from "../../../types/cryptoSpecs";
 import { unknownTokenLogo } from "../../../asset/images/images";
 
-const base = cryptoTicker.ether;
+const base = cryptoTicker.ETH;
 const quote = "0xabc...def";
 
 const props = defineProps<{

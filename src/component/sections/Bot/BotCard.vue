@@ -18,15 +18,14 @@
           alt="token"
           class="h-auto w-10"
         />
-        <img
+        <component
           v-else
-          :src="
-            index % 2
+          class="!w-10 !h-auto"
+          :is="
+            (index + 1) % 2
               ? cryptoLogo[cryptoTicker.primaryUnknown]
               : cryptoLogo[cryptoTicker.secondaryUnknown]
           "
-          alt="token"
-          class="w-10 h-auto"
         />
       </div>
       <svg
@@ -50,24 +49,23 @@
           alt="token"
           class="h-auto w-10"
         />
-        <img
+        <component
           v-else
-          :src="
+          class="!w-10 !h-auto"
+          :is="
             index % 2
               ? cryptoLogo[cryptoTicker.primaryUnknown]
               : cryptoLogo[cryptoTicker.secondaryUnknown]
           "
-          alt="token"
-          class="w-10 h-auto"
         />
       </div>
-    </div>
+    </div> 
     <div class="card-body !pt-1">
       <div class="!m-0 flex card-title justify-center">
         <span
           class="text-base px-4 rounded-full bg-base-300 text-primary-content shadow-lg shadow-black/50"
         >
-          Bot #1
+          Bot #{{ index + 1 }}
         </span>
       </div>
       <hr class="border-white/20 w-1/2 m-auto pb-3" />
@@ -83,15 +81,14 @@
                 alt="token"
                 class="h-5 w-5"
               />
-              <img
+              <component
                 v-else
-                :src="
-                  index % 2
+                class="!w-5 !h-5"
+                :is="
+                  (index + 1) % 2
                     ? cryptoLogo[cryptoTicker.primaryUnknown]
                     : cryptoLogo[cryptoTicker.secondaryUnknown]
                 "
-                alt="token"
-                class="w-5 h-5"
               />
               <div class="grow text-center font-sans font-bold">
                 {{ bot.base }}
@@ -100,21 +97,20 @@
             <div
               class="flex grow gap-2 font-sans font-bold items-center p-1 px-2 bg-base-300 rounded-full shadow-lg shadow-black/50"
             >
-            <img
+              <img
                 v-if="tokenToName(bot.quoteToken, chainId) in cryptoTicker"
                 :src="cryptoLogo[<'USDT'>tokenToName(bot.quoteToken, chainId)]"
                 alt="token"
                 class="h-5 w-5"
               />
-              <img
+              <component
                 v-else
-                :src="
+                class="!w-5 !h-5"
+                :is="
                   index % 2
                     ? cryptoLogo[cryptoTicker.primaryUnknown]
                     : cryptoLogo[cryptoTicker.secondaryUnknown]
                 "
-                alt="token"
-                class="w-5 h-5"
               />
               <div class="grow text-center font-sans font-bold">
                 {{ bot.quote }}
@@ -128,50 +124,28 @@
         >
           fees: {{ bot.fees_earned }}
           <img
-                v-if="tokenToName(bot.quoteToken, chainId) in cryptoTicker"
-                :src="cryptoLogo[<'USDT'>tokenToName(bot.quoteToken, chainId)]"
-                alt="token"
-                class="h-5 w-5"
-              />
-              <img
-                v-else
-                :src="
-                  index % 2
-                    ? cryptoLogo[cryptoTicker.primaryUnknown]
-                    : cryptoLogo[cryptoTicker.secondaryUnknown]
-                "
-                alt="token"
-                class="w-5 h-5"
-              />ƒ
+            v-if="tokenToName(bot.quoteToken, chainId) in cryptoTicker"
+            :src="cryptoLogo[<'USDT'>tokenToName(bot.quoteToken, chainId)]"
+            alt="token"
+            class="h-5 w-5"
+          />
+          <component
+            v-else
+            class="!w-5 !h-5"
+            :is="
+              index % 2
+                ? cryptoLogo[cryptoTicker.primaryUnknown]
+                : cryptoLogo[cryptoTicker.secondaryUnknown]
+            "
+          />
         </div>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { Values, cryptoTicker, cryptoLogo } from "../../../types/cryptoSpecs";
-import {
-  usdt,
-  ether,
-  logo,
-  polygon,
-  avax,
-  bnb,
-  usdc,
-  aave,
-} from "../../../asset/images/images";
+import { cryptoTicker, cryptoLogo } from "../../../types/cryptoSpecs";
 import { tokenToName } from "../../../utils";
-
-const cryptoDetails = {
-  [cryptoTicker.matic]: { bg: "border border-purple-600", logo: polygon },
-  [cryptoTicker.avax]: { bg: "border border-red-600", logo: avax },
-  [cryptoTicker.bnb]: { bg: "border border-yellow-600", logo: bnb },
-  [cryptoTicker.usdc]: { bg: "border border-blue-600", logo: usdc },
-  [cryptoTicker.usdt]: { bg: "border border-emerald-600", logo: usdt },
-  [cryptoTicker.ether]: { bg: "border border-gray-600", logo: ether },
-  [cryptoTicker.coss]: { bg: "border border-blue-600", logo: logo },
-  [cryptoTicker.aave]: { bg: "border border-fuchsia-600", logo: logo },
-};
 
 const props = defineProps<{
   bot: {

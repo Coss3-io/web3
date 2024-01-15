@@ -54,7 +54,7 @@ let routes: RouteRecordRaw[] = [
           ),
       },
       {
-        path: ":id",
+        path: ":index",
         name: RouteNames.Bot,
         component: () =>
           import(

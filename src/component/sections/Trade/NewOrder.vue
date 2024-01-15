@@ -387,7 +387,7 @@ const props = defineProps<{
 }>();
 
 const base = "0xabc...def";
-const quote = cryptoTicker.avax;
+const quote = cryptoTicker.AVAX;
 const isBuyOrder = ref(true);
 const isMakerOrder = ref(true);
 const isQuoteFeesOrder = ref(true);

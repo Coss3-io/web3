@@ -1047,14 +1047,14 @@ import { ethers } from "ethers";
 import { notify } from "@kyvg/vue3-notification";
 
 const cryptoDetails = {
-  [cryptoTicker.matic]: { bg: "border border-purple-600", logo: polygon },
-  [cryptoTicker.avax]: { bg: "border border-red-600", logo: avax },
-  [cryptoTicker.bnb]: { bg: "border border-yellow-600", logo: bnb },
-  [cryptoTicker.usdc]: { bg: "border border-blue-600", logo: usdc },
-  [cryptoTicker.usdt]: { bg: "border border-emerald-600", logo: usdt },
-  [cryptoTicker.ether]: { bg: "border border-gray-600", logo: ether },
-  [cryptoTicker.coss]: { bg: "border border-blue-600", logo: logo },
-  [cryptoTicker.aave]: { bg: "border border-purple-500", logo: aave },
+  [cryptoTicker.MATIC]: { bg: "border border-purple-600", logo: polygon },
+  [cryptoTicker.AVAX]: { bg: "border border-red-600", logo: avax },
+  [cryptoTicker.BNB]: { bg: "border border-yellow-600", logo: bnb },
+  [cryptoTicker.USDC]: { bg: "border border-blue-600", logo: usdc },
+  [cryptoTicker.USDT]: { bg: "border border-emerald-600", logo: usdt },
+  [cryptoTicker.ETH]: { bg: "border border-gray-600", logo: ether },
+  [cryptoTicker.COSS]: { bg: "border border-blue-600", logo: logo },
+  [cryptoTicker.AAVE]: { bg: "border border-purple-500", logo: aave },
 };
 
 let focusBaseLabel = ref<HTMLInputElement | null>(null);

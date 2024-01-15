@@ -37,7 +37,7 @@
               <div>Bots List</div>
             </div>
             <RouterLink
-              :to="{ name: RouteNames.NewBot, params: { id: '' } }"
+              :to="{ name: RouteNames.NewBot }"
               class="badge badge-primary text-sm font-bold shadow-xs shadow-black hover:bg-primary-focus active:scale-95 transition-all"
             >
               + new bot
@@ -109,13 +109,13 @@
               <BotsCard></BotsCard>
             </div>
             <div
-              v-else-if="!Client.botStore.$state.loaded && cardView"
+              v-else-if="Client.botStore.$state.loaded && cardView"
               class="w-full h-full overflow-auto custom-scroll"
             >
               <BotsCard></BotsCard>
             </div>
             <div
-              v-else-if="!Client.botStore.$state.loaded && !cardView"
+              v-else-if="Client.botStore.$state.loaded && !cardView"
               class="w-full h-full overflow-auto custom-scroll"
             >
               <BotsList></BotsList>

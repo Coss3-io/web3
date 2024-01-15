@@ -22,7 +22,7 @@ describe("Test: Stacking contract", () => {
   });
 
   it("Checks the initial value of the coss contract is initialised well", async () => {
-    const cossAddress = await stacking.cossToken();
+    const cossAddress = await stacking.cossToken(); 
     assert.equal(
       cossAddress,
       coss.target,

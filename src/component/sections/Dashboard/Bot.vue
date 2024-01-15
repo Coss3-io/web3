@@ -16,8 +16,8 @@
         :bot="{
           base: 7593,
           quote: 384,
-          baseName: cryptoTicker.ether,
-          quoteName: cryptoTicker.usdc,
+          baseName: cryptoTicker.ETH,
+          quoteName: cryptoTicker.USDC,
           profits: 679,
           fees: 1,
         }"
@@ -47,8 +47,8 @@
         :bot="{
           base: 5024,
           quote: 453,
-          baseName: cryptoTicker.coss,
-          quoteName: cryptoTicker.usdt,
+          baseName: cryptoTicker.COSS,
+          quoteName: cryptoTicker.USDT,
           profits: 45,
           fees: 2,
         }"

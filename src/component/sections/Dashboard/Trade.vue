@@ -278,10 +278,10 @@ async function copy(text: string) {
   }
 }
 const rebalanceList = {
-  [cryptoTicker.coss]: 5456,
-  [cryptoTicker.bnb]: 26844,
-  [cryptoTicker.aave]: 4654,
-  [cryptoTicker.usdt]: 75643,
+  [cryptoTicker.COSS]: 5456,
+  [cryptoTicker.BNB]: 26844,
+  [cryptoTicker.AAVE]: 4654,
+  [cryptoTicker.USDT]: 75643,
   "0x55b0A...199B9fA5": 876896,
   "0x51b0A...199B9fA5": 2508,
   "0x55b0A...19919fA5": 986987,

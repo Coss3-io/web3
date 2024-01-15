@@ -603,17 +603,17 @@ let option = {
 };
 
 const cryptoDetails = {
-  [cryptoTicker.matic]: {
+  [cryptoTicker.MATIC]: {
     bg: "text-purple-600",
     logo: polygon,
     color: "#a347d1",
   },
-  [cryptoTicker.avax]: { bg: "text-red-600", logo: avax, color: "#de2c2c" },
-  [cryptoTicker.bnb]: { bg: "text-yellow-600", logo: bnb, color: "#edda0c" },
-  [cryptoTicker.usdc]: { bg: "text-blue-600", logo: usdc, color: "#009dff" },
-  [cryptoTicker.usdt]: { bg: "text-emerald-600", logo: usdt, color: "#00c41d" },
-  [cryptoTicker.ether]: { bg: "text-gray-400", logo: ether, color: "#b6bfb7" },
-  [cryptoTicker.coss]: { bg: "text-blue-600", logo: logo, color: "#25e5fa" },
+  [cryptoTicker.AVAX]: { bg: "text-red-600", logo: avax, color: "#de2c2c" },
+  [cryptoTicker.BNB]: { bg: "text-yellow-600", logo: bnb, color: "#edda0c" },
+  [cryptoTicker.USDC]: { bg: "text-blue-600", logo: usdc, color: "#009dff" },
+  [cryptoTicker.USDT]: { bg: "text-emerald-600", logo: usdt, color: "#00c41d" },
+  [cryptoTicker.ETH]: { bg: "text-gray-400", logo: ether, color: "#b6bfb7" },
+  [cryptoTicker.COSS]: { bg: "text-blue-600", logo: logo, color: "#25e5fa" },
 };
 
 let selectedBot = ref<(typeof botsList)[0]>();
@@ -621,8 +621,8 @@ const botsList = [
   {
     base: 7593,
     quote: 384,
-    baseName: cryptoTicker.ether,
-    quoteName: cryptoTicker.usdc,
+    baseName: cryptoTicker.ETH,
+    quoteName: cryptoTicker.USDC,
     profits: 679,
     fees: 1,
     lowerBound: 1582,
@@ -631,8 +631,8 @@ const botsList = [
   {
     base: 123,
     quote: 456,
-    baseName: cryptoTicker.coss,
-    quoteName: cryptoTicker.usdt,
+    baseName: cryptoTicker.COSS,
+    quoteName: cryptoTicker.USDT,
     profits: 789,
     fees: 1,
     lowerBound: 4572,
@@ -641,8 +641,8 @@ const botsList = [
   {
     base: 34,
     quote: 535,
-    baseName: cryptoTicker.avax,
-    quoteName: cryptoTicker.usdc,
+    baseName: cryptoTicker.AVAX,
+    quoteName: cryptoTicker.USDC,
     profits: 4,
     fees: 3,
     lowerBound: 4852,
@@ -651,8 +651,8 @@ const botsList = [
   {
     base: 86,
     quote: 78,
-    baseName: cryptoTicker.bnb,
-    quoteName: cryptoTicker.usdt,
+    baseName: cryptoTicker.BNB,
+    quoteName: cryptoTicker.USDT,
     profits: 2,
     fees: 4,
     lowerBound: 8542,
@@ -661,8 +661,8 @@ const botsList = [
   {
     base: 86,
     quote: 78,
-    baseName: cryptoTicker.matic,
-    quoteName: cryptoTicker.usdc,
+    baseName: cryptoTicker.MATIC,
+    quoteName: cryptoTicker.USDC,
     profits: 2,
     fees: 5,
     lowerBound: 156,
@@ -672,8 +672,8 @@ const botsList = [
   {
     base: 86,
     quote: 78,
-    baseName: cryptoTicker.matic,
-    quoteName: cryptoTicker.usdc,
+    baseName: cryptoTicker.MATIC,
+    quoteName: cryptoTicker.USDC,
     profits: 2,
     fees: 5,
     lowerBound: 568,
@@ -682,8 +682,8 @@ const botsList = [
   {
     base: 488,
     quote: 535,
-    baseName: cryptoTicker.avax,
-    quoteName: cryptoTicker.usdc,
+    baseName: cryptoTicker.AVAX,
+    quoteName: cryptoTicker.USDC,
     profits: 4,
     fees: 3,
     lowerBound: 7865,
@@ -692,8 +692,8 @@ const botsList = [
   {
     base: 86,
     quote: 78,
-    baseName: cryptoTicker.bnb,
-    quoteName: cryptoTicker.usdt,
+    baseName: cryptoTicker.BNB,
+    quoteName: cryptoTicker.USDT,
     profits: 2,
     fees: 4,
     lowerBound: 485,
@@ -702,8 +702,8 @@ const botsList = [
   {
     base: 5024,
     quote: 453,
-    baseName: cryptoTicker.coss,
-    quoteName: cryptoTicker.usdt,
+    baseName: cryptoTicker.COSS,
+    quoteName: cryptoTicker.USDT,
     profits: 45,
     fees: 2,
     lowerBound: 438,
@@ -712,8 +712,8 @@ const botsList = [
   {
     base: 488,
     quote: 535,
-    baseName: cryptoTicker.avax,
-    quoteName: cryptoTicker.usdc,
+    baseName: cryptoTicker.AVAX,
+    quoteName: cryptoTicker.USDC,
     profits: 4,
     fees: 3,
     lowerBound: 45578,
