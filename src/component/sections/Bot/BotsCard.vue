@@ -31,12 +31,12 @@
               String($route.params.id) == String(index),
           }"
           :bot="{
-            base: bot.base_token_amount,
-            quote: bot.quote_token_amount,
-            baseToken: bot.base_token,
-            quoteToken: bot.quote_token,
-            fees_earned: bot.fees_earned,
-            fees: bot.maker_fees,
+            base: bot.baseTokenAmount,
+            quote: bot.quoteTokenAmount,
+            baseToken: bot.baseToken,
+            quoteToken: bot.quoteToken,
+            feesEarned: bot.feesEarned,
+            fees: bot.makerFees,
           }"
           :chainId="Client.accountStore.$state.networkId!"
           :index="index"
@@ -63,7 +63,7 @@ const placeHolderList = [
     quote: 384,
     baseToken: namesToToken[chainNames.BSC][cryptoTicker.AVAX],
     quoteToken: namesToToken[chainNames.BSC][cryptoTicker.USDC],
-    fees_earned: 679,
+    feesEarned: 679,
     fees: 1,
   },
   {
@@ -71,7 +71,7 @@ const placeHolderList = [
     quote: 453,
     baseToken: namesToToken[chainNames.BSC][cryptoTicker.COSS],
     quoteToken: namesToToken[chainNames.BSC][cryptoTicker.USDT],
-    fees_earned: 45,
+    feesEarned: 45,
     fees: 2,
   },
   {
@@ -79,7 +79,7 @@ const placeHolderList = [
     quote: 535,
     baseToken: namesToToken[chainNames.BSC][cryptoTicker.BNB],
     quoteToken: namesToToken[chainNames.BSC][cryptoTicker.USDC],
-    fees_earned: 4,
+    feesEarned: 4,
     fees: 3,
   },
   {
@@ -87,7 +87,7 @@ const placeHolderList = [
     quote: 78,
     baseToken: namesToToken[chainNames.BSC][cryptoTicker.MATIC],
     quoteToken: namesToToken[chainNames.BSC][cryptoTicker.USDT],
-    fees_earned: 2,
+    feesEarned: 2,
     fees: 4,
   },
 ];

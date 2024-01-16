@@ -1,19 +1,19 @@
 export type BotState = {
     bots: Array<{
         address: string;
-        base_token: string;
-        base_token_amount: number;
-        chain_id: number;
-        fees_earned: number;
-        lower_bound: number;
-        maker_fees: number;
+        baseToken: string;
+        baseTokenAmount: number;
+        chainId: number;
+        feesEarned: number;
+        lowerBound: number;
+        makerFees: number;
         price: number;
-        quote_token: string;
-        quote_token_amount: number;
+        quoteToken: string;
+        quoteTokenAmount: number;
         step: number;
         timestamp: number;
         expiry: number;
-        upper_bound: number;
+        upperBound: number;
       }>;
     loaded: boolean
 }

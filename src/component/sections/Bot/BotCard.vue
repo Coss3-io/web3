@@ -122,7 +122,7 @@
         <div
           class="flex justify-center font-bold font-sans gap-2 bg-base-300 w-full px-2 p-1 ronded-full border border-white/50 shadow-lg shadow-black/50 rounded-full"
         >
-          fees: {{ bot.fees_earned }}
+          fees: {{ bot.feesEarned }}
           <img
             v-if="tokenToName(bot.quoteToken, chainId) in cryptoTicker"
             :src="cryptoLogo[<'USDT'>tokenToName(bot.quoteToken, chainId)]"
@@ -153,7 +153,7 @@ const props = defineProps<{
     quote: number;
     baseToken: string;
     quoteToken: string;
-    fees_earned: number;
+    feesEarned: number;
     fees: number;
   };
   chainId: number;

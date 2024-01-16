@@ -271,23 +271,23 @@ export class Client {
     }
     this.botStore[BotActions.AddBot]({
       address: data.address,
-      base_token: data.base_token,
-      chain_id: data.chain_id,
-      fees_earned: 0,
-      base_token_amount: new BigNumber(baseNeeded)
+      baseToken: data.base_token,
+      chainId: data.chain_id,
+      feesEarned: 0,
+      baseTokenAmount: new BigNumber(baseNeeded)
         .multipliedBy("1e18")
         .toNumber(),
-      lower_bound: data.lower_bound,
-      maker_fees: data.maker_fees,
+      lowerBound: data.lower_bound,
+      makerFees: data.maker_fees,
       price: data.price,
-      quote_token: data.quote_token,
-      quote_token_amount: new BigNumber(quoteNeeded)
+      quoteToken: data.quote_token,
+      quoteTokenAmount: new BigNumber(quoteNeeded)
         .multipliedBy("1e18")
         .toNumber(),
       step: data.step,
       timestamp: Math.floor(Date.now() / 1000),
       expiry: Number(data.expiry),
-      upper_bound: data.upper_bound,
+      upperBound: data.upper_bound,
     });
     return success;
   }
