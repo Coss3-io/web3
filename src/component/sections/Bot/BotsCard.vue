@@ -10,7 +10,7 @@
         <BotCard
           :class="{
             'outline-1 outline outline-primary':
-              String($route.params.id) == String(index),
+              String($route.params.index) == String(index),
           }"
           :bot="bot"
           :chainId="Number(chainIds[chainNames.BSC])"
@@ -28,7 +28,7 @@
         <BotCard
           :class="{
             'outline-1 outline outline-primary':
-              String($route.params.id) == String(index),
+              String($route.params.index) == String(index),
           }"
           :bot="{
             base: bot.baseTokenAmount,

@@ -15,12 +15,16 @@ import {
 } from "./types/cryptoSpecs";
 
 /**
- * @notice - used to display the beginning and the end of an address only
+ * @notice - used to display the beginning and the end of an address
+ * if the address is not recognized as a known token, if the address 
+ * is recognized only the name will be displayed
+ * 
  * @param address - the address to display
  * @returns - The formatted address to be displayed
  */
 export function displayAddress(address: string): string {
   const length = address.length - 1;
+  if (length < 10) return address
   return `${address.slice(0, 6)}...${address.slice(length - 4)}`;
 }
 
@@ -45,6 +49,44 @@ export function displayNumber(number: number): string {
     return "";
   }
 }
+
+/**
+ * Function used to convert numbers to string converting high unit with letters
+ * @param num number to convert
+ * @param digits the maximal number of floatting point decimals
+ * @returns string
+ *
+ * Basic usage example:
+ * ```
+ *  nFormatter(3156, 1) => "3.1k"
+ * ```
+ */
+
+export const nFormatter = (num: number, digits: number): string => {
+  const lookup = [
+    { value: 1, symbol: "" },
+    { value: 1e3, symbol: "k" },
+    { value: 1e6, symbol: "m" },
+    { value: 1e9, symbol: "G" },
+    { value: 1e12, symbol: "T" },
+    { value: 1e15, symbol: "P" },
+    { value: 1e18, symbol: "E" },
+  ];
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  var item = lookup
+    .slice()
+    .reverse()
+    .find(function (item) {
+      return num >= item.value;
+    });
+  return item
+    ? (Math.ceil((num * 10 ** digits) / item.value) / 10 ** digits)
+        .toFixed(item.symbol === "m" ? 2 : digits)
+        .replace(rx, "$1") + item.symbol
+    : num
+    ? num.toFixed(digits)
+    : "0";
+};
 
 /**
  * @notice - function used to determine the dollars value of a given input
@@ -77,7 +119,10 @@ export function dollarsValue(tokens: { [key in string]: number }): number {
  * @notice - Used to map token addresses to token names if applicable
  * @returns - The token name corresponding to the token on the specified chain
  */
-export function tokenToName(token: string, chainId: number | string): string {
+export function tokenToName(
+  token: string,
+  chainId: number | string
+): string | keyof typeof cryptoTicker {
   var ret: { [key in string]: string } = {};
   const chainName = chainIdToName(Number(chainId));
   for (var key in namesToToken[chainName]) {

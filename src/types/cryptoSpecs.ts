@@ -53,6 +53,21 @@ export const cryptoBg: { [key in Values<typeof cryptoTicker>]: string } = {
   [cryptoTicker.secondaryUnknown]: "!bg-gray-400",
 };
 
+export const cryptoGraph: {
+  [key in Values<typeof cryptoTicker>]: { text: string; color: string };
+} = {
+  [cryptoTicker.USDT]: { text: "text-emerald-600", color: "#00c41d" },
+  [cryptoTicker.ETH]: { text: "text-gray-400", color: "#b6bfb7" },
+  [cryptoTicker.COSS]: { text: "text-blue-600", color: "#25e5fa" },
+  [cryptoTicker.AVAX]: { text: "text-red-600", color: "#de2c2c" },
+  [cryptoTicker.BNB]: { text: "text-yellow-600", color: "#edda0c" },
+  [cryptoTicker.MATIC]: { text: "text-purple-600", color: "#a347d1" },
+  [cryptoTicker.USDC]: { text: "text-blue-600", color: "#009dff" },
+  [cryptoTicker.AAVE]: { text: "text-fuchsia-400", color: "#e879f9" },
+  [cryptoTicker.primaryUnknown]:{ text: "text-primary", color: "#661AE6" },
+  [cryptoTicker.secondaryUnknown]: { text: "text-secondary", color: "#D926AA" },
+} as const;
+
 export const cryptoBorder: { [key in Values<typeof cryptoTicker>]: string } = {
   [cryptoTicker.USDT]: "!border-emerald-700",
   [cryptoTicker.ETH]: "!border-slate-400",
@@ -79,7 +94,7 @@ export const cryptoLogo: { [key in Values<typeof cryptoTicker>]: string } = {
   [cryptoTicker.secondaryUnknown]: <string>(<unknown>unknownSecondaryTokenLogo),
 };
 
-export const chainNames : {[key in string]: string} = {
+export const chainNames: { [key in string]: string } = {
   BSC: "BSC",
   Ethereum: "Ethereum",
   Avalanche: "Avalanche",
@@ -100,11 +115,11 @@ export const namesToToken: {
 } = {
   [chainNames.BSC]: {
     [cryptoTicker.USDC]: "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525",
-    [cryptoTicker.USDT]: "0x4BBEeB066ed09b7aEd07BF39EEE0460dFA261523",
-    [cryptoTicker.ETH]: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524",
+    [cryptoTicker.USDT]: "0x4BBEeB066ed09b7aEd07BF39EEE0460dFA261533",
+    [cryptoTicker.ETH]: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261534",
     [cryptoTicker.AVAX]: "0x4BBeeB066ed09B7AeD07bf39EeE0460dfA261522",
     [cryptoTicker.BNB]: "0x4bbeEB066ED09b7Aed07Bf39EeE0460DFA261521",
-    [cryptoTicker.AAVE]: "0x4bbeEB066eD09B7AEd07bF39EEe0460DFa261520",
+    [cryptoTicker.AAVE]: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524",
     [cryptoTicker.COSS]: "0x5bbeEB066eD09B7AEd07bF39EEe0460DFa261520",
     [cryptoTicker.MATIC]: "0x6bbeEB066eD09B7AEd07bF39EEe0460DFa261520",
     [cryptoTicker.primaryUnknown]: "",

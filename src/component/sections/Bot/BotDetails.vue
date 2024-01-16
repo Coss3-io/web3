@@ -1,5 +1,14 @@
 <template>
-  <div
+  <div v-if="!Client.botStore.$state.loaded || !loaded" class="w-full h-full relative">
+    <div class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center">
+      <button class="btn btn-primary btn-square"
+      ><span class="loading loading-spinner">
+
+      </span>
+    </button>
+  </div>
+  </div>
+  <div v-else
     class="w-full h-full grid grid-cols-12 gap-3 grid-rows-[min-content_1fr_min-content]"
   >
     <div
@@ -7,35 +16,45 @@
     >
       <div class="stat place-items-center">
         <div class="stat-figure">
-          <img
-            :src="cryptoDetails[selectedBot!.baseName].logo"
-            alt="ether"
+          <img v-if="baseLogo"
+            :src="baseLogo"
+            alt="baseTokenLogo"
             class="w-10 h-10"
           />
+          <component
+          v-else
+          class="!w-10 !h-10"
+          :is="cryptoLogo[<keyof typeof cryptoTicker>baseTokenName]"
+        />
         </div>
         <div class="stat-title">Base Balance</div>
         <div
           class="stat-value"
-          :class="cryptoDetails[selectedBot!.baseName].bg"
+          :class="cryptoGraph[<keyof typeof cryptoTicker>baseTokenName].text"
         >
-          {{ selectedBot?.base }}
+          {{ selectedBot!.baseTokenAmount }}
         </div>
         <div class="stat-desc">+21% since launch</div>
       </div>
       <div class="stat place-items-center">
         <div class="stat-figure">
-          <img
-            :src="cryptoDetails[selectedBot!.quoteName].logo"
+          <img v-if="quoteLogo"
+            :src="quoteLogo"
             alt="usdc"
             class="w-10 h-10"
           />
+          <component
+          v-else
+          class="!w-10 !h-10"
+          :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
+        />
         </div>
         <div class="stat-title">Quote Balance</div>
         <div
           class="stat-value"
-          :class="cryptoDetails[selectedBot!.quoteName].bg"
+          :class="cryptoGraph[<keyof typeof cryptoTicker>quoteTokenName].text"
         >
-          {{ selectedBot?.quote }}
+          {{ selectedBot!.quoteTokenAmount }}
         </div>
         <div class="stat-desc">-21% since launch</div>
       </div>
@@ -73,7 +92,7 @@
           <h2
             class="xl:hidden 2xl:block card-title text-primary-content bg-neutral shadow shadow-black/50 rounded-full px-4"
           >
-            Bot #{{ selectedBot?.fees }} Details
+            Bot #{{ Number(<string>$route.params.index + 1) }} Details
           </h2>
           <div
             class="grow flex flex-col w-full justify-evenly bg-neutral max-h-28 shadow-lg shadow-black/50 rounded-xl p-3 font-bold pb-4"
@@ -100,7 +119,7 @@
               <div
                 class="badge border border-warning/70 bg-transparent font-sans font-bold px-2 text-warning/70"
               >
-                bot fees: {{ selectedBot?.fees }}%
+                bot fees: {{ selectedBot?.makerFees }}%
               </div>
             </div>
             <div class="grow flex items-center">
@@ -112,10 +131,16 @@
                     collected
                   </div>
                   <div class="flex gap-3 items-center">
-                    {{ selectedBot?.profits }}
-                    <img
-                      class="w-6 h-6"
-                      :src="cryptoDetails[selectedBot!.quoteName].logo"
+                    {{ selectedBot?.feesEarned }}
+                    <img v-if="quoteLogo"
+                        :src="quoteLogo"
+                        alt="usdc"
+                        class="w-6 h-6"
+                      />
+                      <component
+                      v-else
+                      class="!w-6 !h-6"
+                      :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
                     />
                   </div>
                 </div>
@@ -126,11 +151,17 @@
                     volume
                   </div>
                   <div class="flex items-center gap-3">
-                    {{ selectedBot?.profits }}
-                    <img
+                    {{ selectedBot?.feesEarned }}
+                    <img v-if="quoteLogo"
+                      :src="quoteLogo"
+                      alt="quoteLogo"
                       class="w-6 h-6"
-                      :src="cryptoDetails[selectedBot!.quoteName].logo"
                     />
+                    <component
+                    v-else
+                    class="!w-6 !h-6"
+                    :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
+                  />
                   </div>
                 </div>
               </div>
@@ -161,7 +192,7 @@
               <div
                 class="badge border border-success/70 bg-transparent font-sans font-bold px-2 text-success/70"
               >
-                + {{ selectedBot?.fees }}%
+                + {{ selectedBot?.feesEarned }}%
               </div>
             </div>
             <div class="grow flex items-center">
@@ -175,7 +206,7 @@
                     start USD value
                   </div>
                   <div class="flex gap-3 items-center">
-                    {{ selectedBot?.quote }}
+                    {{ selectedBot?.feesEarned }}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -201,7 +232,7 @@
                     USD value
                   </div>
                   <div class="flex items-center gap-3">
-                    {{ selectedBot?.base }}
+                    {{ selectedBot?.feesEarned }}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -379,36 +410,38 @@
             Balance Repartition
           </div>
         </div>
-        <div class="h-full w-full" :id="`botgraph${$route.params.id}`"></div>
+        <div class="h-full w-full" :id="`botgraph${$route.params.index}`"></div>
       </div>
     </div>
     <div
       class="stats xl:grid xl:grid-cols-2 2xl:grid-cols-3 xl:grid-rows-[1fr_min-content] stats-vertical lg:stats-horizontal sm:col-span-5 col-span-full lg:col-span-full xl:col-span-7 shadow-lg bg-base-300 shadow-black/50 relative !overflow-visible"
     >
       <span
-        v-if="selectedBot?.baseName.toLowerCase() == 'avax'"
+        v-if="baseTokenName!.toLowerCase() == 'avax'"
         class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0"
       ></span>
       <span
-        v-if="selectedBot?.baseName.toLowerCase() == 'avax'"
+        v-if="baseTokenName!.toLowerCase() == 'avax'"
         class="absolute w-3 h-3 rounded-full bg-red-500 top-0 right-0 border-red-500 animate-ping"
       ></span>
       <div
         class="stat place-items-center grid-cols-[1fr_max-content] 2xl:gap-1"
       >
         <div class="stat-figure">
-          <img
-            :src="cryptoDetails[selectedBot!.baseName].logo"
-            alt="ether"
-            class="w-7 h-7 shrink-0"
+          <img v-if="baseLogo"
+            :src="baseLogo"
+            alt="usdc"
+            class="w-7 h-7"
           />
+          <component
+          v-else
+          class="!w-7 !h-7 !shrink-0"
+          :is="cryptoLogo[<keyof typeof cryptoTicker>baseTokenName]"
+        />
         </div>
         <div class="stat-title">Wallet Base</div>
-        <div
-          class="stat-value"
-          :class="cryptoDetails[selectedBot!.baseName].bg"
-        >
-          {{ selectedBot?.base }}
+        <div class="stat-value" :class="cryptoGraph[<keyof typeof cryptoTicker>baseTokenName].text">
+          {{ nFormatter(selectedBot!.baseTokenAmount, 1) }}
         </div>
         <div class="stat-desc relative">
           +21% above needs
@@ -432,18 +465,23 @@
         class="stat place-items-center xl:row-start-1 grid-cols-[1fr_max-content] 2xl:gap-1"
       >
         <div class="stat-figure">
-          <img
-            :src="cryptoDetails[selectedBot!.quoteName].logo"
+          <img v-if="quoteLogo"
+            :src="quoteLogo"
             alt="usdc"
             class="w-7 h-7"
           />
+          <component
+          v-else
+          class="!w-7 !h-7"
+          :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
+        />
         </div>
         <div class="stat-title">Wallet Quote</div>
         <div
           class="stat-value"
-          :class="cryptoDetails[selectedBot!.quoteName].bg"
+          :class="cryptoGraph[<keyof typeof cryptoTicker>quoteTokenName].text"
         >
-          {{ selectedBot?.quote }}
+          {{ nFormatter(selectedBot!.quoteTokenAmount, 1) }}
         </div>
         <div class="stat-desc relative">
           -21% below needs
@@ -464,7 +502,7 @@
       </div>
 
       <div
-        v-if="selectedBot?.baseName.toLowerCase() == 'avax'"
+        v-if="baseTokenName!.toLowerCase() == 'avax'"
         class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 2xl:col-span-1 xl:col-start-1 xl:col-span-2 place-items-center xl:!border-t-[1px] xl:!border-solid grid-cols-[1fr_max-content] xl:grid-cols-2 2xl:grid-cols-[1fr_max-content]"
       >
         <div class="stat-figure text-secondary xl:justify-self-center">
@@ -520,17 +558,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import {
-  ether,
-  avax,
-  usdc,
-  usdt,
-  polygon,
-  bnb,
-  logo,
-} from "../../../asset/images/images";
-import { cryptoTicker } from "../../../types/cryptoSpecs";
+import { ref, watch, computed } from "vue";
+import { cryptoTicker, cryptoGraph, cryptoLogo } from "../../../types/cryptoSpecs";
 import { useRoute } from "vue-router";
 import { onBeforeMount } from "vue";
 import * as echarts from "echarts/core";
@@ -540,7 +569,13 @@ import { LabelLayout } from "echarts/features";
 import { CanvasRenderer } from "echarts/renderers";
 import { setGraph } from "../../../asset/scripts/utils";
 import { onMounted } from "vue";
+import { Client } from "../../../api";
+import { tokenToName, displayAddress, nFormatter } from "../../../utils";
+import { onUpdated } from "vue";
 
+const botLoaded = computed(() => Client.botStore.$state.loaded)
+
+let loaded = ref<boolean>(false)
 let route = useRoute();
 echarts.use([
   TooltipComponent,
@@ -602,145 +637,84 @@ let option = {
   ],
 };
 
-const cryptoDetails = {
-  [cryptoTicker.MATIC]: {
-    bg: "text-purple-600",
-    logo: polygon,
-    color: "#a347d1",
-  },
-  [cryptoTicker.AVAX]: { bg: "text-red-600", logo: avax, color: "#de2c2c" },
-  [cryptoTicker.BNB]: { bg: "text-yellow-600", logo: bnb, color: "#edda0c" },
-  [cryptoTicker.USDC]: { bg: "text-blue-600", logo: usdc, color: "#009dff" },
-  [cryptoTicker.USDT]: { bg: "text-emerald-600", logo: usdt, color: "#00c41d" },
-  [cryptoTicker.ETH]: { bg: "text-gray-400", logo: ether, color: "#b6bfb7" },
-  [cryptoTicker.COSS]: { bg: "text-blue-600", logo: logo, color: "#25e5fa" },
-};
-
-let selectedBot = ref<(typeof botsList)[0]>();
-const botsList = [
-  {
-    base: 7593,
-    quote: 384,
-    baseName: cryptoTicker.ETH,
-    quoteName: cryptoTicker.USDC,
-    profits: 679,
-    fees: 1,
-    lowerBound: 1582,
-    upperBound: 288,
-  },
-  {
-    base: 123,
-    quote: 456,
-    baseName: cryptoTicker.COSS,
-    quoteName: cryptoTicker.USDT,
-    profits: 789,
-    fees: 1,
-    lowerBound: 4572,
-    upperBound: 5345,
-  },
-  {
-    base: 34,
-    quote: 535,
-    baseName: cryptoTicker.AVAX,
-    quoteName: cryptoTicker.USDC,
-    profits: 4,
-    fees: 3,
-    lowerBound: 4852,
-    upperBound: 1235,
-  },
-  {
-    base: 86,
-    quote: 78,
-    baseName: cryptoTicker.BNB,
-    quoteName: cryptoTicker.USDT,
-    profits: 2,
-    fees: 4,
-    lowerBound: 8542,
-    upperBound: 365,
-  },
-  {
-    base: 86,
-    quote: 78,
-    baseName: cryptoTicker.MATIC,
-    quoteName: cryptoTicker.USDC,
-    profits: 2,
-    fees: 5,
-    lowerBound: 156,
-    upperBound: 862,
-  },
-
-  {
-    base: 86,
-    quote: 78,
-    baseName: cryptoTicker.MATIC,
-    quoteName: cryptoTicker.USDC,
-    profits: 2,
-    fees: 5,
-    lowerBound: 568,
-    upperBound: 237,
-  },
-  {
-    base: 488,
-    quote: 535,
-    baseName: cryptoTicker.AVAX,
-    quoteName: cryptoTicker.USDC,
-    profits: 4,
-    fees: 3,
-    lowerBound: 7865,
-    upperBound: 2232,
-  },
-  {
-    base: 86,
-    quote: 78,
-    baseName: cryptoTicker.BNB,
-    quoteName: cryptoTicker.USDT,
-    profits: 2,
-    fees: 4,
-    lowerBound: 485,
-    upperBound: 2578,
-  },
-  {
-    base: 5024,
-    quote: 453,
-    baseName: cryptoTicker.COSS,
-    quoteName: cryptoTicker.USDT,
-    profits: 45,
-    fees: 2,
-    lowerBound: 438,
-    upperBound: 543,
-  },
-  {
-    base: 488,
-    quote: 535,
-    baseName: cryptoTicker.AVAX,
-    quoteName: cryptoTicker.USDC,
-    profits: 4,
-    fees: 3,
-    lowerBound: 45578,
-    upperBound: 536,
-  },
-];
-
-onBeforeMount(() => {
-  if (typeof route.params.id == "string") {
-    selectedBot.value = botsList[parseInt(route.params.id)];
+function mountData(){
+  if (typeof route.params.index == "string") {
+    selectedBot.value = Client.botStore.$state.bots[parseInt(route.params.index)];
   }
-});
+  baseTokenName.value= tokenToName(
+    selectedBot.value!.baseToken,
+    selectedBot.value!.chainId
+  );
+  quoteTokenName.value = tokenToName(
+    selectedBot.value!.quoteToken,
+    selectedBot.value!.chainId
+  );
 
-onMounted(() => {
+  if (baseTokenName.value in cryptoTicker) {
+    baseLogo.value = cryptoLogo[<keyof typeof cryptoTicker>baseTokenName.value];
+  } else {
+    baseTokenName.value = cryptoTicker.primaryUnknown
+  }
+
+  if (quoteTokenName.value in cryptoTicker) {
+    quoteLogo.value = cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName.value];
+    } else {
+    quoteTokenName.value = cryptoTicker.secondaryUnknown
+  }
+
   option.color = [
-    cryptoDetails[selectedBot.value!.baseName].color,
-    cryptoDetails[selectedBot.value!.quoteName].color,
+    baseTokenName.value in cryptoTicker
+      ? cryptoGraph[<keyof typeof cryptoTicker>baseTokenName.value].color
+      : Number(route.params.id) % 2 == 0
+      ? cryptoGraph[cryptoTicker.primaryUnknown].color
+      : cryptoGraph[cryptoTicker.secondaryUnknown].color,
+    quoteTokenName.value in cryptoTicker
+      ? cryptoGraph[<keyof typeof cryptoTicker>quoteTokenName.value].color
+      : Number(route.params.id) % 2 == 0
+      ? cryptoGraph[cryptoTicker.primaryUnknown].color
+      : cryptoGraph[cryptoTicker.secondaryUnknown].color,
   ];
   option.series[0].data = [
-    { value: selectedBot.value!.base, name: selectedBot.value!.baseName },
-    { value: selectedBot.value!.quote, name: selectedBot.value!.quoteName },
+    {
+      value: selectedBot.value!.baseTokenAmount,
+      name: displayAddress(tokenToName(selectedBot.value!.baseToken, selectedBot.value!.chainId)),
+    },
+    {
+      value: selectedBot.value!.quoteTokenAmount,
+      name: displayAddress(tokenToName(selectedBot.value!.quoteToken, selectedBot.value!.chainId)),
+    },
   ];
+  loaded.value = true
+}
+
+onUpdated(() => {
   setGraph(
-    document.getElementById(`botgraph${route.params.id}`),
+    document.getElementById(`botgraph${route.params.index}`),
     echarts.getInstanceByDom,
     echarts.init,
     option
   );
+})
+
+let selectedBot = ref<(typeof Client.botStore.$state.bots)[0]>();
+let baseTokenName= ref<keyof typeof cryptoTicker | string>();
+let quoteTokenName= ref<keyof typeof cryptoTicker | string>();
+let baseLogo= ref<string>();
+let quoteLogo= ref<string>();
+
+onMounted(() => {
+  if (Client.botStore.$state.loaded) {
+    mountData()
+  } else {
+    watch(botLoaded, (newValue) => {
+      if (newValue) mountData()
+    })
+  }
 });
+
+onBeforeMount(() => {
+  if (Client.botStore.$state.loaded && typeof route.params.index == "string"){
+    selectedBot.value = Client.botStore.$state.bots[parseInt(route.params.index)];
+  }
+}) 
 </script>
