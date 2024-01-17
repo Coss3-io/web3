@@ -32,7 +32,7 @@
           class="stat-value"
           :class="cryptoGraph[<keyof typeof cryptoTicker>baseTokenName].text"
         >
-          {{ selectedBot!.baseTokenAmount }}
+          {{ displayNumber(selectedBot!.baseTokenAmount) }}
         </div>
         <div class="stat-desc">+21% since launch</div>
       </div>
@@ -54,7 +54,7 @@
           class="stat-value"
           :class="cryptoGraph[<keyof typeof cryptoTicker>quoteTokenName].text"
         >
-          {{ selectedBot!.quoteTokenAmount }}
+          {{ displayNumber(selectedBot!.quoteTokenAmount) }}
         </div>
         <div class="stat-desc">-21% since launch</div>
       </div>
@@ -570,7 +570,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import { setGraph } from "../../../asset/scripts/utils";
 import { onMounted } from "vue";
 import { Client } from "../../../api";
-import { tokenToName, displayAddress, nFormatter } from "../../../utils";
+import { tokenToName, displayAddress, nFormatter, displayNumber } from "../../../utils";
 import { onUpdated } from "vue";
 
 const botLoaded = computed(() => Client.botStore.$state.loaded)

@@ -6,7 +6,7 @@
     <div
       class="absolute badge border border-warning/70 bg-transparent font-sans font-bold px-2 text-warning/70 text-xs top-2 right-2"
     >
-      {{ bot.fees }}%
+      {{ bot.makerFees }}%
     </div>
     <div
       class="flex gap-3 justify-center p-5 items-center bg-base-300 rounded-t-xl"
@@ -91,7 +91,7 @@
                 "
               />
               <div class="grow text-center font-sans font-bold">
-                {{ bot.base }}
+                {{ nFormatter(bot.baseTokenAmount, 2) }}
               </div>
             </div>
             <div
@@ -113,7 +113,7 @@
                 "
               />
               <div class="grow text-center font-sans font-bold">
-                {{ bot.quote }}
+                {{  nFormatter(bot.quoteTokenAmount, 2) }}
               </div>
             </div>
           </div>
@@ -145,16 +145,16 @@
 </template>
 <script setup lang="ts">
 import { cryptoTicker, cryptoLogo } from "../../../types/cryptoSpecs";
-import { tokenToName } from "../../../utils";
+import { nFormatter, tokenToName } from "../../../utils";
 
 const props = defineProps<{
   bot: {
-    base: number;
-    quote: number;
+    baseTokenAmount: number;
+    quoteTokenAmount: number;
     baseToken: string;
     quoteToken: string;
     feesEarned: number;
-    fees: number;
+    makerFees: number;
   };
   chainId: number;
   index: number;

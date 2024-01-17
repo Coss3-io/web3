@@ -115,11 +115,11 @@ export const namesToToken: {
 } = {
   [chainNames.BSC]: {
     [cryptoTicker.USDC]: "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525",
-    [cryptoTicker.USDT]: "0x4BBEeB066ed09b7aEd07BF39EEE0460dFA261533",
-    [cryptoTicker.ETH]: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261534",
+    [cryptoTicker.USDT]: "0x4BBEeB066ed09b7aEd07BF39EEE0460dFA261523",
+    [cryptoTicker.ETH]: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524",
     [cryptoTicker.AVAX]: "0x4BBeeB066ed09B7AeD07bf39EeE0460dfA261522",
     [cryptoTicker.BNB]: "0x4bbeEB066ED09b7Aed07Bf39EeE0460DFA261521",
-    [cryptoTicker.AAVE]: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524",
+    [cryptoTicker.AAVE]: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261530",
     [cryptoTicker.COSS]: "0x5bbeEB066eD09B7AEd07bF39EEe0460DFa261520",
     [cryptoTicker.MATIC]: "0x6bbeEB066eD09B7AEd07bF39EEe0460DFa261520",
     [cryptoTicker.primaryUnknown]: "",

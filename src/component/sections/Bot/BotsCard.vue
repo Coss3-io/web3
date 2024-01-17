@@ -4,7 +4,7 @@
       class="col-span-full sm:col-span-6 md:col-span-4 xl:col-span-6 2xl:col-span-4"
       v-if="!Client.botStore.$state.loaded"
       v-for="(bot, index) in placeHolderList"
-      :key="bot.base + bot.quote"
+      :key="bot.baseTokenAmount + bot.quoteTokenAmount"
     >
       <RouterLink :to="{ name: RouteNames.Bot, params: { index: index } }">
         <BotCard
@@ -31,12 +31,12 @@
               String($route.params.index) == String(index),
           }"
           :bot="{
-            base: bot.baseTokenAmount,
-            quote: bot.quoteTokenAmount,
+            baseTokenAmount: bot.baseTokenAmount,
+            quoteTokenAmount: bot.quoteTokenAmount,
             baseToken: bot.baseToken,
             quoteToken: bot.quoteToken,
             feesEarned: bot.feesEarned,
-            fees: bot.makerFees,
+            makerFees: bot.makerFees,
           }"
           :chainId="Client.accountStore.$state.networkId!"
           :index="index"
@@ -59,36 +59,36 @@ import { Client } from "../../../api";
 
 const placeHolderList = [
   {
-    base: 7593,
-    quote: 384,
+    baseTokenAmount: 7593,
+    quoteTokenAmount: 384,
     baseToken: namesToToken[chainNames.BSC][cryptoTicker.AVAX],
     quoteToken: namesToToken[chainNames.BSC][cryptoTicker.USDC],
     feesEarned: 679,
-    fees: 1,
+    makerFees: 1,
   },
   {
-    base: 5024,
-    quote: 453,
+    baseTokenAmount: 5024,
+    quoteTokenAmount: 453,
     baseToken: namesToToken[chainNames.BSC][cryptoTicker.COSS],
     quoteToken: namesToToken[chainNames.BSC][cryptoTicker.USDT],
     feesEarned: 45,
-    fees: 2,
+    makerFees: 2,
   },
   {
-    base: 488,
-    quote: 535,
+    baseTokenAmount: 488,
+    quoteTokenAmount: 535,
     baseToken: namesToToken[chainNames.BSC][cryptoTicker.BNB],
     quoteToken: namesToToken[chainNames.BSC][cryptoTicker.USDC],
     feesEarned: 4,
-    fees: 3,
+    makerFees: 3,
   },
   {
-    base: 86,
-    quote: 78,
+    baseTokenAmount: 86,
+    quoteTokenAmount: 78,
     baseToken: namesToToken[chainNames.BSC][cryptoTicker.MATIC],
     quoteToken: namesToToken[chainNames.BSC][cryptoTicker.USDT],
     feesEarned: 2,
-    fees: 4,
+    makerFees: 4,
   },
 ];
 </script>
