@@ -39,6 +39,7 @@ export class Client {
    * @dev function used to check if the user is connected to the API
    */
   public static async checkConnection(): Promise<void> {
+    Client.accountStore[AccountActions.UpdateLoaded](false);
     try {
       let response = await axios.get(this.url + this.takerPath, {
         params: {
@@ -57,6 +58,7 @@ export class Client {
       );
       console.log(e);
     }
+    Client.accountStore[AccountActions.UpdateLoaded](true);
   }
 
   /**
@@ -271,6 +273,7 @@ export class Client {
     }
     this.botStore[BotActions.AddBot]({
       address: data.address,
+      amount: data.amount,
       baseToken: data.base_token,
       chainId: data.chain_id,
       feesEarned: 0,

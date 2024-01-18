@@ -92,7 +92,6 @@ watchNetwork(async (network) => {
   accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
   accountStore[AccountActions.UpdateNetworkName](network.chain?.name);
   await Client.checkConnection();
-  accountStore[AccountActions.UpdateLoaded](true)
 });
 
 const Suspense = suspense_ as {

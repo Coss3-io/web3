@@ -34,7 +34,7 @@
           >
             <transition name="fadeNav">
               <button
-                v-if="accountStore.$state.loading"
+                v-if="!accountStore.$state.loaded"
                 class="btn btn-primary w-40"
               >
                 <span class="loading loading-spinner"></span>

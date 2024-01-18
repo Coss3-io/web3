@@ -8,6 +8,7 @@ export type BotState = {
         lowerBound: number;
         makerFees: number;
         price: number;
+        amount: number;
         quoteToken: string;
         quoteTokenAmount: number;
         step: number;

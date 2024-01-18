@@ -22,13 +22,14 @@ export function addBot(this: ReturnType<typeof useBotStore>, bot: any): void {
         : unBigNumberify(String(bot.fees_earned)),
     lowerBound:
       "lowerBound" in bot
-        ? unBigNumberify(String(bot.lower_bound))
+        ? unBigNumberify(String(bot.lowerBound))
         : unBigNumberify(String(bot.lower_bound)),
     makerFees:
       "makerFees" in bot
-        ? Number(bot.makerFees) / 10
-        : Number(bot.maker_fees) / 10,
+        ? Number(bot.makerFees) / 100
+        : Number(bot.maker_fees) / 100,
     price: unBigNumberify(String(bot.price)),
+    amount: unBigNumberify(String(bot.amount)),
     quoteToken: "quoteToken" in bot ? bot.quoteToken : bot.quote_token,
     quoteTokenAmount:
       "quoteTokenAmount" in bot

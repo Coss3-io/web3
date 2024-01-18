@@ -131,20 +131,24 @@
                       tabindex="0"
                       class="dropdown-content z-20 menu p-2 shadow bg-base-100 rounded-box w-52 flex max-h-52 flex-nowrap overflow-auto custom-scroll"
                     >
-                      <li
-                        v-for="name of cryptoTicker"
-                        @click="() => {selectedBase = <Values<typeof cryptoTicker>>name; focusBaseLabel!.blur()}"
-                      >
-                        <a class="flex gap-1 items-center uppercase">
-                          <img
-                            :src="cryptoLogo[name]"
-                            class="w-7 h-7"
-                          />
-                          <div class="grow text-center">
-                            {{ name }}
-                          </div>
-                        </a>
-                      </li>
+                      <template v-for="name of cryptoTicker">
+                        <li
+                          v-if="
+                            !(
+                              name == cryptoTicker.primaryUnknown ||
+                              name == cryptoTicker.secondaryUnknown
+                            )
+                          "
+                          @click="() => {selectedBase = <Values<typeof cryptoTicker>>name; focusBaseLabel!.blur()}"
+                        >
+                          <a class="flex gap-1 items-center uppercase">
+                            <img :src="cryptoLogo[name]" class="w-7 h-7" />
+                            <div class="grow text-center">
+                              {{ name }}
+                            </div>
+                          </a>
+                        </li>
+                      </template>
                     </ul>
                   </div>
                 </div>
@@ -235,20 +239,24 @@
                       tabindex="0"
                       class="dropdown-content z-20 menu p-2 shadow bg-base-100 rounded-box w-52 flex max-h-52 flex-nowrap overflow-auto custom-scroll"
                     >
-                      <li
-                        v-for="name of cryptoTicker"
-                        @click="() => {selectedQuote = <Values<typeof cryptoTicker>>name; focusQuoteLabel!.blur()}"
-                      >
-                        <a class="flex gap-1 items-center uppercase">
-                          <img
-                            :src="cryptoLogo[name]"
-                            class="w-7 h-7"
-                          />
-                          <div class="grow text-center">
-                            {{ name }}
-                          </div>
-                        </a>
-                      </li>
+                      <template v-for="name of cryptoTicker">
+                        <li
+                          v-if="
+                            !(
+                              name == cryptoTicker.primaryUnknown ||
+                              name == cryptoTicker.secondaryUnknown
+                            )
+                          "
+                          @click="() => {selectedQuote = <Values<typeof cryptoTicker>>name; focusQuoteLabel!.blur()}"
+                        >
+                          <a class="flex gap-1 items-center uppercase">
+                            <img :src="cryptoLogo[name]" class="w-7 h-7" />
+                            <div class="grow text-center">
+                              {{ name }}
+                            </div>
+                          </a>
+                        </li>
+                      </template>
                     </ul>
                   </div>
                 </div>
@@ -1021,7 +1029,7 @@
 <script setup lang="ts">
 import type { Values } from "../../../types/cryptoSpecs";
 import {
-cryptoLogo,
+  cryptoLogo,
   cryptoRange,
   cryptoTicker,
   unknownToken,
@@ -1067,11 +1075,11 @@ let lowerBoundValue = ref<number>(0);
 let upperBoundValue = ref<number>(0);
 let priceValue = ref<number | undefined>();
 
-watch(lowerBoundValue, (newValue, oldValue) => {
+watch(lowerBoundValue, (newValue) => {
   if (!priceValue.value && newValue) lowerBoundValue.value = 0;
 });
 
-watch(upperBoundValue, (newValue, oldValue) => {
+watch(upperBoundValue, (newValue) => {
   if (!priceValue.value && newValue) upperBoundValue.value = 0;
 });
 
@@ -1095,8 +1103,8 @@ const absoluteStep = computed(() => {
 });
 
 const numOrders = computed(() => {
-  const range = upperBoundPrice.value - priceValue.value!;
-  return Math.floor(range / absoluteStep.value);
+  const range = upperBoundPrice.value + 1 - (priceValue.value! + absoluteStep.value);
+  return Math.ceil(range / absoluteStep.value);
 });
 
 const baseNeeded = computed(() => {
@@ -1145,7 +1153,7 @@ async function createBot() {
     step: new BigNumber(absoluteStep.value)
       .multipliedBy(multiplicator)
       .toFixed(),
-    maker_fees: String(Math.floor((selectedFees.value ) * 10)),
+    maker_fees: String(Math.floor(selectedFees.value * 10)),
     upper_bound: new BigNumber(upperBoundPrice.value)
       .multipliedBy(multiplicator)
       .toFixed(),
@@ -1153,8 +1161,14 @@ async function createBot() {
     lower_bound: new BigNumber(lowerBoundPrice.value)
       .multipliedBy(multiplicator)
       .toFixed(),
-    base_token: nameToToken(selectedBase.value!, Client.accountStore.$state.networkId!),
-    quote_token: nameToToken(selectedQuote.value!, Client.accountStore.$state.networkId!),
+    base_token: nameToToken(
+      selectedBase.value!,
+      Client.accountStore.$state.networkId!
+    ),
+    quote_token: nameToToken(
+      selectedQuote.value!,
+      Client.accountStore.$state.networkId!
+    ),
     expiry: String(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 1000),
     is_buyer: false,
     replace_order: true,
@@ -1206,11 +1220,18 @@ async function createBot() {
       data.replace_order,
     ]
   );
-  if (await Client.createUserBot(data, String(baseNeeded.value), String(quoteNeeded.value), encodedData)){
+  if (
+    await Client.createUserBot(
+      data,
+      String(baseNeeded.value),
+      String(quoteNeeded.value),
+      encodedData
+    )
+  ) {
     notify({
-      text:"Bot created successfully",
-      type:"success"
-    })
-  };
+      text: "Bot created successfully",
+      type: "success",
+    });
+  }
 }
 </script>

@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import {
   usdt,
   ether,
@@ -64,7 +65,7 @@ export const cryptoGraph: {
   [cryptoTicker.MATIC]: { text: "text-purple-600", color: "#a347d1" },
   [cryptoTicker.USDC]: { text: "text-blue-600", color: "#009dff" },
   [cryptoTicker.AAVE]: { text: "text-fuchsia-400", color: "#e879f9" },
-  [cryptoTicker.primaryUnknown]:{ text: "text-primary", color: "#661AE6" },
+  [cryptoTicker.primaryUnknown]: { text: "text-primary", color: "#661AE6" },
   [cryptoTicker.secondaryUnknown]: { text: "text-secondary", color: "#D926AA" },
 } as const;
 
@@ -114,14 +115,30 @@ export const namesToToken: {
   [key in string]: { [key in Values<typeof cryptoTicker>]: string };
 } = {
   [chainNames.BSC]: {
-    [cryptoTicker.USDC]: "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525",
-    [cryptoTicker.USDT]: "0x4BBEeB066ed09b7aEd07BF39EEE0460dFA261523",
-    [cryptoTicker.ETH]: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524",
-    [cryptoTicker.AVAX]: "0x4BBeeB066ed09B7AeD07bf39EeE0460dfA261522",
-    [cryptoTicker.BNB]: "0x4bbeEB066ED09b7Aed07Bf39EeE0460DFA261521",
-    [cryptoTicker.AAVE]: "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261530",
-    [cryptoTicker.COSS]: "0x5bbeEB066eD09B7AEd07bF39EEe0460DFa261520",
-    [cryptoTicker.MATIC]: "0x6bbeEB066eD09B7AEd07bF39EEe0460DFa261520",
+    [cryptoTicker.USDC]: ethers.getAddress(
+      "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525".toLowerCase()
+    ),
+    [cryptoTicker.USDT]: ethers.getAddress(
+      "0x4BBEeB066ed09b7aEd07BF39EEE0460dFA261523".toLowerCase()
+    ),
+    [cryptoTicker.ETH]: ethers.getAddress(
+      "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524".toLowerCase()
+    ),
+    [cryptoTicker.AVAX]: ethers.getAddress(
+      "0x4BBeeB066ed09B7AeD07bf39EeE0460dfA261522".toLowerCase()
+    ),
+    [cryptoTicker.BNB]: ethers.getAddress(
+      "0x4bbeEB066ED09b7Aed07Bf39EeE0460DFA261521".toLowerCase()
+    ),
+    [cryptoTicker.AAVE]: ethers.getAddress(
+      "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261530".toLowerCase()
+    ),
+    [cryptoTicker.COSS]: ethers.getAddress(
+      "0x5bbeEB066eD09B7AEd07bF39EEe0460DFa261520".toLowerCase()
+    ),
+    [cryptoTicker.MATIC]: ethers.getAddress(
+      "0x6bbeEB066eD09B7AEd07bF39EEe0460DFa261520".toLowerCase()
+    ),
     [cryptoTicker.primaryUnknown]: "",
     [cryptoTicker.secondaryUnknown]: "",
   },

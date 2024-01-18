@@ -16,15 +16,15 @@ import {
 
 /**
  * @notice - used to display the beginning and the end of an address
- * if the address is not recognized as a known token, if the address 
+ * if the address is not recognized as a known token, if the address
  * is recognized only the name will be displayed
- * 
+ *
  * @param address - the address to display
  * @returns - The formatted address to be displayed
  */
 export function displayAddress(address: string): string {
   const length = address.length - 1;
-  if (length < 10) return address
+  if (length < 10) return address;
   return `${address.slice(0, 6)}...${address.slice(length - 4)}`;
 }
 
@@ -33,21 +33,30 @@ export function displayAddress(address: string): string {
  * @param number - The number to convert to stylized string
  * @returns - the stylized string
  */
-export function displayNumber(number: number): string {
+export function displayNumber(number: number, decimalDigits = 3): string {
+  let response = "";
+  
   if (number || number === 0) {
-    if (number < 1000) return String(number);
-    return String(number)
-      .split("")
-      .reverse()
-      .join("")
-      .match(/.{1,3}/g)!
-      .join(",")
-      .split("")
-      .reverse()
-      .join("");
-  } else {
-    return "";
+    const [integer, decimals] = String(number).split(".");
+    if (number < 1000) {
+      response += String(integer);
+    } else {
+      response += String(integer)
+        .split("")
+        .reverse()
+        .join("")
+        .match(/.{1,3}/g)!
+        .join(",")
+        .split("")
+        .reverse()
+        .join("");
+    }
+    
+    if (decimals) {
+      response += "." + String(decimals.slice(0, decimalDigits));
+    }
   }
+  return response;
 }
 
 /**
@@ -63,6 +72,7 @@ export function displayNumber(number: number): string {
  */
 
 export const nFormatter = (num: number, digits: number): string => {
+  if (num < 1) return String(num.toExponential(digits));
   const lookup = [
     { value: 1, symbol: "" },
     { value: 1e3, symbol: "k" },
@@ -135,7 +145,7 @@ export function tokenToName(
   }
 }
 
-function chainIdToName(chainId: number): Values<typeof chainNames> {
+function chainIdToName(chainId: number | string): Values<typeof chainNames> {
   var ret: { [key in string]: string } = {};
   for (var key in chainIds) {
     ret[chainIds[<Values<typeof cryptoTicker>>key]] = key;
@@ -153,7 +163,7 @@ export function nameToToken(
   name: Values<typeof cryptoTicker>,
   chainId: string | number
 ): string {
-  return namesToToken[chainId][name].toUpperCase();
+  return namesToToken[chainIdToName(chainId)][name];
 }
 
 /**

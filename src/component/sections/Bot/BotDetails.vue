@@ -1,14 +1,18 @@
 <template>
-  <div v-if="!Client.botStore.$state.loaded || !loaded" class="w-full h-full relative">
-    <div class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center">
-      <button class="btn btn-primary btn-square"
-      ><span class="loading loading-spinner">
-
-      </span>
-    </button>
+  <div
+    v-if="!Client.botStore.$state.loaded || !loaded"
+    class="w-full h-full relative"
+  >
+    <div
+      class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
+    >
+      <button class="btn btn-primary btn-square">
+        <span class="loading loading-spinner"></span>
+      </button>
+    </div>
   </div>
-  </div>
-  <div v-else
+  <div
+    v-else
     class="w-full h-full grid grid-cols-12 gap-3 grid-rows-[min-content_1fr_min-content]"
   >
     <div
@@ -16,16 +20,17 @@
     >
       <div class="stat place-items-center">
         <div class="stat-figure">
-          <img v-if="baseLogo"
+          <img
+            v-if="baseLogo"
             :src="baseLogo"
             alt="baseTokenLogo"
             class="w-10 h-10"
           />
           <component
-          v-else
-          class="!w-10 !h-10"
-          :is="cryptoLogo[<keyof typeof cryptoTicker>baseTokenName]"
-        />
+            v-else
+            class="!w-10 !h-10"
+            :is="cryptoLogo[<keyof typeof cryptoTicker>baseTokenName]"
+          />
         </div>
         <div class="stat-title">Base Balance</div>
         <div
@@ -34,20 +39,16 @@
         >
           {{ displayNumber(selectedBot!.baseTokenAmount) }}
         </div>
-        <div class="stat-desc">+21% since launch</div>
+        <div class="stat-desc">{{Number(baseBalanceDiff) >= 0 ? "+" : "-"}}{{Math.abs(Number(baseBalanceDiff))}}% since launch</div>
       </div>
       <div class="stat place-items-center">
         <div class="stat-figure">
-          <img v-if="quoteLogo"
-            :src="quoteLogo"
-            alt="usdc"
-            class="w-10 h-10"
-          />
+          <img v-if="quoteLogo" :src="quoteLogo" alt="usdc" class="w-10 h-10" />
           <component
-          v-else
-          class="!w-10 !h-10"
-          :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
-        />
+            v-else
+            class="!w-10 !h-10"
+            :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
+          />
         </div>
         <div class="stat-title">Quote Balance</div>
         <div
@@ -56,7 +57,7 @@
         >
           {{ displayNumber(selectedBot!.quoteTokenAmount) }}
         </div>
-        <div class="stat-desc">-21% since launch</div>
+        <div class="stat-desc">{{Number(quoteBalanceDiff) >= 0 ? "+" : "-"}}{{Math.abs(Number(quoteBalanceDiff))}}% since launch</div>
       </div>
       <div class="stat place-items-center">
         <div class="stat-figure text-secondary">
@@ -92,7 +93,7 @@
           <h2
             class="xl:hidden 2xl:block card-title text-primary-content bg-neutral shadow shadow-black/50 rounded-full px-4"
           >
-            Bot #{{ Number(<string>$route.params.index + 1) }} Details
+            Bot &#35;{{ Number(($route.params.index as string) + 1) }} Details
           </h2>
           <div
             class="grow flex flex-col w-full justify-evenly bg-neutral max-h-28 shadow-lg shadow-black/50 rounded-xl p-3 font-bold pb-4"
@@ -131,13 +132,14 @@
                     collected
                   </div>
                   <div class="flex gap-3 items-center">
-                    {{ selectedBot?.feesEarned }}
-                    <img v-if="quoteLogo"
-                        :src="quoteLogo"
-                        alt="usdc"
-                        class="w-6 h-6"
-                      />
-                      <component
+                    {{ selectedBot!.feesEarned.toFixed(4) }}
+                    <img
+                      v-if="quoteLogo"
+                      :src="quoteLogo"
+                      alt="usdc"
+                      class="w-6 h-6"
+                    />
+                    <component
                       v-else
                       class="!w-6 !h-6"
                       :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
@@ -151,17 +153,23 @@
                     volume
                   </div>
                   <div class="flex items-center gap-3">
-                    {{ selectedBot?.feesEarned }}
-                    <img v-if="quoteLogo"
+                    {{
+                      (
+                        selectedBot!.feesEarned /
+                        (selectedBot!.makerFees / 100)
+                      ).toFixed(4)
+                    }}
+                    <img
+                      v-if="quoteLogo"
                       :src="quoteLogo"
                       alt="quoteLogo"
                       class="w-6 h-6"
                     />
                     <component
-                    v-else
-                    class="!w-6 !h-6"
-                    :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
-                  />
+                      v-else
+                      class="!w-6 !h-6"
+                      :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
+                    />
                   </div>
                 </div>
               </div>
@@ -283,7 +291,7 @@
             <div class="grow flex items-center justify-between">
               <div class="flex flex-wrap gap-4 justify-evenly w-full">
                 <div
-                  class="flex grow shrink justify-center gap-8 items-center rounded-full bg-base-300 px-4 py-0.5 shadow-md shadow-black/50"
+                  class="flex shrink justify-center gap-8 items-center rounded-full bg-base-300 px-4 py-0.5 shadow-md shadow-black/50"
                 >
                   <div class="relative">
                     {{ selectedBot?.lowerBound }}
@@ -319,28 +327,31 @@
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div class="flex grow justify-around items-center mt-3">
+              <div
+                class="flex relative shrink items-center rounded-full bg-base-300 px-4 py-0.5 gap-x-4 shadow-md shadow-black/50"
+              >
                 <div
-                  class="flex relative grow shrink items-center rounded-full bg-base-300 px-4 py-0.5 shadow-md shadow-black/50"
+                  class="absolute text-[9px] font-light -bottom-2.5 left-1/2 -translate-x-1/2"
                 >
-                  <div
-                    class="absolute text-[9px] font-light -bottom-2.5 left-1/2"
-                  >
-                    step
-                  </div>
-                  <svg
-                    class="w-6 h-6 fill-current rounded-full bg-neutral shadow-md shadow-black/50 p-1"
-                    version="1.1"
-                    id="Capa_1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                    width="800px"
-                    height="800px"
-                    viewBox="0 0 515.458 515.458"
-                    xml:space="preserve"
-                  >
-                    <g>
-                      <path
-                        d="M298.794,386.711c27.805,9.522,52.357,15.587,87.633,26.427C372.875,584.374,210.952,516.371,298.794,386.711z
+                  step
+                </div>
+                <svg
+                  class="w-6 h-6 fill-current rounded-full bg-neutral shadow-md shadow-black/50 p-1"
+                  version="1.1"
+                  id="Capa_1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  width="800px"
+                  height="800px"
+                  viewBox="0 0 515.458 515.458"
+                  xml:space="preserve"
+                >
+                  <g>
+                    <path
+                      d="M298.794,386.711c27.805,9.522,52.357,15.587,87.633,26.427C372.875,584.374,210.952,516.371,298.794,386.711z
            M443.366,229.409c-1.826-51.415-10.882-118.86-83.017-108.292c-33.815,8.825-58.8,45.962-70.551,110.035
           c-6.454,35.229-2.701,84.678,4.912,114.32c6.951,20.889,4.587,19.605,12.058,23.572c28.916,6.514,57.542,13.725,86.693,21.078
           C423.075,369.209,447.397,258.182,443.366,229.409z M220.752,225.463c7.607-29.646,11.36-79.095,4.909-114.32
@@ -348,11 +359,35 @@
           c-4.031,28.768,20.294,139.802,49.911,160.711c29.149-7.353,57.771-14.558,86.696-21.078
           C216.162,245.069,213.798,246.352,220.752,225.463z M129.029,293.132c13.547,171.234,175.47,103.231,87.63-26.427
           C188.854,276.228,164.304,282.292,129.029,293.132z"
-                      />
-                    </g>
-                  </svg>
-                  <div class="grow text-sm font-bold">1234</div>
+                    />
+                  </g>
+                </svg>
+                <div class="text-sm font-bold">{{ selectedBot!.step }}</div>
+              </div>
+              <div
+                class="flex relative shrink items-center rounded-full bg-base-300 px-4 py-0.5 gap-x-4 shadow-md shadow-black/50"
+              >
+                <div
+                  class="absolute text-[9px] font-light -bottom-2.5 left-1/2 -translate-x-1/2"
+                >
+                  amount/order
                 </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-6 h-6 fill-current rounded-full bg-neutral shadow-md shadow-black/50 p-1"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
+                  />
+                </svg>
+
+                <div class="text-sm font-bold">{{ selectedBot!.amount }}</div>
               </div>
             </div>
           </div>
@@ -428,19 +463,18 @@
         class="stat place-items-center grid-cols-[1fr_max-content] 2xl:gap-1"
       >
         <div class="stat-figure">
-          <img v-if="baseLogo"
-            :src="baseLogo"
-            alt="usdc"
-            class="w-7 h-7"
-          />
+          <img v-if="baseLogo" :src="baseLogo" alt="usdc" class="w-7 h-7" />
           <component
-          v-else
-          class="!w-7 !h-7 !shrink-0"
-          :is="cryptoLogo[<keyof typeof cryptoTicker>baseTokenName]"
-        />
+            v-else
+            class="!w-7 !h-7 !shrink-0"
+            :is="cryptoLogo[<keyof typeof cryptoTicker>baseTokenName]"
+          />
         </div>
         <div class="stat-title">Wallet Base</div>
-        <div class="stat-value" :class="cryptoGraph[<keyof typeof cryptoTicker>baseTokenName].text">
+        <div
+          class="stat-value"
+          :class="cryptoGraph[<keyof typeof cryptoTicker>baseTokenName].text"
+        >
           {{ nFormatter(selectedBot!.baseTokenAmount, 1) }}
         </div>
         <div class="stat-desc relative">
@@ -465,16 +499,12 @@
         class="stat place-items-center xl:row-start-1 grid-cols-[1fr_max-content] 2xl:gap-1"
       >
         <div class="stat-figure">
-          <img v-if="quoteLogo"
-            :src="quoteLogo"
-            alt="usdc"
-            class="w-7 h-7"
-          />
+          <img v-if="quoteLogo" :src="quoteLogo" alt="usdc" class="w-7 h-7" />
           <component
-          v-else
-          class="!w-7 !h-7"
-          :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
-        />
+            v-else
+            class="!w-7 !h-7"
+            :is="cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName]"
+          />
         </div>
         <div class="stat-title">Wallet Quote</div>
         <div
@@ -506,7 +536,7 @@
         class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 2xl:col-span-1 xl:col-start-1 xl:col-span-2 place-items-center xl:!border-t-[1px] xl:!border-solid grid-cols-[1fr_max-content] xl:grid-cols-2 2xl:grid-cols-[1fr_max-content]"
       >
         <div class="stat-figure text-secondary xl:justify-self-center">
-          <div class="">
+          <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -534,7 +564,7 @@
         class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 xl:col-start-1 xl:col-span-2 2xl:col-span-1 place-items-center xl:!border-t-[1px] xl:!border-solid xl:grid-cols-2"
       >
         <div class="stat-figure text-secondary xl:justify-self-center">
-          <div class="">
+          <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -559,7 +589,11 @@
 </template>
 <script setup lang="ts">
 import { ref, watch, computed } from "vue";
-import { cryptoTicker, cryptoGraph, cryptoLogo } from "../../../types/cryptoSpecs";
+import {
+  cryptoTicker,
+  cryptoGraph,
+  cryptoLogo,
+} from "../../../types/cryptoSpecs";
 import { useRoute } from "vue-router";
 import { onBeforeMount } from "vue";
 import * as echarts from "echarts/core";
@@ -570,13 +604,69 @@ import { CanvasRenderer } from "echarts/renderers";
 import { setGraph } from "../../../asset/scripts/utils";
 import { onMounted } from "vue";
 import { Client } from "../../../api";
-import { tokenToName, displayAddress, nFormatter, displayNumber } from "../../../utils";
+import {
+  tokenToName,
+  displayAddress,
+  nFormatter,
+  displayNumber,
+} from "../../../utils";
 import { onUpdated } from "vue";
 
-const botLoaded = computed(() => Client.botStore.$state.loaded)
+const botLoaded = computed(() => Client.botStore.$state.loaded);
 
-let loaded = ref<boolean>(false)
+let loaded = ref<boolean>(false);
 let route = useRoute();
+let selectedBot = ref<(typeof Client.botStore.$state.bots)[0]>();
+let baseTokenName = ref<keyof typeof cryptoTicker | string>();
+let quoteTokenName = ref<keyof typeof cryptoTicker | string>();
+let baseLogo = ref<string>();
+let quoteLogo = ref<string>();
+
+let baseUSD = ref<number>(0);
+let quoteUSD = ref<number>(0);
+let initialBaseUSD = ref<number>(0);
+let initialQuoteUSD = ref<number>(0);
+
+const initialBaseToken = computed<number>(() => {
+  if (!selectedBot.value) return 0;
+  const numOrders = Math.ceil(
+    (selectedBot.value.upperBound + 1 - (selectedBot.value.price + selectedBot.value.step)) /
+      selectedBot.value.step
+  );
+  return numOrders * selectedBot.value.amount;
+});
+
+const initialQuoteToken = computed<number>(() => {
+  if (!selectedBot.value) return 0;
+  let counter = 0;
+  let price = selectedBot.value.price;
+  let amountNeeded = 0;
+
+  while (counter < 5000 && price >= selectedBot.value.lowerBound) {
+    amountNeeded += Number((selectedBot.value.amount * price).toFixed(10));
+    price -= selectedBot.value.step;
+    ++counter;
+  }
+  return amountNeeded;
+});
+
+const baseBalanceDiff = computed<string>(() => {
+  if (!initialBaseToken) return "0";
+  const percent =
+    ((selectedBot.value!.baseTokenAmount - initialBaseToken.value) /
+      initialBaseToken.value) *
+    100;
+  return percent.toFixed(1);
+});
+
+const quoteBalanceDiff = computed<string>(() => {
+  if (!initialQuoteToken) return "0";
+  const percent =
+    ((selectedBot.value!.quoteTokenAmount - initialQuoteToken.value) /
+      initialQuoteToken.value) *
+    100;
+  return percent.toFixed(1);
+});
 echarts.use([
   TooltipComponent,
   LegendComponent,
@@ -637,11 +727,12 @@ let option = {
   ],
 };
 
-function mountData(){
+function mountData() {
   if (typeof route.params.index == "string") {
-    selectedBot.value = Client.botStore.$state.bots[parseInt(route.params.index)];
+    selectedBot.value =
+      Client.botStore.$state.bots[parseInt(route.params.index)];
   }
-  baseTokenName.value= tokenToName(
+  baseTokenName.value = tokenToName(
     selectedBot.value!.baseToken,
     selectedBot.value!.chainId
   );
@@ -653,13 +744,14 @@ function mountData(){
   if (baseTokenName.value in cryptoTicker) {
     baseLogo.value = cryptoLogo[<keyof typeof cryptoTicker>baseTokenName.value];
   } else {
-    baseTokenName.value = cryptoTicker.primaryUnknown
+    baseTokenName.value = cryptoTicker.primaryUnknown;
   }
 
   if (quoteTokenName.value in cryptoTicker) {
-    quoteLogo.value = cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName.value];
-    } else {
-    quoteTokenName.value = cryptoTicker.secondaryUnknown
+    quoteLogo.value =
+      cryptoLogo[<keyof typeof cryptoTicker>quoteTokenName.value];
+  } else {
+    quoteTokenName.value = cryptoTicker.secondaryUnknown;
   }
 
   option.color = [
@@ -677,14 +769,18 @@ function mountData(){
   option.series[0].data = [
     {
       value: selectedBot.value!.baseTokenAmount,
-      name: displayAddress(tokenToName(selectedBot.value!.baseToken, selectedBot.value!.chainId)),
+      name: displayAddress(
+        tokenToName(selectedBot.value!.baseToken, selectedBot.value!.chainId)
+      ),
     },
     {
       value: selectedBot.value!.quoteTokenAmount,
-      name: displayAddress(tokenToName(selectedBot.value!.quoteToken, selectedBot.value!.chainId)),
+      name: displayAddress(
+        tokenToName(selectedBot.value!.quoteToken, selectedBot.value!.chainId)
+      ),
     },
   ];
-  loaded.value = true
+  loaded.value = true;
 }
 
 onUpdated(() => {
@@ -694,27 +790,24 @@ onUpdated(() => {
     echarts.init,
     option
   );
-})
-
-let selectedBot = ref<(typeof Client.botStore.$state.bots)[0]>();
-let baseTokenName= ref<keyof typeof cryptoTicker | string>();
-let quoteTokenName= ref<keyof typeof cryptoTicker | string>();
-let baseLogo= ref<string>();
-let quoteLogo= ref<string>();
+});
 
 onMounted(() => {
   if (Client.botStore.$state.loaded) {
-    mountData()
+    mountData();
   } else {
     watch(botLoaded, (newValue) => {
-      if (newValue) mountData()
-    })
+      if (newValue) mountData();
+    });
   }
 });
 
 onBeforeMount(() => {
-  if (Client.botStore.$state.loaded && typeof route.params.index == "string"){
-    selectedBot.value = Client.botStore.$state.bots[parseInt(route.params.index)];
+  if (Client.botStore.$state.loaded && typeof route.params.index == "string") {
+    selectedBot.value =
+      Client.botStore.$state.bots[parseInt(route.params.index)];
   }
-}) 
+});
+
+//https://api.binance.com/api/v3/aggTrades?symbol=AAVEUSDT&limit=1&startTime=1640995200000
 </script>
