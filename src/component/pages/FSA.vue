@@ -20,10 +20,7 @@
             v-if="privateLoading"
             class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
           >
-            <Dashboard v-if="privateLoading"></Dashboard>
-            <button v-else class="btn btn-primary w-44">
-              <span class="loading loading-spinner"></span>
-            </button>
+            <Dashboard></Dashboard>
           </div>
         </Transition>
         <div class="flex justify-start">
@@ -134,7 +131,9 @@ import { computed } from "vue";
 import { watch } from "vue";
 
 const accountStore = useAccountStore();
-const networkId = computed(() => accountStore.$state.networkId);
+const loadingReady = computed(
+  () => accountStore.$state.appConnected && accountStore.$state.networkId
+);
 
 let loading = ref<boolean>(true);
 let privateLoading = ref<boolean>(true);
@@ -417,11 +416,13 @@ function loadStacking() {
   });
 }
 
-if (networkId.value) {
+if (loadingReady.value) {
   loadStacking();
 } else {
-  watch(networkId, (newValue) => {
-    if (newValue) loadStacking();
+  watch(loadingReady, (newValue) => {
+    if (newValue) {
+      loadStacking();
+    }
   });
 }
 </script>

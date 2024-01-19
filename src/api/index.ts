@@ -177,6 +177,7 @@ export class Client {
   }
   public static async loadUserStacking(): Promise<boolean> {
     if (this.stackingStore.$state.user.loaded) return true;
+    if (!this.accountStore.$state.appConnected) return false;
 
     let success = false;
     let stacking, feesWithdrawal: AxiosResponse;
@@ -215,6 +216,7 @@ export class Client {
    */
   public static async loadUserBots(): Promise<boolean> {
     if (this.botStore.loaded) return true;
+    if (!this.accountStore.$state.appConnected) return false;
 
     let success = false;
     let botsList: AxiosResponse;

@@ -103,7 +103,7 @@
                 class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
               >
                 <button class="btn btn-primary btn-square">
-                  <span class="loading loading-spinner"></span>
+                  <span class="loading loading-infinity"></span>
                 </button>
               </div>
               <BotsCard></BotsCard>
@@ -160,12 +160,14 @@ import { computed } from "vue";
 import { watch } from "vue";
 
 const accountStore = useAccountStore();
-const networkId = computed(() => accountStore.$state.networkId);
+const loadingReady = computed(
+  () => accountStore.$state.appConnected && accountStore.$state.networkId
+);
 
-if (networkId.value) {
+if (loadingReady.value) {
   Client.loadUserBots();
 } else {
-  watch(networkId, (newValue) => {
+  watch(loadingReady, (newValue) => {
     if (newValue) {
       Client.loadUserBots();
     }

@@ -7,7 +7,7 @@
       class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
     >
       <button class="btn btn-primary btn-square">
-        <span class="loading loading-spinner"></span>
+        <span class="loading loading-infinity"></span>
       </button>
     </div>
   </div>
@@ -39,7 +39,10 @@
         >
           {{ displayNumber(selectedBot!.baseTokenAmount) }}
         </div>
-        <div class="stat-desc">{{Number(baseBalanceDiff) >= 0 ? "+" : "-"}}{{Math.abs(Number(baseBalanceDiff))}}% since launch</div>
+        <div class="stat-desc">
+          {{ Number(baseBalanceDiff) >= 0 ? "+" : "-"
+          }}{{ Math.abs(Number(baseBalanceDiff)) }}% since launch
+        </div>
       </div>
       <div class="stat place-items-center">
         <div class="stat-figure">
@@ -57,7 +60,10 @@
         >
           {{ displayNumber(selectedBot!.quoteTokenAmount) }}
         </div>
-        <div class="stat-desc">{{Number(quoteBalanceDiff) >= 0 ? "+" : "-"}}{{Math.abs(Number(quoteBalanceDiff))}}% since launch</div>
+        <div class="stat-desc">
+          {{ Number(quoteBalanceDiff) >= 0 ? "+" : "-"
+          }}{{ Math.abs(Number(quoteBalanceDiff)) }}% since launch
+        </div>
       </div>
       <div class="stat place-items-center">
         <div class="stat-figure text-secondary">
@@ -214,7 +220,11 @@
                     start USD value
                   </div>
                   <div class="flex gap-3 items-center">
-                    {{ selectedBot?.feesEarned }}
+                    {{
+                      initialBaseUSD && initialQuoteUSD
+                        ? (initialBaseUSD + initialQuoteUSD).toFixed(2)
+                        : "???"
+                    }}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -240,7 +250,11 @@
                     USD value
                   </div>
                   <div class="flex items-center gap-3">
-                    {{ selectedBot?.feesEarned }}
+                    {{
+                      baseUSD && quoteUSD
+                        ? (baseUSD + quoteUSD).toFixed(2)
+                        : "???"
+                    }}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -261,7 +275,7 @@
             </div>
           </div>
           <div
-            class="justify-around grow flex flex-col w-full bg-neutral xl:max-h-32 2xl:max-h-28 shadow-lg shadow-black/50 rounded-xl p-3 font-bold"
+            class="justify-around grow flex flex-col w-full bg-neutral xl:max-h-32 shadow-lg shadow-black/50 rounded-xl p-3 font-bold"
           >
             <div class="flex gap-3 items-center justify-between w-full">
               <div class="flex items-center gap-3">
@@ -588,21 +602,29 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import axios from "axios";
+import {
+  ref,
+  watch,
+  computed,
+  Ref,
+  ComputedRef,
+  onBeforeMount,
+  onMounted,
+  onUpdated,
+} from "vue";
 import {
   cryptoTicker,
   cryptoGraph,
   cryptoLogo,
 } from "../../../types/cryptoSpecs";
 import { useRoute } from "vue-router";
-import { onBeforeMount } from "vue";
 import * as echarts from "echarts/core";
 import { TooltipComponent, LegendComponent } from "echarts/components";
 import { PieChart } from "echarts/charts";
 import { LabelLayout } from "echarts/features";
 import { CanvasRenderer } from "echarts/renderers";
 import { setGraph } from "../../../asset/scripts/utils";
-import { onMounted } from "vue";
 import { Client } from "../../../api";
 import {
   tokenToName,
@@ -610,11 +632,12 @@ import {
   nFormatter,
   displayNumber,
 } from "../../../utils";
-import { onUpdated } from "vue";
+import { AxiosResponse } from "axios";
 
 const botLoaded = computed(() => Client.botStore.$state.loaded);
 
 let loaded = ref<boolean>(false);
+let usdValueLoaded = ref<boolean>(false);
 let route = useRoute();
 let selectedBot = ref<(typeof Client.botStore.$state.bots)[0]>();
 let baseTokenName = ref<keyof typeof cryptoTicker | string>();
@@ -622,15 +645,17 @@ let quoteTokenName = ref<keyof typeof cryptoTicker | string>();
 let baseLogo = ref<string>();
 let quoteLogo = ref<string>();
 
-let baseUSD = ref<number>(0);
-let quoteUSD = ref<number>(0);
-let initialBaseUSD = ref<number>(0);
-let initialQuoteUSD = ref<number>(0);
+let baseUSD = ref<number>();
+let quoteUSD = ref<number>();
+let initialBaseUSD = ref<number>();
+let initialQuoteUSD = ref<number>();
 
 const initialBaseToken = computed<number>(() => {
   if (!selectedBot.value) return 0;
   const numOrders = Math.ceil(
-    (selectedBot.value.upperBound + 1 - (selectedBot.value.price + selectedBot.value.step)) /
+    (selectedBot.value.upperBound +
+      1 -
+      (selectedBot.value.price + selectedBot.value.step)) /
       selectedBot.value.step
   );
   return numOrders * selectedBot.value.amount;
@@ -781,6 +806,7 @@ function mountData() {
     },
   ];
   loaded.value = true;
+  loadUSDValue();
 }
 
 onUpdated(() => {
@@ -808,6 +834,78 @@ onBeforeMount(() => {
       Client.botStore.$state.bots[parseInt(route.params.index)];
   }
 });
+
+/**
+ * @notice - Used to load the token balances USD value
+ */
+async function loadUSDValue() {
+  if (!selectedBot.value) {
+    usdValueLoaded.value = true;
+    return;
+  } else {
+    await Promise.all([
+      getPriceUpdatePromise(
+        baseTokenName.value!,
+        selectedBot.value,
+        initialBaseToken,
+        initialBaseUSD,
+        baseUSD
+      ),
+      getPriceUpdatePromise(
+        quoteTokenName.value!,
+        selectedBot.value,
+        initialQuoteToken,
+        initialQuoteUSD,
+        quoteUSD
+      ),
+    ]);
+  }
+}
+
+/**
+ * @notice - Use to get promise for USD price update for parallelization
+ */
+async function getPriceUpdatePromise(
+  token: string,
+  bot: (typeof Client.botStore.$state.bots)[0],
+  initialBalanceRef: ComputedRef<number>,
+  inititalUSDValueRef: Ref<number | undefined>,
+  actualUSDValueRef: Ref<number | undefined>
+): Promise<void> {
+  if (token == cryptoTicker.USDT) {
+    inititalUSDValueRef.value = initialBalanceRef.value;
+    actualUSDValueRef.value = bot.baseTokenAmount;
+  } else {
+    const [initial, actual] = await Promise.all([
+      getUsdValue(token, bot.timestamp),
+      getUsdValue(token, Date.now()),
+    ]);
+    inititalUSDValueRef.value = initial * initialBalanceRef.value;
+    actualUSDValueRef.value = actual * bot.baseTokenAmount;
+  }
+}
+
+/**
+ * @notice - Used to retrieve the usd value of a token if it exists at a
+ * specific timestamp from the binance api
+ *
+ * @param token - The token ticker to retrieve the price
+ * @param time - The time at which retrieve the price at
+ */
+async function getUsdValue(token: string, time: number): Promise<number> {
+  const response: AxiosResponse = await axios.get(
+    "https://api.binance.com/api/v3/aggTrades",
+    {
+      params: {
+        symbol: token + "USDT",
+        limit: "1",
+        startTime: String(time),
+      },
+    }
+  );
+  if (response.status != axios.HttpStatusCode.Ok) return 0;
+  return Number(response.data["p"]);
+}
 
 //https://api.binance.com/api/v3/aggTrades?symbol=AAVEUSDT&limit=1&startTime=1640995200000
 </script>

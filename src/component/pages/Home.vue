@@ -37,7 +37,7 @@
                 v-if="!accountStore.$state.loaded"
                 class="btn btn-primary w-40"
               >
-                <span class="loading loading-spinner"></span>
+                <span class="loading loading-infinity"></span>
               </button>
               <button
                 v-else-if="!accountStore.$state.blockchainConnected"

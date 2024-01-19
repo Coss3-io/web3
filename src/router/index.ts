@@ -4,7 +4,6 @@ import {
   createRouter,
   createWebHashHistory,
 } from "vue-router";
-import { useAccountStore } from "../store/account";
 import { useNotification } from "@kyvg/vue3-notification";
 
 const { notify } = useNotification();
