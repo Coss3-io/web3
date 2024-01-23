@@ -1,7 +1,7 @@
 import type { AccountState } from "../../types/account";
 
 export const state: AccountState = {
-  loaded: true,
+  loaded: false,
   blockchainConnected: false,
   appConnected: false,
   address: undefined,

@@ -229,9 +229,10 @@ export class Client {
         },
       });
       success = true;
-      botsList.data.forEach((bot: BotState["bots"][0]) => {
-        this.botStore[BotActions.AddBot](bot);
-      });
+      const promises = botsList.data.map((bot: BotState["bots"][0]) =>
+        this.botStore[BotActions.AddBot](bot)
+      );
+      await Promise.all(promises)
       this.botStore.loaded = true;
     } catch (e) {
       notify({

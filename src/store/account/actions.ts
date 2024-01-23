@@ -65,7 +65,7 @@ export function updateNetworkName(
  * @param this - The stacking store
  */
 export function reset(this: ReturnType<typeof useAccountStore>): void {
-  this.$state.loaded = true;
+  this.$state.loaded = false;
   this.$state.blockchainConnected = false;
   this.$state.appConnected = false;
   this.$state.address = undefined;

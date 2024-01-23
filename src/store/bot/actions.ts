@@ -1,21 +1,43 @@
 import BigNumber from "bignumber.js";
 import { useBotStore } from ".";
 import { BotState } from "../../types/bot";
-import { unBigNumberify } from "../../utils";
+import { getUsdValue, tokenToName, unBigNumberify } from "../../utils";
 
 /**
  *  @notice - Used to addd a bot to the bot store
  *  @param bot - The bot to ad to the bot store
  */
-export function addBot(this: ReturnType<typeof useBotStore>, bot: any): void {
+export async function addBot(
+  this: ReturnType<typeof useBotStore>,
+  bot: any
+): Promise<void> {
+  const time = Date.now();
+  const chainId = "chainId" in bot ? bot.chainId : bot.chain_id;
+  const baseToken = "baseToken" in bot ? bot.baseToken : bot.base_token;
+  const quoteToken = "quoteToken" in bot ? bot.quoteToken : bot.quote_token;
+  const baseTokenAmount =
+    "baseTokenAmount" in bot
+      ? unBigNumberify(String(bot.baseTokenAmount))
+      : unBigNumberify(String(bot.base_token_amount));
+  const quoteTokenAmount =
+    "quoteTokenAmount" in bot
+      ? unBigNumberify(String(bot.quoteTokenAmount))
+      : unBigNumberify(String(bot.quote_token_amount));
+
+  const [basePrice, quotePrice] = await Promise.all([
+    getUsdValue(tokenToName(baseToken, chainId), time),
+    getUsdValue(tokenToName(quoteToken, chainId), time),
+  ]);
+
   this.$state.bots.push({
+    basePrice: basePrice,
+    quotePrice: quotePrice,
+    baseUSD: basePrice * baseTokenAmount,
+    quoteUSD: quotePrice * quoteTokenAmount,
     address: bot.address,
-    baseToken: "baseToken" in bot ? bot.baseToken : bot.base_token,
-    baseTokenAmount:
-      "baseTokenAmount" in bot
-        ? unBigNumberify(String(bot.baseTokenAmount))
-        : unBigNumberify(String(bot.base_token_amount)),
-    chainId: "chainId" in bot ? bot.chainId : bot.chain_id,
+    baseToken: baseToken,
+    baseTokenAmount: baseTokenAmount,
+    chainId: chainId,
     feesEarned:
       "feesEarned" in bot
         ? unBigNumberify(String(bot.feesEarned))
@@ -30,12 +52,9 @@ export function addBot(this: ReturnType<typeof useBotStore>, bot: any): void {
         : Number(bot.maker_fees) / 100,
     price: unBigNumberify(String(bot.price)),
     amount: unBigNumberify(String(bot.amount)),
-    quoteToken: "quoteToken" in bot ? bot.quoteToken : bot.quote_token,
-    quoteTokenAmount:
-      "quoteTokenAmount" in bot
-        ? unBigNumberify(String(bot.quoteTokenAmount))
-        : unBigNumberify(String(bot.quote_token_amount)),
+    quoteToken: quoteToken,
     step: unBigNumberify(String(bot.step)),
+    quoteTokenAmount: quoteTokenAmount,
     timestamp: bot.timestamp,
     expiry: bot.expiry,
     upperBound:

@@ -13,6 +13,7 @@ import {
   cryptoTicker,
   namesToToken,
 } from "./types/cryptoSpecs";
+import axios, { AxiosResponse } from "axios";
 
 /**
  * @notice - used to display the beginning and the end of an address
@@ -33,23 +34,36 @@ export function displayAddress(address: string): string {
  * @param number - The number to convert to stylized string
  * @returns - the stylized string
  */
-export function displayNumber(number: number, decimalDigits = 3): string {
+export function displayNumber(number: number | string, decimalDigits = 3): string {
   let response = "";
   
-  if (number || number === 0) {
+  if (number || Number(number) === 0) {
     const [integer, decimals] = String(number).split(".");
-    if (number < 1000) {
+    if (Number(number) < 1000 && Number(number) > -1000) {
       response += String(integer);
     } else {
-      response += String(integer)
-        .split("")
-        .reverse()
-        .join("")
-        .match(/.{1,3}/g)!
-        .join(",")
-        .split("")
-        .reverse()
-        .join("");
+      if (Number(number) < 0) {
+        response += "-" + String(integer)
+          .split("")
+          .slice(1)
+          .reverse()
+          .join("")
+          .match(/.{1,3}/g)!
+          .join(",")
+          .split("")
+          .reverse()
+          .join("");
+      } else {
+        response += String(integer)
+          .split("")
+          .reverse()
+          .join("")
+          .match(/.{1,3}/g)!
+          .join(",")
+          .split("")
+          .reverse()
+          .join("");
+      }
     }
     
     if (decimals) {
@@ -193,4 +207,27 @@ export async function getSigner(
  */
 export function unBigNumberify(number: string): number {
   return Number(new BigNumber(number).dividedBy("1e18"));
+}
+
+/**
+ * @notice - Used to retrieve the usd value of a token if it exists at a
+ * specific timestamp from the binance api
+ *
+ * @param token - The token ticker to retrieve the price
+ * @param time - The time at which retrieve the price at
+ */
+export async function getUsdValue(token: string, time: number): Promise<number> {
+  if (token == cryptoTicker.USDT) return 1
+  const response: AxiosResponse = await axios.get(
+    "https://api.binance.com/api/v3/aggTrades",
+    {
+      params: {
+        symbol: token + cryptoTicker.USDT,
+        limit: "1",
+        endTime: String(time),
+      },
+    }
+  );
+  if (response.status != axios.HttpStatusCode.Ok) return 0;
+  return Number(response.data[0]["p"]);
 }

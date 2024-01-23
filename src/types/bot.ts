@@ -1,5 +1,9 @@
 export type BotState = {
     bots: Array<{
+        baseUSD: number;
+        quoteUSD: number;
+        basePrice: number;
+        quotePrice: number;
         address: string;
         baseToken: string;
         baseTokenAmount: number;
