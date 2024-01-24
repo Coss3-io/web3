@@ -89,7 +89,8 @@
         </div>
         <div class="stat-title">USD value</div>
         <div class="stat-desc text-secondary">
-          {{ USDValue - startUSDValue > 0 ? "+" : "" }}{{ displayNumber(USDValue - startUSDValue) }} USD raw
+          {{ USDValue - startUSDValue > 0 ? "+" : ""
+          }}{{ displayNumber(USDValue - startUSDValue) }} USD raw
         </div>
       </div>
     </div>
@@ -208,7 +209,7 @@
                 Performance
               </div>
               <div
-                class="badge border bg-transparent font-sans font-bold px-2"
+                class="badge border bg-transparent font-sans font-bold px-2 transition-all w-20"
                 :class="
                   usdPerformance >= 0
                     ? 'border-success/70 text-success/70'
@@ -221,58 +222,94 @@
             <div class="grow flex items-center">
               <div class="flex flex-wrap gap-4 justify-evenly w-full">
                 <div
-                  class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
+                  class="flex grow basis-5/12 justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
                 >
                   <div
                     class="absolute text-[9px] -bottom-3 font-light text-secondary"
                   >
                     start USD value
                   </div>
-                  <div class="flex gap-3 items-center">
-                    {{
-                      startUSDValue ? displayNumber(startUSDValue, 2) : "???"
-                    }}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-6 h-6 stroke-secondary"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
+                  <transition name="fadeNav">
+                    <div v-if="startUSDValue" class="flex items-center gap-3">
+                      {{ displayNumber(startUSDValue, 2) }}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6 stroke-secondary"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <div v-else class="flex items-center gap-3">
+                      ???
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6 stroke-secondary"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                  </transition>
                 </div>
                 <div
-                  class="flex grow justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
+                  class="flex grow basis-5/12 justify-center px-3 py-0.5 gap-1 bg-base-300 rounded-full shadow-md shadow-black/50 relative"
                 >
                   <div
                     class="absolute text-[9px] -bottom-3 font-light text-secondary"
                   >
                     USD value
                   </div>
-                  <div class="flex items-center gap-3">
-                    {{ USDValue ? displayNumber(USDValue, 2) : "???" }}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-6 h-6 stroke-secondary"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
+                  <transition name="fadeNav">
+                    <div v-if="USDValue" class="flex items-center gap-3">
+                      {{ displayNumber(USDValue, 2) }}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6 stroke-secondary"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <div v-else class="flex items-center gap-3">
+                      ???
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6 stroke-secondary"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                  </transition>
                 </div>
               </div>
             </div>
@@ -907,5 +944,7 @@ async function getPriceUpdatePromise(
   }
 }
 
-//https://api.binance.com/api/v3/aggTrades?symbol=AAVEUSDT&limit=1&startTime=1640995200000
+//fees per year
+// getter for dashboard
+// try with unknown token bot details page
 </script>
