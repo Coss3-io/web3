@@ -28,3 +28,10 @@ export const BotActions = {
     AddBot: "AddBot",
     UpdateLoaded: "UpdateLoaded"
 } as const
+
+export const BotGetters = {
+    TotalVolume: "TotalVolume",
+    TotalFees: "TotalFees",
+    TotalYield: "TotalYield",
+    TotalValue: "TotalValue",
+}

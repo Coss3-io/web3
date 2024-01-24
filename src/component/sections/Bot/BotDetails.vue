@@ -961,8 +961,4 @@ async function getPriceUpdatePromise(
     inititalUSDValueRef.value = initial * initialBalanceRef.value;
   }
 }
-
-//fees per year
-// getter for dashboard
-// try with unknown token bot details page
 </script>

@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
 import { state } from "./state";
-import { BotActions, BotState } from "../../types/bot";
+import { BotActions, BotGetters, BotState } from "../../types/bot";
 import { addBot, reset } from "./actions";
 import { updateLoaded } from "../account/actions";
+import { totalFees, totalValue, totalVolume, totalYield } from "./getters";
 
 export const useBotStore = defineStore("Bot", {
   state: (): BotState => state,
@@ -11,4 +12,10 @@ export const useBotStore = defineStore("Bot", {
     [BotActions.AddBot]: addBot,
     [BotActions.UpdateLoaded]: updateLoaded,
   },
+  getters: {
+    [BotGetters.TotalFees]: totalFees,
+    [BotGetters.TotalValue]: totalValue,
+    [BotGetters.TotalVolume]: totalVolume,
+    [BotGetters.TotalYield]: totalYield,
+  }
 });
