@@ -84,13 +84,30 @@
             </svg>
           </div>
         </div>
-        <div class="stat-value">
-          {{ usdPerformance > 0 ? "+" : "" }}{{ usdPerformance }}%
-        </div>
-        <div class="stat-title">USD value</div>
-        <div class="stat-desc text-secondary">
-          {{ USDValue - startUSDValue > 0 ? "+" : ""
-          }}{{ displayNumber(USDValue - startUSDValue) }} USD raw
+        <div class="relative w-full">
+          <transition name="fadeNav">
+            <div v-if="USDValue && startUSDValue" class=" absolute">
+              <div class="stat-value" >
+                {{ usdPerformance > 0 ? "+" : "" }}{{ usdPerformance }}%
+              </div>
+              <div class="stat-title">USD value</div>
+              <div class="stat-desc text-secondary">
+                {{ USDValue - startUSDValue > 0 ? "+" : ""
+                }}{{ displayNumber(USDValue - startUSDValue) }}
+                USD raw
+              </div>
+            </div>
+            <div v-else class="absolute">
+              <div class="stat-value">
+                +??%
+              </div>
+              <div class="stat-title">USD value</div>
+              <div class="stat-desc text-secondary">
+                +???
+                USD raw
+              </div>
+            </div>
+          </transition> 
         </div>
       </div>
     </div>
@@ -216,7 +233,8 @@
                     : 'border-error/70 text-error/70'
                 "
               >
-                {{ usdPerformance > 0 ? "+" : "" }}{{ usdPerformance }}%
+                {{ usdPerformance > 0 ? "+" : ""
+                }}{{ USDValue && startUSDValue ? usdPerformance : "??" }}%
               </div>
             </div>
             <div class="grow flex items-center">
