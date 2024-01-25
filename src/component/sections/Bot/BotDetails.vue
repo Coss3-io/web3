@@ -86,8 +86,8 @@
         </div>
         <div class="relative w-full">
           <transition name="fadeNav">
-            <div v-if="USDValue && startUSDValue" class=" absolute">
-              <div class="stat-value" >
+            <div v-if="USDValue && startUSDValue" class="absolute">
+              <div class="stat-value">
                 {{ usdPerformance > 0 ? "+" : "" }}{{ usdPerformance }}%
               </div>
               <div class="stat-title">USD value</div>
@@ -98,16 +98,11 @@
               </div>
             </div>
             <div v-else class="absolute">
-              <div class="stat-value">
-                +??%
-              </div>
+              <div class="stat-value">+??%</div>
               <div class="stat-title">USD value</div>
-              <div class="stat-desc text-secondary">
-                +???
-                USD raw
-              </div>
+              <div class="stat-desc text-secondary">+??? USD raw</div>
             </div>
-          </transition> 
+          </transition>
         </div>
       </div>
     </div>
@@ -878,13 +873,19 @@ function mountData() {
   ];
   option.series[0].data = [
     {
-      value: selectedBot.value!.baseUSD,
+      value:
+        selectedBot.value!.baseUSD && selectedBot.value!.quoteUSD
+          ? selectedBot.value!.baseUSD
+          : selectedBot.value!.baseTokenAmount * selectedBot.value!.price,
       name: displayAddress(
         tokenToName(selectedBot.value!.baseToken, selectedBot.value!.chainId)
       ),
     },
     {
-      value: selectedBot.value!.quoteUSD,
+      value:
+        selectedBot.value!.baseUSD && selectedBot.value!.quoteUSD
+          ? selectedBot.value!.quoteUSD
+          : selectedBot.value!.quoteTokenAmount,
       name: displayAddress(
         tokenToName(selectedBot.value!.quoteToken, selectedBot.value!.chainId)
       ),

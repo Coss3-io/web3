@@ -116,9 +116,9 @@
                           <div
                             v-else
                             :key="unknownToken"
-                            class="w-full flex justify-evenly uppercase gap-1 items-center p-1 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
+                            class="w-full flex justify-evenly gap-1 items-center p-1 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
                           >
-                            {{ selectedBase }}
+                            {{ displayAddress(selectedBase) }}
                             <unknownTokenLogo
                               class="w-7 h-7 fill-primary"
                             ></unknownTokenLogo>
@@ -210,9 +210,9 @@
                           <div
                             v-else
                             :key="unknownToken"
-                            class="w-full flex justify-evenly uppercase gap-1 items-center p-1 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
+                            class="w-full flex justify-evenly gap-1 items-center p-1 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
                           >
-                            {{ selectedQuote }}
+                            {{ displayAddress(selectedQuote) }}
                             <svg
                               class="w-7 h-7 fill-secondary"
                               role="img"
@@ -1048,7 +1048,7 @@ import {
   dollars,
 } from "../../../asset/images/images";
 import { computed, ref, watch } from "vue";
-import { nameToToken } from "../../../utils";
+import { displayAddress, nameToToken } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
