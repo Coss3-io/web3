@@ -182,7 +182,8 @@ export function nameToToken(
   name: Values<typeof cryptoTicker>,
   chainId: string | number
 ): string {
-  return namesToToken[chainIdToName(chainId)][name];
+  const token = namesToToken[chainIdToName(chainId)][name];
+  return token || name
 }
 
 /**
