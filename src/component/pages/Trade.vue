@@ -3,17 +3,54 @@
     <div
       class="grid grid-cols-12 grid-rows-[min-content_1fr] bg-base-300 rounded-lg p-2 gap-3 w-full xl:h-[calc(100vh-110px)]"
     >
-      <div class="col-span-full m-2 flex justify-start">
+      <div class="col-span-full m-2 flex justify-start items-center gap-2">
         <div class="tooltip" data-tip="click for help">
           <button class="flex gap-4 btn btn-ghost text-4xl font-bold">
             <tradeLogo class="w-12 h-12"></tradeLogo>
             Trade
           </button>
         </div>
+        <CryptoDropdown
+          v-model="selectedBase"
+          class="flex items-center w-64 h-11 bg-gray-800 hover:bg-gray-700 rounded-xl p-1 transition-all shadow-lg shadow-black/50"
+        >
+          BASE
+        </CryptoDropdown>
+        <CryptoDropdown
+          v-model="selectedQuote"
+          class="flex items-center w-64 h-11 bg-gray-800 hover:bg-gray-700 rounded-xl p-1 transition-all shadow-lg shadow-black/50"
+        >
+          QUOTE
+        </CryptoDropdown>
       </div>
       <div
         class="grid grid-cols-12 overflow-x-hidden overflow-y-auto sm:grid-rows-[min-content_min-content_1fr] xl:grid-rows-[min-content_1fr_1fr] col-span-full xl:col-span-7 overflow-hidden gap-2 bg-base-100 shadow-md shadow-black/50 rounded-lg p-2 opacity-0 translate-y-3 animate-slideIn"
       >
+        <Transition name="fadeNav">
+          <div
+            v-if="true"
+            class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
+          >
+            <div class="btn btn-primary no-animation cursor-default">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+                />
+              </svg>
+
+              Select a pair
+            </div>
+          </div>
+        </Transition>
         <div class="col-span-full justify-self-start items-start">
           <div
             class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
@@ -62,13 +99,27 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import Orderbook from "../sections/Trade/Orderbook.vue";
 import UserOrders from "../sections/Trade/UserOrders.vue";
+import CryptoDropdown from "../sections/Bot/CryptoDropdown.vue";
 import TradeHistory from "../sections/Trade/TradeHistory.vue";
 import NewOrder from "../sections/Trade/NewOrder.vue";
 import BalancesDetails from "../sections/Trade/BalancesDetails.vue";
 import { tradeLogo } from "../../asset/images/images";
+import {
+  Values,
+  cryptoLogo,
+  cryptoTicker,
+  unknownToken,
+} from "../../types/cryptoSpecs";
+import { displayAddress } from "../../utils";
+
+let focusBaseLabel = ref<HTMLInputElement | null>(null);
+let focusQuoteLabel = ref<HTMLInputElement | null>(null);
+
+let selectedBase = ref<Values<typeof cryptoTicker>>();
+let selectedQuote = ref<Values<typeof cryptoTicker>>();
 
 const orderDetails = reactive({ price: 0, amount: 0 });
 const tradeHistory = reactive([{ price: 0, amount: 0 }]);
