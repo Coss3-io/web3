@@ -2,6 +2,12 @@
   <div
     class="flex flex-col overflow-hidden gap-2 xl:h-full lg:h-[calc(100vh-215px)] h-[calc(100vh-100px)] col-span-full xl:col-span-5 bg-base-100 shadow-md shadow-black/50 rounded-lg p-2 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
   >
+    <Transition name="fadeNav">
+      <div
+        v-if="true"
+        class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
+      ></div>
+    </Transition>
     <div class="flex justify-start items-center gap-3 flex-wrap">
       <div
         class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
@@ -209,9 +215,7 @@
           </a>
         </div>
       </div>
-      <div
-        class="col-span-full h-full pt-2 min-h-[11rem] flex justify-center"
-      >
+      <div class="col-span-full h-full pt-2 min-h-[11rem] flex justify-center">
         <div
           class="grid grid-cols-12 max-w-4xl w-full grid-rows-[min-content_1fr_min-content] h-full bg-base-300 shadow-lg shadow-black/50 rounded-lg px-2 gap-1 py-1 pb-2"
         >
@@ -235,11 +239,11 @@
               >
                 <div
                   v-if="
-                    (filterOrderType == orderType.All ||
+                    (filterOrderType == orderType.ALL ||
                       filterOrderType == order.type) &&
-                    (filterOrderSide == orderSide.All ||
+                    (filterOrderSide == orderSide.ALL ||
                       filterOrderSide == order.side) &&
-                    (filterOrderStatus == orderStatus.All ||
+                    (filterOrderStatus == orderStatus.ALL ||
                       filterOrderStatus == order.status)
                   "
                   @click.passive="order.selected = !order.selected"
@@ -315,9 +319,9 @@ const props = defineProps<{
 let filterElement = ref<HTMLInputElement | null>(null);
 let filterValue = ref<string>("Date");
 
-let filterOrderType = ref<Values<typeof orderType>>(orderType.All);
-let filterOrderSide = ref<Values<typeof orderSide>>(orderSide.All);
-let filterOrderStatus = ref<Values<typeof orderStatus>>(orderStatus.All);
+let filterOrderType = ref<Values<typeof orderType>>(orderType.ALL);
+let filterOrderSide = ref<Values<typeof orderSide>>(orderSide.ALL);
+let filterOrderStatus = ref<Values<typeof orderStatus>>(orderStatus.ALL);
 
 const base = aave;
 const quote = usdc;
@@ -369,9 +373,9 @@ function addOrder() {
     selected: false,
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Open,
-    side: orderSide.Buy,
-    type: orderType.Maker,
+    status: orderStatus.OPEN,
+    side: orderSide.BUY,
+    type: orderType.MAKER,
   });
 }
 
@@ -384,9 +388,9 @@ const orders = ref([
     selected: false,
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Sell,
-    status: orderStatus.Filled,
-    type: orderType.Maker,
+    side: orderSide.SELL,
+    status: orderStatus.FILLED,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -396,9 +400,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Open,
-    type: orderType.Maker,
+    side: orderSide.BUY,
+    status: orderStatus.OPEN,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -408,9 +412,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Cancel,
-    type: orderType.Taker,
+    side: orderSide.BUY,
+    status: orderStatus.CANCEL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -420,9 +424,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -432,9 +436,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Filled,
-    type: orderType.Taker,
+    side: orderSide.BUY,
+    status: orderStatus.FILLED,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -444,9 +448,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Cancel,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.CANCEL,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -456,9 +460,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Filled,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.FILLED,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -468,9 +472,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Open,
-    type: orderType.Taker,
+    side: orderSide.BUY,
+    status: orderStatus.OPEN,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -480,9 +484,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Cancel,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.CANCEL,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -492,9 +496,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Filled,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.FILLED,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -504,9 +508,9 @@ const orders = ref([
     selected: false,
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Open,
-    type: orderType.Taker,
+    side: orderSide.BUY,
+    status: orderStatus.OPEN,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -516,9 +520,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     selected: false,
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Cancel,
-    type: orderType.Taker,
+    side: orderSide.BUY,
+    status: orderStatus.CANCEL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -528,9 +532,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Cancel,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.CANCEL,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -540,9 +544,9 @@ const orders = ref([
     selected: false,
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -552,9 +556,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     selected: false,
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Cancel,
-    type: orderType.Taker,
+    side: orderSide.BUY,
+    status: orderStatus.CANCEL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -564,9 +568,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
     selected: false,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -576,9 +580,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     selected: false,
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Filled,
-    type: orderType.Maker,
+    side: orderSide.BUY,
+    status: orderStatus.FILLED,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -588,9 +592,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
     selected: false,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -600,9 +604,9 @@ const orders = ref([
     selected: false,
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Filled,
-    type: orderType.Maker,
+    side: orderSide.BUY,
+    status: orderStatus.FILLED,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -612,9 +616,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -624,9 +628,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Filled,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.FILLED,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -636,9 +640,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Open,
-    type: orderType.Taker,
+    side: orderSide.BUY,
+    status: orderStatus.OPEN,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -648,9 +652,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Filled,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.FILLED,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -660,9 +664,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Open,
-    type: orderType.Maker,
+    side: orderSide.BUY,
+    status: orderStatus.OPEN,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -672,9 +676,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Filled,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.FILLED,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -684,9 +688,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Open,
-    type: orderType.Taker,
+    side: orderSide.BUY,
+    status: orderStatus.OPEN,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -696,9 +700,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Filled,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.FILLED,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -708,9 +712,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -720,9 +724,9 @@ const orders = ref([
     selected: false,
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    side: orderSide.Buy,
-    status: orderStatus.Filled,
-    type: orderType.Taker,
+    side: orderSide.BUY,
+    status: orderStatus.FILLED,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -732,9 +736,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     selected: false,
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -744,9 +748,9 @@ const orders = ref([
     date: Date.now() - Math.round(Math.random() * 5000),
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -756,9 +760,9 @@ const orders = ref([
     selected: false,
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Filled,
-    side: orderSide.Sell,
-    type: orderType.Maker,
+    status: orderStatus.FILLED,
+    side: orderSide.SELL,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -768,9 +772,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     selected: false,
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -780,9 +784,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
     selected: false,
-    side: orderSide.Buy,
-    status: orderStatus.Filled,
-    type: orderType.Maker,
+    side: orderSide.BUY,
+    status: orderStatus.FILLED,
+    type: orderType.MAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -792,9 +796,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     selected: false,
     baseFees: Math.random() > 0.5,
-    status: orderStatus.Open,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.OPEN,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
   {
     price: Math.round(Math.random() * 2000),
@@ -804,9 +808,9 @@ const orders = ref([
     fees: Math.round(Math.random() * 2000),
     baseFees: Math.random() > 0.5,
     selected: false,
-    status: orderStatus.Filled,
-    side: orderSide.Sell,
-    type: orderType.Taker,
+    status: orderStatus.FILLED,
+    side: orderSide.SELL,
+    type: orderType.TAKER,
   },
 ]);
 </script>

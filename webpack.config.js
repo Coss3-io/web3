@@ -110,7 +110,7 @@ module.exports = {
         options: {
           compilerOptions: {
             isCustomElement: (tag) => {
-              return tag.startsWith("w3m-");
+              return tag.startsWith("w3m-") || tag == "unknownTokenLogo";
             },
           },
         },
@@ -144,6 +144,9 @@ module.exports = {
     }),
     new DefinePlugin({
       CONFIG: JSON.stringify(config),
+      __VUE_OPTIONS_API__: 'false',
+      __VUE_PROD_DEVTOOLS__: "DEV" in process.env ? 'true': 'false',
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "DEV" in process.env ? 'true': 'false'
     }),
     new NodePolyfillPlugin(),
     new WebpackPwaManifest({

@@ -12,60 +12,60 @@ import {
 import { Values } from "./cryptoSpecs";
 
 export const orderType = {
-  Maker: "Maker",
-  All: "All",
-  Taker: "Taker",
+  MAKER: "MAKER",
+  ALL: "ALL",
+  TAKER: "TAKER",
 } as const;
 
 export const orderSide = {
-  Buy: "Buy",
-  All: "All",
-  Sell: "Sell",
+  BUY: "BUY",
+  ALL: "ALL",
+  SELL: "SELL",
 } as const;
 
 export const orderStatus = {
-  Open: "Open",
-  All: "All",
-  Filled: "Filled",
-  Cancel: "Cancel",
+  OPEN: "OPEN",
+  ALL: "ALL",
+  FILLED: "FILLED",
+  CANCEL: "CANCEL",
 } as const;
 
 export const orderSideBg: { [key in Values<typeof orderSide>]: string } = {
-  [orderSide.Buy]: "!bg-green-700",
-  [orderSide.All]: "",
-  [orderSide.Sell]: "!bg-red-700",
+  [orderSide.BUY]: "!bg-green-700",
+  [orderSide.ALL]: "",
+  [orderSide.SELL]: "!bg-red-700",
 } as const;
 
 export const orderTypeBg: { [key in Values<typeof orderType>]: string } = {
-  [orderType.Maker]: "!bg-neutral",
-  [orderType.All]: "",
-  [orderType.Taker]: "!bg-yellow-700",
+  [orderType.MAKER]: "!bg-neutral",
+  [orderType.ALL]: "",
+  [orderType.TAKER]: "!bg-yellow-700",
 } as const;
 
 export const orderStatusBg: { [key in Values<typeof orderStatus>]: string } = {
-  [orderStatus.Open]: "!bg-blue-700",
-  [orderStatus.All]: "",
-  [orderStatus.Filled]: "!bg-green-700",
-  [orderStatus.Cancel]: "!bg-red-700",
+  [orderStatus.OPEN]: "!bg-blue-700",
+  [orderStatus.ALL]: "",
+  [orderStatus.FILLED]: "!bg-green-700",
+  [orderStatus.CANCEL]: "!bg-red-700",
 } as const;
 
 export const orderSideLogo: { [key in Values<typeof orderSide>]: Component } = {
-  [orderSide.Buy]: buyLogo,
-  [orderSide.All]: allLogo,
-  [orderSide.Sell]: sellLogo,
+  [orderSide.BUY]: buyLogo,
+  [orderSide.ALL]: allLogo,
+  [orderSide.SELL]: sellLogo,
 } as const;
 
 export const orderTypeLogo: { [key in Values<typeof orderType>]: Component } = {
-  [orderType.Maker]: limitOrderLogo,
-  [orderType.All]: allLogo,
-  [orderType.Taker]: marketOrderLogo,
+  [orderType.MAKER]: limitOrderLogo,
+  [orderType.ALL]: allLogo,
+  [orderType.TAKER]: marketOrderLogo,
 } as const;
 
 export const orderStatusLogo: {
   [key in Values<typeof orderStatus>]: Component;
 } = {
-  [orderStatus.Open]: openOrderLogo,
-  [orderStatus.All]: allLogo,
-  [orderStatus.Filled]: filledOrderLogo,
-  [orderStatus.Cancel]: cancelledOrderLogo,
+  [orderStatus.OPEN]: openOrderLogo,
+  [orderStatus.ALL]: allLogo,
+  [orderStatus.FILLED]: filledOrderLogo,
+  [orderStatus.CANCEL]: cancelledOrderLogo,
 } as const;

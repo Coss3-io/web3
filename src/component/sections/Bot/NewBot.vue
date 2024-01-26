@@ -63,202 +63,18 @@
                 <div
                   class="font-bold rounded-full bg-base-100 w-full h-9 flex gap-1 items-center px-3 hover:bg-base-200 transition-all shadow-md shadow-black/50"
                 >
-                  <div class="dropdown grow group">
-                    <label
-                      tabindex="0"
-                      class="grid grid-cols-[min-content_1fr] grow gap-1 items-center cursor-pointer"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-5 h-5 transition-all focusRotation"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                        />
-                      </svg>
-                      <div
-                        class="group-focus-within:opacity-100 group-focus-within:flex hidden opacity-0 transition-all"
-                      >
-                        <input
-                          v-model="selectedBase"
-                          type="text"
-                          placeholder="type address"
-                          class="text-center p-2 appearance-none outline-0 w-full bg-transparent placeholder:text-neutral-content/50"
-                        />
-                      </div>
-                      <div
-                        class="relative w-full h-full flex justify-center items-center opacity-100 group-focus-within:absolute group-focus-within:opacity-0 transition-all"
-                      >
-                        <transition name="fadeFast">
-                          <div
-                            v-if="!selectedBase"
-                            class="grow text-center p-2 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
-                          >
-                            base
-                          </div>
-                          <div
-                            :key="selectedBase"
-                            v-else-if="selectedBase in cryptoDetails"
-                            class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
-                          >
-                            {{ selectedBase }}
-                            <img
-                              :src="cryptoLogo[selectedBase]"
-                              class="w-7 h-7"
-                            />
-                          </div>
-                          <div
-                            v-else
-                            :key="unknownToken"
-                            class="w-full flex justify-evenly gap-1 items-center p-1 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
-                          >
-                            {{ displayAddress(selectedBase) }}
-                            <unknownTokenLogo
-                              class="w-7 h-7 fill-primary"
-                            ></unknownTokenLogo>
-                          </div>
-                        </transition>
-                      </div>
-                    </label>
-                    <ul
-                      ref="focusBaseLabel"
-                      tabindex="0"
-                      class="dropdown-content z-20 menu p-2 shadow bg-base-100 rounded-box w-52 flex max-h-52 flex-nowrap overflow-auto custom-scroll"
-                    >
-                      <template v-for="name of cryptoTicker">
-                        <li
-                          v-if="
-                            !(
-                              name == cryptoTicker.primaryUnknown ||
-                              name == cryptoTicker.secondaryUnknown
-                            )
-                          "
-                          @click="() => {selectedBase = <Values<typeof cryptoTicker>>name; focusBaseLabel!.blur()}"
-                        >
-                          <a class="flex gap-1 items-center uppercase">
-                            <img :src="cryptoLogo[name]" class="w-7 h-7" />
-                            <div class="grow text-center">
-                              {{ name }}
-                            </div>
-                          </a>
-                        </li>
-                      </template>
-                    </ul>
-                  </div>
+                  <CryptoDropdown class="grow" v-model="selectedBase">
+                    base
+                  </CryptoDropdown>
                 </div>
               </div>
               <div class="col-span-full sm:col-span-6 flex justify-center">
                 <div
                   class="font-bold rounded-full bg-base-100 w-full h-9 flex gap-1 items-center px-3 hover:bg-base-200 transition-all shadow-lg shadow-black/50"
                 >
-                  <div class="dropdown grow group">
-                    <label
-                      tabindex="0"
-                      class="grid grid-cols-[min-content_1fr] grow gap-1 items-center cursor-pointer"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-5 h-5 transition-all focusRotation"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                        />
-                      </svg>
-                      <div
-                        class="group-focus-within:opacity-100 group-focus-within:flex hidden opacity-0 transition-all"
-                      >
-                        <input
-                          v-model="selectedQuote"
-                          type="text"
-                          placeholder="type address"
-                          class="text-center p-2 appearance-none outline-0 w-full bg-transparent placeholder:text-neutral-content/50"
-                        />
-                      </div>
-                      <div
-                        class="relative w-full h-full flex justify-center items-center opacity-100 group-focus-within:absolute group-focus-within:opacity-0 transition-all"
-                      >
-                        <transition name="fadeFast">
-                          <div
-                            v-if="!selectedQuote"
-                            class="grow text-center p-2 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
-                          >
-                            quote
-                          </div>
-                          <div
-                            :key="selectedQuote"
-                            v-else-if="selectedQuote in cryptoDetails"
-                            class="w-full flex justify-evenly uppercase gap-1 items-center p-1"
-                          >
-                            {{ selectedQuote }}
-                            <img
-                              :src="cryptoLogo[selectedQuote]"
-                              class="w-7 h-7"
-                            />
-                          </div>
-                          <div
-                            v-else
-                            :key="unknownToken"
-                            class="w-full flex justify-evenly gap-1 items-center p-1 group-focus-within:opacity-0 opacity-100 transition-all duration-500"
-                          >
-                            {{ displayAddress(selectedQuote) }}
-                            <svg
-                              class="w-7 h-7 fill-secondary"
-                              role="img"
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 1000 1000"
-                            >
-                              <path
-                                id="path"
-                                style="
-                                  opacity: 1;
-                                  vector-effect: none;
-                                  fill-opacity: 1;
-                                "
-                                d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
-                                transform=""
-                              ></path>
-                            </svg>
-                          </div>
-                        </transition>
-                      </div>
-                    </label>
-                    <ul
-                      ref="focusQuoteLabel"
-                      tabindex="0"
-                      class="dropdown-content z-20 menu p-2 shadow bg-base-100 rounded-box w-52 flex max-h-52 flex-nowrap overflow-auto custom-scroll"
-                    >
-                      <template v-for="name of cryptoTicker">
-                        <li
-                          v-if="
-                            !(
-                              name == cryptoTicker.primaryUnknown ||
-                              name == cryptoTicker.secondaryUnknown
-                            )
-                          "
-                          @click="() => {selectedQuote = <Values<typeof cryptoTicker>>name; focusQuoteLabel!.blur()}"
-                        >
-                          <a class="flex gap-1 items-center uppercase">
-                            <img :src="cryptoLogo[name]" class="w-7 h-7" />
-                            <div class="grow text-center">
-                              {{ name }}
-                            </div>
-                          </a>
-                        </li>
-                      </template>
-                    </ul>
-                  </div>
+                  <CryptoDropdown class="grow" v-model="selectedQuote">
+                    quote
+                  </CryptoDropdown>
                 </div>
               </div>
             </div>
@@ -302,233 +118,52 @@
                 </div>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div class="grow">
-                  <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
-                  >
-                    <input
-                      :disabled="selectedQuote == undefined ? true : false"
-                      :value="
-                        lowerBoundValue && priceValue
-                          ? (priceValue * lowerBoundValue) / 100
-                          : ''
-                      "
-                      @input="event => lowerBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value) * 100 / priceValue!: 0"
-                      type="text"
-                      placeholder="lower bound"
-                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                    />
-                    <div
-                      class="flex bg-base-100 rounded-full items-center grow relative"
-                    >
-                      <div
-                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
-                      >
-                        <div
-                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
-                        >
-                          <div
-                            class="h-full"
-                            :style="{
-                              width: `${
-                                priceValue ? Math.min(100, lowerBoundValue) : 0
-                              }%`,
-                            }"
-                          ></div>
-                          <transition name="fadeNav" appear>
-                            <unknownTokenLogo
-                              v-if="
-                                selectedQuote &&
-                                !(selectedQuote in cryptoDetails)
-                              "
-                              :key="unknownToken"
-                              class="w-7 h-7 fill-secondary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
-                              :style="{
-                                transform: `translateX(${
-                                  priceValue
-                                    ? String(
-                                        -Math.min(100, lowerBoundValue) / 1.15
-                                      )
-                                    : 0
-                                }%)`,
-                                left: `${
-                                  priceValue
-                                    ? Math.min(100, lowerBoundValue)
-                                    : 0
-                                }%`,
-                              }"
-                            ></unknownTokenLogo>
-                            <img
-                              v-else-if="
-                                selectedQuote && selectedQuote in cryptoDetails
-                              "
-                              :key="selectedQuote"
-                              :src="cryptoLogo[selectedQuote]"
-                              class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
-                              :style="{
-                                transform: `translateX(${
-                                  priceValue
-                                    ? String(
-                                        -Math.min(100, lowerBoundValue) / 1.15
-                                      )
-                                    : 0
-                                }%)`,
-                                left: `${
-                                  priceValue
-                                    ? Math.min(100, lowerBoundValue)
-                                    : 0
-                                }%`,
-                              }"
-                            />
-                          </transition>
-                        </div>
-                      </div>
-                      <div class="relative w-full h-5">
-                        <transition name="fadeNav" appear>
-                          <input
-                            v-if="
-                              selectedQuote && selectedQuote in cryptoDetails
-                            "
-                            :key="selectedQuote"
-                            v-model="lowerBoundValue"
-                            type="range"
-                            min="0"
-                            max="100"
-                            class="range range-sm w-full absolute"
-                            :class="cryptoRange[selectedQuote]"
-                          />
-                          <input
-                            v-else-if="
-                              selectedQuote && !(selectedQuote in cryptoDetails)
-                            "
-                            :key="unknownToken"
-                            v-model="lowerBoundValue"
-                            type="range"
-                            min="0"
-                            max="100"
-                            class="range range-sm w-full range-secondary absolute"
-                          />
-                        </transition>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <CryptoRange
+                  class="grow"
+                  :trackedValue="lowerBoundValue"
+                  :active="!!priceValue"
+                  :visible="!!selectedQuote"
+                  name="lowerBound"
+                  :rangeClass="
+                    selectedQuote && selectedQuote in cryptoTicker
+                      ? cryptoRange[selectedQuote]
+                      : ''
+                  "
+                  logoClass="fill-secondary"
+                  :multiplier="priceValue || 0"
+                  :logo="
+                    selectedQuote && selectedQuote in cryptoTicker
+                    ? h('img', { src: String(cryptoLogo[selectedQuote!]) })
+                    : unknownTokenLogo
+                  "
+                  @update="(v: any) => {lowerBoundValue = v}"
+                ></CryptoRange>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div class="grow">
-                  <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
-                  >
-                    <input
-                      :disabled="selectedBase == undefined ? true : false"
-                      :value="
-                        upperBoundValue && priceValue
-                          ? priceValue + (priceValue * upperBoundValue) / 100
-                          : ''
-                      "
-                      @input="event => upperBoundValue = parseFloat((<HTMLInputElement>event.target).value) ? (parseFloat((<HTMLInputElement>event.target).value) - priceValue!) * 100 / priceValue!: 0"
-                      type="text"
-                      placeholder="upper bound"
-                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                    />
-                    <div
-                      class="flex bg-base-100 rounded-full items-center grow relative"
-                    >
-                      <div
-                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
-                      >
-                        <div
-                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
-                        >
-                          <div
-                            class="h-full"
-                            :style="{
-                              width: `${
-                                priceValue ? Math.min(upperBoundValue, 100) : 0
-                              }%`,
-                            }"
-                          ></div>
-                          <transition name="fadeNav" appear>
-                            <img
-                              v-if="
-                                selectedBase && selectedBase in cryptoDetails
-                              "
-                              :key="selectedBase"
-                              :src="cryptoLogo[selectedBase]"
-                              class="w-7 h-7 pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
-                              :style="{
-                                transform: `translateX(${
-                                  priceValue
-                                    ? String(
-                                        -Math.min(
-                                          100,
-                                          Math.max(upperBoundValue, 0)
-                                        ) / 1.15
-                                      )
-                                    : 0
-                                }%)`,
-                                left: `${
-                                  priceValue
-                                    ? Math.min(
-                                        100,
-                                        Math.max(upperBoundValue, 0)
-                                      )
-                                    : 0
-                                }%`,
-                              }"
-                            />
-                            <unknownTokenLogo
-                              v-else-if="
-                                selectedBase && !(selectedBase in cryptoDetails)
-                              "
-                              :key="unknownToken"
-                              class="w-7 h-7 fill-primary pointer-events-none absolute rounded-full p-0.5 bg-base-300 shadow-lg shadow-black/50"
-                              :style="{
-                                transform: `translateX(${
-                                  priceValue
-                                    ? String(
-                                        -Math.min(100, upperBoundValue / 1.15)
-                                      )
-                                    : 0
-                                }%)`,
-                                left: `${
-                                  priceValue
-                                    ? Math.min(100, upperBoundValue)
-                                    : 0
-                                }%`,
-                              }"
-                            ></unknownTokenLogo>
-                          </transition>
-                        </div>
-                      </div>
-                      <div class="relative w-full h-5">
-                        <transition name="fadeNav" appear>
-                          <input
-                            v-if="selectedBase && selectedBase in cryptoDetails"
-                            :key="selectedBase"
-                            v-model="upperBoundValue"
-                            type="range"
-                            min="0"
-                            max="100"
-                            class="range range-sm w-full absolute"
-                            :class="cryptoRange[selectedBase]"
-                          />
-                          <input
-                            v-else-if="
-                              selectedBase && !(selectedBase in cryptoDetails)
-                            "
-                            :key="unknownToken"
-                            v-model="upperBoundValue"
-                            type="range"
-                            min="0"
-                            max="100"
-                            class="range range-sm range-primary w-full absolute"
-                          />
-                        </transition>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <CryptoRange
+                  class="grow"
+                  :trackedValue="upperBoundValue"
+                  :active="!!priceValue"
+                  :visible="!!selectedBase"
+                  name="upperBound"
+                  :rangeClass="
+                    selectedBase && selectedBase in cryptoTicker
+                      ? cryptoRange[selectedBase]
+                      : ''
+                  "
+                  logoClass="fill-secondary"
+                  :multiplier="
+                    priceValue
+                      ? priceValue + (priceValue * 100) / upperBoundValue
+                      : 0
+                  "
+                  :logo="
+                    selectedBase && selectedBase in cryptoTicker
+                    ? h('img', { src: String(cryptoLogo[selectedBase!]) })
+                    : unknownTokenLogo
+                  "
+                  @update="(v: any) => {upperBoundValue = v}"
+                ></CryptoRange>
               </div>
             </div>
             <div
@@ -567,171 +202,83 @@
                 </div>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div class="grow">
-                  <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
-                  >
-                    <input
-                      :disabled="
-                        !(lowerBoundValue && upperBoundValue && priceValue)
-                      "
-                      :value="
-                        selectedStep &&
-                        lowerBoundValue &&
-                        upperBoundValue &&
-                        priceValue
-                          ? selectedStep / 25 + '%'
-                          : ''
-                      "
-                      @input="event => selectedStep = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value)*25: 0"
-                      type="text"
-                      placeholder="step"
-                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                    />
-                    <div
-                      class="flex bg-base-100 rounded-full items-center grow relative"
-                    >
-                      <div
-                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
-                      >
-                        <div
-                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
-                        >
-                          <div
-                            class="h-full"
-                            :style="{
-                              width: `${Math.min(100, selectedStep)}%`,
-                            }"
-                          ></div>
-                          <transition name="fadeNav" appear>
-                            <svg
-                              v-if="
-                                lowerBoundValue && upperBoundValue && priceValue
-                              "
-                              class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
-                              :style="{
-                                transform: `translateX(${String(
-                                  -Math.min(100, selectedStep) / 1.15
-                                )}%)`,
-                                left: `${Math.min(100, selectedStep)}%`,
-                              }"
-                              version="1.1"
-                              id="Capa_1"
-                              xmlns="http://www.w3.org/2000/svg"
-                              xmlns:xlink="http://www.w3.org/1999/xlink"
-                              width="800px"
-                              height="800px"
-                              viewBox="0 0 515.458 515.458"
-                              xml:space="preserve"
-                            >
-                              <g>
-                                <path
-                                  d="M298.794,386.711c27.805,9.522,52.357,15.587,87.633,26.427C372.875,584.374,210.952,516.371,298.794,386.711z
-         M443.366,229.409c-1.826-51.415-10.882-118.86-83.017-108.292c-33.815,8.825-58.8,45.962-70.551,110.035
-        c-6.454,35.229-2.701,84.678,4.912,114.32c6.951,20.889,4.587,19.605,12.058,23.572c28.916,6.514,57.542,13.725,86.693,21.078
-        C423.075,369.209,447.397,258.182,443.366,229.409z M220.752,225.463c7.607-29.646,11.36-79.095,4.909-114.32
-        C213.919,47.067,188.931,9.924,155.11,1.105C82.975-9.463,73.919,57.981,72.093,109.399
-        c-4.031,28.768,20.294,139.802,49.911,160.711c29.149-7.353,57.771-14.558,86.696-21.078
-        C216.162,245.069,213.798,246.352,220.752,225.463z M129.029,293.132c13.547,171.234,175.47,103.231,87.63-26.427
-        C188.854,276.228,164.304,282.292,129.029,293.132z"
-                                />
-                              </g>
-                            </svg>
-                          </transition>
-                        </div>
-                      </div>
-                      <div class="relative w-full h-5">
-                        <transition name="fadeNav" appear>
-                          <input
-                            v-if="
-                              lowerBoundValue && upperBoundValue && priceValue
-                            "
-                            v-model="selectedStep"
-                            type="range"
-                            min="0"
-                            max="100"
-                            class="range range-sm w-full absolute range-gray-700"
-                          />
-                        </transition>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <CryptoRange
+                  class="grow"
+                  :trackedValue="selectedStep"
+                  :active="
+                    !!lowerBoundValue && !!upperBoundValue && !!priceValue
+                  "
+                  :visible="
+                    !!lowerBoundValue && !!upperBoundValue && !!priceValue
+                  "
+                  name="step"
+                  :percent="true"
+                  rangeClass="range-gray-700"
+                  logoClass="fill-current"
+                  :multiplier="4"
+                  :logo="
+                    h(
+                      'svg',
+                      {
+                        version: '1.1',
+                        id: 'Capa_1',
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        'xmlns:xlink': 'http://www.w3.org/1999/xlink',
+                        width: '800px',
+                        height: '800px',
+                        viewBox: '0 0 515.458 515.458',
+                        'xml:space': 'preserve',
+                      },
+                      h(
+                        'g',
+                        {},
+                        h('path', {
+                          d: 'M298.794,386.711c27.805,9.522,52.357,15.587,87.633,26.427C372.875,584.374,210.952,516.371,298.794,386.711zM443.366,229.409c-1.826-51.415-10.882-118.86-83.017-108.292c-33.815,8.825-58.8,45.962-70.551,110.035c-6.454,35.229-2.701,84.678,4.912,114.32c6.951,20.889,4.587,19.605,12.058,23.572c28.916,6.514,57.542,13.725,86.693,21.078C423.075,369.209,447.397,258.182,443.366,229.409z M220.752,225.463c7.607-29.646,11.36-79.095,4.909-114.32C213.919,47.067,188.931,9.924,155.11,1.105C82.975-9.463,73.919,57.981,72.093,109.399c-4.031,28.768,20.294,139.802,49.911,160.711c29.149-7.353,57.771-14.558,86.696-21.078C216.162,245.069,213.798,246.352,220.752,225.463z M129.029,293.132c13.547,171.234,175.47,103.231,87.63-26.427C188.854,276.228,164.304,282.292,129.029,293.132z',
+                        })
+                      )
+                    )
+                  "
+                  @update="(v: any) => {selectedStep = v}"
+                ></CryptoRange>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div class="grow">
-                  <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
-                  >
-                    <input
-                      :disabled="
-                        !(lowerBoundValue && upperBoundValue && priceValue)
-                      "
-                      :value="
-                        selectedFees &&
-                        lowerBoundValue &&
-                        upperBoundValue &&
-                        priceValue
-                          ? selectedFees / 10 + '%'
-                          : ''
-                      "
-                      @input="event => selectedFees = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value)*10: 0"
-                      type="text"
-                      placeholder="fees"
-                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                    />
-                    <div
-                      class="flex bg-base-100 rounded-full items-center grow relative"
-                    >
-                      <div
-                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
-                      >
-                        <div
-                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
-                        >
-                          <div
-                            class="h-full"
-                            :style="{
-                              width: `${Math.min(100, selectedFees)}%`,
-                            }"
-                          ></div>
-                          <transition name="fadeNav" appear>
-                            <img
-                              v-if="
-                                lowerBoundValue && upperBoundValue && priceValue
-                              "
-                              :src="moneyBag"
-                              class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
-                              :style="{
-                                transform: `translateX(${String(
-                                  -Math.min(100, selectedFees) / 1.15
-                                )}%)`,
-                                left: `${Math.min(100, selectedFees)}%`,
-                              }"
-                            />
-                          </transition>
-                        </div>
-                      </div>
-                      <div class="relative w-full h-5">
-                        <transition name="fadeNav" appear>
-                          <input
-                            v-if="
-                              lowerBoundValue && upperBoundValue && priceValue
-                            "
-                            v-model="selectedFees"
-                            type="range"
-                            min="0"
-                            max="100"
-                            class="range range-sm w-full absolute range-amber-400"
-                          />
-                        </transition>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <CryptoRange
+                  class="grow"
+                  :trackedValue="selectedFees"
+                  :active="
+                    !!lowerBoundValue && !!upperBoundValue && !!priceValue
+                  "
+                  :visible="
+                    !!lowerBoundValue && !!upperBoundValue && !!priceValue
+                  "
+                  name="fees"
+                  :percent="true"
+                  rangeClass="range-amber-400"
+                  logoClass=""
+                  :multiplier="10"
+                  :logo="h('img', { src: moneyBag })"
+                  @update="(v: any) => {selectedFees = v}"
+                ></CryptoRange>
               </div>
               <div class="col-span-12 flex justify-center">
-                <div class="grow">
+                <CryptoRange
+                  class="grow"
+                  :trackedValue="selectedAmount"
+                  :active="
+                    !!lowerBoundValue && !!upperBoundValue && !!priceValue
+                  "
+                  :visible="
+                    !!lowerBoundValue && !!upperBoundValue && !!priceValue
+                  "
+                  name="amount"
+                  :percent="true"
+                  rangeClass="range-lime-300"
+                  logoClass=""
+                  :multiplier="100"
+                  :logo="h('img', { src: dollars })"
+                  @update="(v: any) => {selectedAmount = v}"
+                ></CryptoRange>
+                <!-- <div class="grow">
                   <div
                     class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
                   >
@@ -800,7 +347,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
             <div
@@ -856,7 +403,7 @@
                       >
                         <transition name="fadeNav">
                           <unknownTokenLogo
-                            v-if="!(selectedBase in cryptoDetails)"
+                            v-if="!(selectedBase in cryptoTicker)"
                             :key="unknownToken"
                             class="w-7 h-7 fill-primary"
                           ></unknownTokenLogo>
@@ -877,7 +424,7 @@
                     >
                       <div class="w-5/12 flex justify-center items-center">
                         <unknownTokenLogo
-                          v-if="!(selectedBase in cryptoDetails)"
+                          v-if="!(selectedBase in cryptoTicker)"
                           :key="unknownToken"
                           class="w-7 h-7 fill-primary"
                         ></unknownTokenLogo>
@@ -923,7 +470,7 @@
                       <div class="w-5/12 flex justify-center items-center">
                         <transition name="fadeNav">
                           <unknownTokenLogo
-                            v-if="!(selectedQuote in cryptoDetails)"
+                            v-if="!(selectedQuote in cryptoTicker)"
                             :key="unknownToken"
                             class="w-7 h-7 fill-secondary"
                           ></unknownTokenLogo>
@@ -944,7 +491,7 @@
                     >
                       <div class="w-5/12 flex justify-center items-center">
                         <svg
-                          v-if="!(selectedQuote in cryptoDetails)"
+                          v-if="!(selectedQuote in cryptoTicker)"
                           :key="unknownToken"
                           class="w-7 h-7 fill-secondary"
                           role="img"
@@ -1035,38 +582,19 @@ import {
   unknownToken,
 } from "../../../types/cryptoSpecs";
 import {
-  usdt,
-  ether,
-  logo,
-  polygon,
-  avax,
-  bnb,
-  usdc,
-  aave,
   unknownTokenLogo,
   moneyBag,
   dollars,
 } from "../../../asset/images/images";
-import { computed, ref, watch } from "vue";
+import CryptoDropdown from "./CryptoDropdown.vue";
+import CryptoRange from "./CryptoRange.vue";
+import { computed, defineComponent, ref, watch } from "vue";
 import { displayAddress, nameToToken } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import { notify } from "@kyvg/vue3-notification";
-
-const cryptoDetails = {
-  [cryptoTicker.MATIC]: { bg: "border border-purple-600", logo: polygon },
-  [cryptoTicker.AVAX]: { bg: "border border-red-600", logo: avax },
-  [cryptoTicker.BNB]: { bg: "border border-yellow-600", logo: bnb },
-  [cryptoTicker.USDC]: { bg: "border border-blue-600", logo: usdc },
-  [cryptoTicker.USDT]: { bg: "border border-emerald-600", logo: usdt },
-  [cryptoTicker.ETH]: { bg: "border border-gray-600", logo: ether },
-  [cryptoTicker.COSS]: { bg: "border border-blue-600", logo: logo },
-  [cryptoTicker.AAVE]: { bg: "border border-purple-500", logo: aave },
-};
-
-let focusBaseLabel = ref<HTMLInputElement | null>(null);
-let focusQuoteLabel = ref<HTMLInputElement | null>(null);
+import { h } from "vue";
 
 let selectedBase = ref<Values<typeof cryptoTicker>>();
 let selectedQuote = ref<Values<typeof cryptoTicker>>();
@@ -1103,7 +631,8 @@ const absoluteStep = computed(() => {
 });
 
 const numOrders = computed(() => {
-  const range = upperBoundPrice.value + 1 - (priceValue.value! + absoluteStep.value);
+  const range =
+    upperBoundPrice.value + 1 - (priceValue.value! + absoluteStep.value);
   return Math.ceil(range / absoluteStep.value);
 });
 
