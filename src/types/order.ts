@@ -2,7 +2,7 @@ import { BotState } from "./bot";
 import { Values } from "./cryptoSpecs";
 import { orderStatus } from "./orderSpecs";
 
-export type Order = {
+export type Maker = {
   bot: undefined | BotState["bots"][0];
   base_token: string;
   quote_token: string;
@@ -21,14 +21,16 @@ export type Order = {
 };
 
 export type OrderState = {
-  orders: { [key in string]: Array<Order> };
-  userOrdersLoaded: { [key in string]: boolean };
-  publicOrdersLoaded: { [key in string]: boolean };
+  makers: { [key in string]: Array<Maker> };
+  takers: { [key in string]: Array<Maker> };
+  makersLoaded: { [key in string]: boolean };
+  takersLoaded: { [key in string]: boolean };
 };
 
 export const OrderActions = {
   Reset: "Reset",
   AddOrder: "AddOrder",
+  LoadOrders: "LoadOrders",
   UpdateLoaded: "UpdateLoaded",
 } as const;
 

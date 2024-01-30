@@ -77,7 +77,12 @@
         <div
           class="col-span-full sm:col-span-6 lg:col-span-4 sm:row-span-2 h-[calc(100vh-250px)] min-h-full xl:h-auto w-full rounded-xl"
         >
-          <Orderbook :orderDetails="orderDetails" :base="selectedBase" :quote="selectedQuote"></Orderbook>
+          <Orderbook
+            :orderDetails="orderDetails"
+            :base="selectedBase"
+            :quote="selectedQuote"
+            :loading="loading"
+          ></Orderbook>
         </div>
         <div
           class="col-span-full sm:col-span-6 lg:col-span-4 min-h-full h-[calc(50vh-125px)] sm:h-[calc(50vh-50px)] lg:h-[calc(50vh-100px)] xl:h-full overflow-hidden w-full rounded-xl"
@@ -94,7 +99,11 @@
         </div>
       </div>
 
-      <UserOrders :userOrders="userOrders" :base="selectedBase" :quote="selectedQuote"></UserOrders>
+      <UserOrders
+        :userOrders="userOrders"
+        :base="selectedBase"
+        :quote="selectedQuote"
+      ></UserOrders>
     </div>
   </div>
 </template>
@@ -107,15 +116,20 @@ import TradeHistory from "../sections/Trade/TradeHistory.vue";
 import NewOrder from "../sections/Trade/NewOrder.vue";
 import BalancesDetails from "../sections/Trade/BalancesDetails.vue";
 import { tradeLogo } from "../../asset/images/images";
-import {
-  Values,
-  cryptoTicker,
-} from "../../types/cryptoSpecs";
+import { Values, cryptoTicker } from "../../types/cryptoSpecs";
 import { useRoute } from "vue-router";
+import { Client } from "../../api";
+import { nameToToken } from "../../utils";
+import { watch } from "vue";
 
-const route = useRoute()
-let selectedBase = ref<Values<typeof cryptoTicker>>(<Values<typeof cryptoTicker>>route.params.base);
-let selectedQuote = ref<Values<typeof cryptoTicker>>(<Values<typeof cryptoTicker>>route.params.quote);
+const route = useRoute();
+let selectedBase = ref<Values<typeof cryptoTicker>>(
+  <Values<typeof cryptoTicker>>route.params.base
+);
+let selectedQuote = ref<Values<typeof cryptoTicker>>(
+  <Values<typeof cryptoTicker>>route.params.quote
+);
+let loading = ref<boolean>(false);
 
 const orderDetails = reactive({ price: 0, amount: 0 });
 const tradeHistory = reactive([{ price: 0, amount: 0 }]);
@@ -123,4 +137,23 @@ const newOrder = reactive([{ price: 0, amount: 0 }]);
 const balancesDetails = reactive([{ price: 0, amount: 0 }]);
 const userOrders: Array<number> = [];
 
+watch(
+  [selectedBase, selectedQuote],
+  ([newBase, newQuote], [olBase, OldQuote]) => {
+    if (newBase && newQuote) {
+      loading.value = true;
+      Client.loadPair(
+        nameToToken(
+          <Values<typeof cryptoTicker>>newBase,
+          Client.accountStore.networkId!
+        ),
+        nameToToken(
+          <Values<typeof cryptoTicker>>newQuote,
+          Client.accountStore.networkId!
+        )
+      );
+      loading.value = false;
+    }
+  }
+);
 </script>

@@ -75,15 +75,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { watch, ref } from "vue";
+import { ref } from "vue";
 import { useRoute } from "vue-router";
-import { Client } from "../../../api";
-import { nameToToken } from "../../../utils";
 import { Values, cryptoTicker } from "../../../types/cryptoSpecs";
 
 const route = useRoute();
 
 const props = defineProps<{
+  loading: boolean;
   base: string | Values<typeof cryptoTicker>;
   quote: string | Values<typeof cryptoTicker>;
   orderDetails: { price: number; amount: number };
@@ -91,20 +90,6 @@ const props = defineProps<{
 
 const sellContainer = ref<HTMLDivElement | null>(null);
 const buyContainer = ref<HTMLDivElement | null>(null);
-watch([props.base, props.quote], ([newBase, newQuote], [olBase, OldQuote]) => {
-  if (newBase && newQuote) {
-    Client.loadPair(
-      nameToToken(
-        <Values<typeof cryptoTicker>>newBase,
-        Client.accountStore.networkId!
-      ),
-      nameToToken(
-        <Values<typeof cryptoTicker>>newQuote,
-        Client.accountStore.networkId!
-      )
-    );
-  }
-});
 
 const sellOrders = ref([
   [11788, 44741, 18161],
