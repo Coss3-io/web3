@@ -1,7 +1,7 @@
 <template>
   <div class="min-w-[11rem] relative h-12">
     <transition name="fadeNav">
-      <button v-if="!accountStore.$state.loaded" class="btn btn-primary w-44">
+      <button v-if="!accountStore.$state.loaded && accountStore.$state.blockchainConnected" class="btn btn-primary w-44">
         <span class="loading loading-infinity"></span>
       </button>
       <button

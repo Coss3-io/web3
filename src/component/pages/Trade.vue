@@ -28,10 +28,10 @@
       >
         <Transition name="fadeNav">
           <div
-            v-if="true"
+            v-if="!selectedBase || !selectedQuote"
             class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
           >
-            <div class="btn btn-primary no-animation cursor-default">
+            <div class="btn btn-primary no-animation cursor-default w-38">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -77,7 +77,7 @@
         <div
           class="col-span-full sm:col-span-6 lg:col-span-4 sm:row-span-2 h-[calc(100vh-250px)] min-h-full xl:h-auto w-full rounded-xl"
         >
-          <Orderbook :orderDetails="orderDetails"></Orderbook>
+          <Orderbook :orderDetails="orderDetails" :base="selectedBase" :quote="selectedQuote"></Orderbook>
         </div>
         <div
           class="col-span-full sm:col-span-6 lg:col-span-4 min-h-full h-[calc(50vh-125px)] sm:h-[calc(50vh-50px)] lg:h-[calc(50vh-100px)] xl:h-full overflow-hidden w-full rounded-xl"
@@ -94,7 +94,7 @@
         </div>
       </div>
 
-      <UserOrders :userOrders="userOrders"></UserOrders>
+      <UserOrders :userOrders="userOrders" :base="selectedBase" :quote="selectedQuote"></UserOrders>
     </div>
   </div>
 </template>
@@ -109,21 +109,18 @@ import BalancesDetails from "../sections/Trade/BalancesDetails.vue";
 import { tradeLogo } from "../../asset/images/images";
 import {
   Values,
-  cryptoLogo,
   cryptoTicker,
-  unknownToken,
 } from "../../types/cryptoSpecs";
-import { displayAddress } from "../../utils";
+import { useRoute } from "vue-router";
 
-let focusBaseLabel = ref<HTMLInputElement | null>(null);
-let focusQuoteLabel = ref<HTMLInputElement | null>(null);
-
-let selectedBase = ref<Values<typeof cryptoTicker>>();
-let selectedQuote = ref<Values<typeof cryptoTicker>>();
+const route = useRoute()
+let selectedBase = ref<Values<typeof cryptoTicker>>(<Values<typeof cryptoTicker>>route.params.base);
+let selectedQuote = ref<Values<typeof cryptoTicker>>(<Values<typeof cryptoTicker>>route.params.quote);
 
 const orderDetails = reactive({ price: 0, amount: 0 });
 const tradeHistory = reactive([{ price: 0, amount: 0 }]);
 const newOrder = reactive([{ price: 0, amount: 0 }]);
 const balancesDetails = reactive([{ price: 0, amount: 0 }]);
 const userOrders: Array<number> = [];
+
 </script>

@@ -5,8 +5,8 @@
     <div
       class="grid grid-cols-3 justify-items-center text-[10px] text-neutral-content/70 py-1"
     >
-      <div @click="addSellOrder">price</div>
-      <div @click="remove">amount</div>
+      <div>price</div>
+      <div>amount</div>
       <div>total</div>
     </div>
     <div
@@ -75,13 +75,36 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { watch, ref } from "vue";
+import { useRoute } from "vue-router";
+import { Client } from "../../../api";
+import { nameToToken } from "../../../utils";
+import { Values, cryptoTicker } from "../../../types/cryptoSpecs";
+
+const route = useRoute();
 
 const props = defineProps<{
+  base: string | Values<typeof cryptoTicker>;
+  quote: string | Values<typeof cryptoTicker>;
   orderDetails: { price: number; amount: number };
 }>();
+
 const sellContainer = ref<HTMLDivElement | null>(null);
 const buyContainer = ref<HTMLDivElement | null>(null);
+watch([props.base, props.quote], ([newBase, newQuote], [olBase, OldQuote]) => {
+  if (newBase && newQuote) {
+    Client.loadPair(
+      nameToToken(
+        <Values<typeof cryptoTicker>>newBase,
+        Client.accountStore.networkId!
+      ),
+      nameToToken(
+        <Values<typeof cryptoTicker>>newQuote,
+        Client.accountStore.networkId!
+      )
+    );
+  }
+});
 
 const sellOrders = ref([
   [11788, 44741, 18161],
@@ -101,17 +124,4 @@ const sellOrders = ref([
   [3808, 34220, 49287],
   [49987, 16276, 37962],
 ]);
-
-function addSellOrder() {
-  sellOrders.value.splice(3, 0, [
-    parseInt(String(Math.random() * 10000)),
-    parseInt(String(Math.random() * 10000)),
-    parseInt(String(Math.random() * 10000)),
-  ]);
-}
-
-function remove() {
-  sellOrders.value.splice(3, 1);
-  sellOrders.value.splice(5, 1);
-}
 </script>

@@ -34,7 +34,7 @@
           >
             <transition name="fadeNav">
               <button
-                v-if="!accountStore.$state.loaded"
+                v-if="!accountStore.$state.loaded && accountStore.$state.blockchainConnected"
                 class="btn btn-primary w-40"
               >
                 <span class="loading loading-infinity"></span>

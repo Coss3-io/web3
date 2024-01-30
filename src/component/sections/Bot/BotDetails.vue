@@ -6,8 +6,8 @@
     <div
       class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
     >
-      <button class="btn btn-primary btn-square">
-        <span class="loading loading-infinity"></span>
+      <button class="btn btn-primary">
+        <span class="loading loading-infinity"></span> Loading
       </button>
     </div>
   </div>

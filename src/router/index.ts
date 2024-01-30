@@ -30,7 +30,7 @@ let routes: RouteRecordRaw[] = [
     name: RouteNames.Home,
   },
   {
-    path: "/trade/:pair?",
+    path: "/trade/:base?/:quote?",
     component: () =>
       import(
         /* webpackPreload: true */ /* webpackChunkName: "trade" */ "../component/pages/Trade.vue"

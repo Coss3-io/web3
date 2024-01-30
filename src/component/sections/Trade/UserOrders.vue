@@ -4,9 +4,41 @@
   >
     <Transition name="fadeNav">
       <div
-        v-if="true"
+        v-if="
+          !base ||
+          !quote ||
+          !Client.accountStore.appConnected ||
+          !Client.accountStore.blockchainConnected
+        "
         class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
-      ></div>
+      >
+        <transition name="fadeNav">
+          <Dashboard
+            v-if="
+              !Client.accountStore.appConnected ||
+              !Client.accountStore.blockchainConnected
+            "
+          ></Dashboard>
+          <div v-else class="btn btn-primary no-animation cursor-default w-38">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+              />
+            </svg>
+
+            Select a pair
+          </div>
+        </transition>
+      </div>
     </Transition>
     <div class="flex justify-start items-center gap-3 flex-wrap">
       <div
@@ -267,7 +299,7 @@
                       {{ order.fees }}
                     </div>
                     <img
-                      :src="order.baseFees ? base : quote"
+                      :src="order.baseFees ? aave : usdc"
                       alt="token"
                       class="w-4 h-4 sm:h-5 sm:w-5"
                     />
@@ -290,6 +322,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import Dashboard from "../../buttons/Dashboard.vue";
 import { ref } from "vue";
 import { Values } from "../../../types/cryptoSpecs";
 import {
@@ -311,8 +344,11 @@ import {
   price,
   orderArrow,
 } from "../../../asset/images/images";
+import { Client } from "../../../api";
 
 const props = defineProps<{
+  base: string;
+  quote: string;
   userOrders: Array<number>;
 }>();
 
@@ -322,9 +358,6 @@ let filterValue = ref<string>("Date");
 let filterOrderType = ref<Values<typeof orderType>>(orderType.ALL);
 let filterOrderSide = ref<Values<typeof orderSide>>(orderSide.ALL);
 let filterOrderStatus = ref<Values<typeof orderStatus>>(orderStatus.ALL);
-
-const base = aave;
-const quote = usdc;
 
 let sortAscending = ref(false);
 function propertySortFactory(
