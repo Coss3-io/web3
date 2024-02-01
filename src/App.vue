@@ -45,17 +45,20 @@ import { useStackingStore } from "./store/stacking";
 import { StackingActions } from "./types/stacking";
 import { useBotStore } from "./store/bot";
 import { BotActions } from "./types/bot";
+import { useOrderStore } from "./store/order";
 
 const accountStore = useAccountStore();
 const stackingStore = useStackingStore();
 const priceStore = usePriceStore();
 const botStore = useBotStore();
+const orderStore = useOrderStore();
 const projectId = "aced478ee21b257981d650fe8ec77c40";
 
 Client.accountStore = accountStore;
 Client.stackingStore = stackingStore;
 Client.priceStore = priceStore;
 Client.botStore = botStore;
+Client.orderStore = orderStore;
 
 const metadata = {
   name: "coss3.io",
