@@ -139,10 +139,10 @@ const userOrders: Array<number> = [];
 
 watch(
   [selectedBase, selectedQuote],
-  ([newBase, newQuote], [olBase, OldQuote]) => {
+  async ([newBase, newQuote], [oldBase, OldQuote]) => {
     if (newBase && newQuote) {
       loading.value = true;
-      Client.loadPair(
+      await Client.loadPair(
         nameToToken(
           <Values<typeof cryptoTicker>>newBase,
           Client.accountStore.networkId!

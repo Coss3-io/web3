@@ -16,13 +16,23 @@ export type Maker = {
   filled: number;
   signature: string;
   address: string;
-  quote_fees: string;
-  base_fees: string;
+  quote_fees: number;
+  base_fees: number;
+};
+
+export type Taker = {
+  block: number;
+  price: number,
+  taker_amount: number;
+  base_fees: boolean;
+  fees: number;
+  is_buyer: boolean;
+  timestamp: number;
 };
 
 export type OrderState = {
   makers: { [key in string]: Array<Maker> };
-  takers: { [key in string]: Array<Maker> };
+  takers: { [key in string]: Array<Taker> };
   makersLoaded: { [key in string]: boolean };
   takersLoaded: { [key in string]: boolean };
 };

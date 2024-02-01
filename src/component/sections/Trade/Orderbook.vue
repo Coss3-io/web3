@@ -2,6 +2,16 @@
   <div
     class="grid grid-rows-[min-content_1fr_min-content_1fr] w-full h-full overflow-hidden p-1 px-2 bg-base-300 rounded-lg shadow-lg shadow-black/50"
   >
+    <Transition name="fadeNav">
+      <div
+        v-if="props.loading || !Client.orderStore.$state.makersLoaded[pair]"
+        class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-30 flex items-center justify-center"
+      >
+        <div class="btn btn-primary no-animation cursor-default w-38">
+          <span class="loading loading-infinity"></span>
+        </div>
+      </div>
+    </Transition>
     <div
       class="grid grid-cols-3 justify-items-center text-[10px] text-neutral-content/70 py-1"
     >
@@ -16,6 +26,7 @@
       <TransitionGroup name="listSell" tag="div">
         <div
           v-for="n in (sellOrders.length * 24 < sellContainer?.clientHeight! ? Math.floor((sellContainer?.clientHeight! - sellOrders.length * 24 )/16): 0)"
+          :key="'sell' + String(n)"
           class="flex text-center text-[11px] font-bold h-4 -z-10"
         >
           <div class="w-1/3">-</div>
@@ -23,26 +34,41 @@
           <div class="w-1/3">-</div>
         </div>
         <div
-          v-for="[price, amount, total] in sellOrders.toReversed()"
-          :key="amount"
+          v-for="entry in buyOrders"
+          :key="entry.price"
           class="relative w-full min-h-6 z-10 group"
         >
           <div
             class="flex w-full font-sans-inherit absolute transition-all duration-500 hover:duration-150 hover:!bg-red-700/30 group-even:bg-red-900/10 group-odd:bg-red-700/10 text-center text-[11px] font-bold rounded-md py-1"
           >
-            <div class="w-1/3">{{ price }}</div>
-            <div class="w-1/3">{{ amount }}</div>
-            <div class="w-1/3">{{ total }}</div>
+            <div class="w-1/3">{{ entry.price.toFixed(5) }}</div>
+            <div class="w-1/3">{{ entry.total.toFixed(5) }}</div>
+            <div class="w-1/3">
+              {{ (entry.price * entry.total).toFixed(8) }}
+            </div>
           </div>
         </div>
       </TransitionGroup>
     </div>
     <div
-      class="h-7 w-full grid grid-cols-3 justify-items-center items-center text-red-500 font-bold"
+      class="h-7 w-full grid grid-cols-3 justify-items-center items-center font-bold"
+      :class="
+        lastTrade.price
+          ? lastTrade.isBuyer
+            ? 'text-emerald-500'
+            : 'text-red-500'
+          : ''
+      "
     >
-      <div class="font-sans">1234</div>
-      <div class="font-sans">2345</div>
-      <div class="font-sans">6798</div>
+      <div class="font-sans">{{ lastTrade.price?.toFixed(5) ?? "-" }}</div>
+      <div class="font-sans">{{ lastTrade.amount?.toFixed(5) ?? "-" }}</div>
+      <div class="font-sans">
+        {{
+          lastTrade.amount && lastTrade.price
+            ? (lastTrade.amount * lastTrade.price).toFixed(5)
+            : "-"
+        }}
+      </div>
     </div>
     <div
       ref="buyContainer"
@@ -50,20 +76,23 @@
     >
       <TransitionGroup name="listBuy" tag="div">
         <div
-          v-for="[price, amount, total] in sellOrders"
-          :key="price"
+          v-for="(entry, index) in sellOrders"
+          :key="entry.price"
           class="relative w-full min-h-6 z-10 group"
         >
           <div
             class="flex w-full font-sans-inherit absolute transition-all duration-500 hover:duration-150 hover:!bg-green-700/30 group-even:bg-green-900/10 group-odd:bg-green-600/10 text-center text-[11px] font-bold rounded-md py-1"
           >
-            <div class="w-1/3">{{ price }}</div>
-            <div class="w-1/3">{{ amount }}</div>
-            <div class="w-1/3">{{ total }}</div>
+            <div class="w-1/3">{{ entry.price.toFixed(5) }}</div>
+            <div class="w-1/3">{{ entry.total.toFixed(5) }}</div>
+            <div class="w-1/3">
+              {{ (entry.price * entry.total).toFixed(8) }}
+            </div>
           </div>
         </div>
         <div
           v-for="n in (sellOrders.length * 24 < buyContainer?.clientHeight! ? Math.floor((buyContainer?.clientHeight! - sellOrders.length * 24 )/16): 0)"
+          :key="'buy' + String(n)"
           class="flex text-center text-[11px] font-bold h-4 -z-10"
         >
           <div class="w-1/3">-</div>
@@ -75,12 +104,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import { Values, cryptoTicker } from "../../../types/cryptoSpecs";
-
-const route = useRoute();
-
+import { Client } from "../../../api";
+import { Maker } from "../../../types/order";
+import { nameToToken } from "../../../utils";
 const props = defineProps<{
   loading: boolean;
   base: string | Values<typeof cryptoTicker>;
@@ -88,25 +117,80 @@ const props = defineProps<{
   orderDetails: { price: number; amount: number };
 }>();
 
+const pair = computed(() => {
+  if (!props.base || !props.quote) return "";
+  return `${nameToToken(
+    props.base,
+    Client.accountStore.$state.networkId!
+  )}${nameToToken(props.quote, Client.accountStore.$state.networkId!)}`;
+});
+
+const lastTrade = computed<{
+  price?: number;
+  amount?: number;
+  isBuyer?: boolean;
+}>(() => {
+  if (!Client.orderStore.$state.takers[pair.value]) return {};
+  const taker = Client.orderStore.$state.takers[pair.value][0];
+  return {
+    price: taker.price,
+    amount: taker.taker_amount,
+    isBuyer: taker.is_buyer,
+  };
+});
+
 const sellContainer = ref<HTMLDivElement | null>(null);
 const buyContainer = ref<HTMLDivElement | null>(null);
 
-const sellOrders = ref([
-  [11788, 44741, 18161],
-  [36625, 27235, 16856],
-  [39889, 49739, 24850],
-  [37214, 46969, 42295],
-  [34893, 13127, 12426],
-  [31744, 32077, 14128],
-  [18798, 26645, 44766],
-  [42539, 4924, 45446],
-  [45791, 36402, 22605],
-  [25408, 17107, 22343],
-  [27136, 34669, 44284],
-  [23865, 45218, 27445],
-  [21118, 22623, 27613],
-  [3270, 31912, 28793],
-  [3808, 34220, 49287],
-  [49987, 16276, 37962],
-]);
+const sellOrders = computed(() => {
+  if (!Client.orderStore.$state.makers[pair.value]) return [];
+  const sells = Client.orderStore.$state.makers[pair.value].filter((maker) => {
+    return !maker.is_buyer;
+  });
+  sells.toSorted((first, second) => {
+    return second.price - first.price;
+  });
+  const result: Array<{ price: number; total: number; makers: Array<Maker> }> =
+    [];
+  sells.forEach((maker) => {
+    const index = result.length - 1;
+    if (result.length && result[index].price == maker.price) {
+      result[index]["total"] += maker.amount - maker.filled;
+      result[index]["makers"].push(maker);
+    } else {
+      result.push({
+        total: maker.amount - maker.filled,
+        price: maker.price,
+        makers: [maker],
+      });
+    }
+  });
+  return result;
+});
+
+const buyOrders = computed(() => {
+  if (!Client.orderStore.$state.makers[pair.value]) return [];
+  const buys = Client.orderStore.$state.makers[pair.value].filter((maker) => {
+    return maker.is_buyer;
+  });
+  buys.toSorted((first, second) => {
+    return first.price - second.price;
+  });
+  const result: Array<{ price: number; total: number; makers: Array<Maker> }> =
+    [];
+  buys.forEach((maker) => {
+    const index = result.length - 1;
+    if (result.length && result[index].price == maker.price) {
+      result[index]["total"] += maker.amount - maker.filled;
+      result[index]["makers"].push(maker);
+    } else {
+      result.push({
+        total: maker.amount - maker.filled,
+        price: maker.price,
+        makers: [maker],
+      });
+    }
+  });
+  return result;
+});
 </script>

@@ -179,10 +179,10 @@ function chainIdToName(chainId: number | string): Values<typeof chainNames> {
  * @returns - the token address on the specified chain
  */
 export function nameToToken(
-  name: Values<typeof cryptoTicker>,
+  name: Values<typeof cryptoTicker> | string,
   chainId: string | number
 ): string {
-  const token = namesToToken[chainIdToName(chainId)][name];
+  const token = namesToToken[chainIdToName(chainId)][<Values<typeof cryptoTicker>>name];
   return token || name
 }
 
