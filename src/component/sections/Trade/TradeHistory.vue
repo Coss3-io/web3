@@ -1,7 +1,17 @@
 <template>
   <div
-    class="grid grid-rows-[min-content_min-content_1fr] w-full h-full overflow-hidden p-2 bg-base-300 rounded-lg shadow-lg shadow-black/50"
+    class="grid relative grid-rows-[min-content_min-content_1fr] w-full h-full overflow-hidden p-2 bg-base-300 rounded-lg shadow-lg shadow-black/50"
   >
+    <Transition name="fadeNav">
+      <div
+        v-if="(props.loading || !Client.orderStore.$state.takersLoaded[pair]) && base && quote"
+        class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-30 flex items-center justify-center"
+      >
+        <div class="btn btn-primary no-animation cursor-default w-38">
+          <span class="loading loading-infinity"></span>
+        </div>
+      </div>
+    </Transition>
     <div class="col-span-full flex justify-center">
       <div
         class="flex gap-2 items-center text-xs font-bold px-4 py-0.5 rounded-full bg-neutral shadow-sm shadow-black"
@@ -68,10 +78,16 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
+import { Values, cryptoTicker } from "../../../types/cryptoSpecs";
+import { Client } from "../../../api";
 
 const tradeContainer = ref<HTMLDivElement | null>(null);
 const props = defineProps<{
   tradeHistory: Object[];
+  loading: boolean;
+  pair: string;
+  base: string | Values<typeof cryptoTicker>;
+  quote: string | Values<typeof cryptoTicker>;
 }>();
 
 const sellOrders = ref([

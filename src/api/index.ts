@@ -12,6 +12,8 @@ import { getSigner } from "../utils";
 import { useBotStore } from "../store/bot";
 import { BotActions, BotState } from "../types/bot";
 import BigNumber from "bignumber.js";
+import { useOrderStore } from "../store/order";
+import { OrderActions } from "../types/order";
 
 const { notify } = useNotification();
 export class Client {
@@ -27,11 +29,14 @@ export class Client {
   private static globalStakingPath = "/api/global-stacking";
   private static stakingFeesPath = "/api/stacking-fees";
   private static botDataPath = "/api/bot";
+  private static makerDataPath = "/api/orders";
+  private static takerDataPath = "/api/taker";
 
   public static accountStore: ReturnType<typeof useAccountStore>;
   public static stackingStore: ReturnType<typeof useStackingStore>;
   public static priceStore: ReturnType<typeof usePriceStore>;
   public static botStore: ReturnType<typeof useBotStore>;
+  public static orderStore: ReturnType<typeof useOrderStore>;
 
   constructor() {}
 
@@ -232,7 +237,7 @@ export class Client {
       const promises = botsList.data.map((bot: BotState["bots"][0]) =>
         this.botStore[BotActions.AddBot](bot)
       );
-      await Promise.all(promises)
+      await Promise.all(promises);
       this.botStore.loaded = true;
     } catch (e) {
       notify({
@@ -296,5 +301,57 @@ export class Client {
       upperBound: data.upper_bound,
     });
     return success;
+  }
+
+  public static async loadPair(base: string, quote: string): Promise<boolean> {
+    try {
+      const makersPromise = axios.get(this.url + this.makerDataPath, {
+        params: {
+          chain_id: this.accountStore.$state.networkId,
+          base_token: base,
+          quote_token: quote,
+        },
+      });
+      const takersPromise = axios.get(this.url + this.takerDataPath, {
+        params: {
+          chain_id: this.accountStore.$state.networkId,
+          base_token: base,
+          quote_token: quote,
+        },
+      });
+      const [makers, takers] = await Promise.all([
+        makersPromise,
+        takersPromise,
+      ]);
+      if (
+        makers.status != axios.HttpStatusCode.Ok ||
+        takers.status != axios.HttpStatusCode.Ok
+      ) {
+        notify({
+          text: "An error occured during orders loading please refresh the page",
+          type: "warn",
+        });
+        return false;
+      }
+      this.orderStore[OrderActions.LoadOrders](
+        makers.data,
+        takers.data,
+        base,
+        quote
+      );
+      this.orderStore.$state.makersLoaded[`${base}${quote}`] = true;
+      this.orderStore.$state.takersLoaded[`${base}${quote}`] = true;
+      console.log(this.orderStore.$state)
+    } catch (e) {
+      notify({
+        text: "An error occured during orders loading check console",
+        type: "warn",
+      });
+      console.log("The orders failed to be loaded check console");
+      console.log(e);
+      return false;
+    }
+
+    return true;
   }
 }

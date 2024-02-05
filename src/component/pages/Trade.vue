@@ -81,13 +81,20 @@
             :orderDetails="orderDetails"
             :base="selectedBase"
             :quote="selectedQuote"
+            :pair="pair"
             :loading="loading"
           ></Orderbook>
         </div>
         <div
           class="col-span-full sm:col-span-6 lg:col-span-4 min-h-full h-[calc(50vh-125px)] sm:h-[calc(50vh-50px)] lg:h-[calc(50vh-100px)] xl:h-full overflow-hidden w-full rounded-xl"
         >
-          <TradeHistory :tradeHistory="tradeHistory"></TradeHistory>
+          <TradeHistory
+            :tradeHistory="tradeHistory"
+            :base="selectedBase"
+            :quote="selectedQuote"
+            :pair="pair"
+            :loading="loading"
+          ></TradeHistory>
         </div>
         <div
           class="col-span-full sm:col-span-6 lg:col-span-4 w-full rounded-xl"
@@ -120,7 +127,7 @@ import { Values, cryptoTicker } from "../../types/cryptoSpecs";
 import { useRoute } from "vue-router";
 import { Client } from "../../api";
 import { nameToToken } from "../../utils";
-import { watch } from "vue";
+import { watch, computed } from "vue";
 
 const route = useRoute();
 let selectedBase = ref<Values<typeof cryptoTicker>>(
@@ -136,6 +143,14 @@ const tradeHistory = reactive([{ price: 0, amount: 0 }]);
 const newOrder = reactive([{ price: 0, amount: 0 }]);
 const balancesDetails = reactive([{ price: 0, amount: 0 }]);
 const userOrders: Array<number> = [];
+
+const pair = computed(() => {
+  if (!selectedBase.value || !selectedQuote.value) return "";
+  return `${nameToToken(
+    selectedBase.value,
+    Client.accountStore.$state.networkId!
+  )}${nameToToken(selectedQuote.value, Client.accountStore.$state.networkId!)}`;
+});
 
 watch(
   [selectedBase, selectedQuote],

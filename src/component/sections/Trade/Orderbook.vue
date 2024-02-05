@@ -1,10 +1,14 @@
 <template>
   <div
-    class="grid grid-rows-[min-content_1fr_min-content_1fr] w-full h-full overflow-hidden p-1 px-2 bg-base-300 rounded-lg shadow-lg shadow-black/50"
+    class="grid relative grid-rows-[min-content_1fr_min-content_1fr] w-full h-full overflow-hidden p-1 px-2 bg-base-300 rounded-lg shadow-lg shadow-black/50"
   >
     <Transition name="fadeNav">
       <div
-        v-if="props.loading || !Client.orderStore.$state.makersLoaded[pair]"
+        v-if="
+          (props.loading || !Client.orderStore.$state.makersLoaded[pair]) &&
+          base &&
+          quote
+        "
         class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-30 flex items-center justify-center"
       >
         <div class="btn btn-primary no-animation cursor-default w-38">
@@ -105,33 +109,25 @@
 </template>
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useRoute } from "vue-router";
 import { Values, cryptoTicker } from "../../../types/cryptoSpecs";
 import { Client } from "../../../api";
 import { Maker } from "../../../types/order";
-import { nameToToken } from "../../../utils";
+
 const props = defineProps<{
   loading: boolean;
+  pair: string;
   base: string | Values<typeof cryptoTicker>;
   quote: string | Values<typeof cryptoTicker>;
   orderDetails: { price: number; amount: number };
 }>();
-
-const pair = computed(() => {
-  if (!props.base || !props.quote) return "";
-  return `${nameToToken(
-    props.base,
-    Client.accountStore.$state.networkId!
-  )}${nameToToken(props.quote, Client.accountStore.$state.networkId!)}`;
-});
 
 const lastTrade = computed<{
   price?: number;
   amount?: number;
   isBuyer?: boolean;
 }>(() => {
-  if (!Client.orderStore.$state.takers[pair.value]) return {};
-  const taker = Client.orderStore.$state.takers[pair.value][0];
+  if (!Client.orderStore.$state.takers[props.pair]) return {};
+  const taker = Client.orderStore.$state.takers[props.pair][0];
   return {
     price: taker.price,
     amount: taker.taker_amount,
@@ -143,8 +139,17 @@ const sellContainer = ref<HTMLDivElement | null>(null);
 const buyContainer = ref<HTMLDivElement | null>(null);
 
 const sellOrders = computed(() => {
-  if (!Client.orderStore.$state.makers[pair.value]) return [];
-  const sells = Client.orderStore.$state.makers[pair.value].filter((maker) => {
+  if (!Client.orderStore.$state.makers[props.pair]) {
+    const string = "1234567";
+    return [...string].map((v) => {
+      return {
+        total: Math.round(Math.random() * 10000),
+        price: Math.round(Math.random() * 10000),
+        makers: [],
+      };
+    });
+  }
+  const sells = Client.orderStore.$state.makers[props.pair].filter((maker) => {
     return !maker.is_buyer;
   });
   sells.toSorted((first, second) => {
@@ -169,8 +174,17 @@ const sellOrders = computed(() => {
 });
 
 const buyOrders = computed(() => {
-  if (!Client.orderStore.$state.makers[pair.value]) return [];
-  const buys = Client.orderStore.$state.makers[pair.value].filter((maker) => {
+  if (!Client.orderStore.$state.makers[props.pair]) {
+    const string = "1234567";
+    return [...string].map((v) => {
+      return {
+        total: Math.round(Math.random() * 10000),
+        price: Math.round(Math.random() * 10000),
+        makers: [],
+      };
+    });
+  }
+  const buys = Client.orderStore.$state.makers[props.pair].filter((maker) => {
     return maker.is_buyer;
   });
   buys.toSorted((first, second) => {
