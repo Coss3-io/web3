@@ -46,11 +46,9 @@ export class Client {
   public static async checkConnection(): Promise<void> {
     Client.accountStore[AccountActions.UpdateLoaded](false);
     try {
-      let response = await axios.get(this.url + this.takerPath, {
+      let response = await axios.get(this.url + this.botDataPath, {
         params: {
           chain_id: this.accountStore.$state.networkId,
-          base_token: "0x0000000000000000000000000000000000000000",
-          quote_token: "0x0000000000000000000000000000000000000000",
         },
         withCredentials: true,
       });
