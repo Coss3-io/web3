@@ -52,10 +52,10 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : props.base }}
+          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : displayAddress(props.base) }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
-        <div class="w-6 h-6">
+        <div class="w-6 h-6 flex items-center">
           <transition name="fadeNav">
             <img
               :key="props.base"
@@ -64,10 +64,10 @@
               alt="token"
               class="w-6 h-6"
             />
-            <unknownTokenLogo
+            <unknownPrimaryTokenLogo
               v-else
-              class="fill-primary w-6 h-6"
-            ></unknownTokenLogo>
+              class="fill-primary !w-6 !h-6"
+            ></unknownPrimaryTokenLogo>
           </transition>
         </div>
       </div>
@@ -77,10 +77,10 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : props.quote }}
+          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : displayAddress(props.quote) }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
-        <div class="w-6 h-6">
+        <div class="w-6 h-6 flex items-center">
           <transition name="fadeNav">
             <img
               :key="props.quote"
@@ -89,10 +89,10 @@
               alt="token"
               class="w-6 h-6"
             />
-            <unknownTokenLogo
+            <unknownSecondaryTokenLogo
               v-else
-              class="fill-secondary w-6 h-6"
-            ></unknownTokenLogo>
+              class="fill-secondary !w-6 !h-6"
+            ></unknownSecondaryTokenLogo>
           </transition>
         </div>
       </div>
@@ -126,10 +126,10 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : props.base }}
+          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : displayAddress(props.base) }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
-        <div class="w-6 h-6">
+        <div class="w-6 h-6 flex items-center">
           <transition name="fadeNav">
             <img
               :key="props.base"
@@ -138,10 +138,10 @@
               alt="token"
               class="w-6 h-6"
             />
-            <unknownTokenLogo
+            <unknownPrimaryTokenLogo
               v-else
-              class="fill-primary w-6 h-6"
-            ></unknownTokenLogo>
+              class="fill-primary !w-6 !h-6"
+            ></unknownPrimaryTokenLogo>
           </transition>
         </div>
       </div>
@@ -151,10 +151,10 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : props.quote }}
+          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : displayAddress(props.quote) }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
-        <div class="w-6 h-6">
+        <div class="w-6 h-6 flex items-center">
           <transition name="fadeNav">
             <img
               :key="props.quote"
@@ -163,10 +163,10 @@
               alt="token"
               class="w-6 h-6"
             />
-            <unknownTokenLogo
+            <unknownSecondaryTokenLogo
               v-else
-              class="fill-secondary w-6 h-6"
-            ></unknownTokenLogo>
+              class="fill-secondary !w-6 !h-6"
+            ></unknownSecondaryTokenLogo>
           </transition>
         </div>
       </div>
@@ -179,7 +179,8 @@ Values,
   cryptoLogo,
   cryptoTicker,
 } from "../../../types/cryptoSpecs";
-import { unknownTokenLogo } from "../../../asset/images/images";
+import { unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
+import { displayAddress } from "../../../utils";
 
 const props = defineProps<{
   base: string | Values<typeof cryptoTicker>;

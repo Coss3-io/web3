@@ -131,6 +131,7 @@ import { useRoute } from "vue-router";
 import { Client } from "../../api";
 import { nameToToken } from "../../utils";
 import { watch, computed } from "vue";
+import { ethers } from "ethers";
 
 const route = useRoute();
 let selectedBase = ref<Values<typeof cryptoTicker>>(
@@ -159,7 +160,17 @@ watch(
   [selectedBase, selectedQuote],
   async ([newBase, newQuote], [oldBase, OldQuote]) => {
     if (newBase && newQuote) {
-      console.log("trigger")
+      const baseToken = nameToToken(
+        <Values<typeof cryptoTicker>>newBase,
+        Client.accountStore.networkId!
+      );
+      const quoteToken = nameToToken(
+        <Values<typeof cryptoTicker>>newQuote,
+        Client.accountStore.networkId!
+      );
+
+      if (!ethers.isAddress(baseToken) || !ethers.isAddress(quoteToken)) return;
+      console.log("trigger");
       loading.value = true;
       await Client.loadPair(
         nameToToken(
