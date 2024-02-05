@@ -99,7 +99,10 @@
         <div
           class="col-span-full sm:col-span-6 lg:col-span-4 w-full rounded-xl"
         >
-          <BalancesDetails :balancesDetails="balancesDetails"></BalancesDetails>
+          <BalancesDetails
+            :base="selectedBase"
+            :quote="selectedQuote"
+          ></BalancesDetails>
         </div>
         <div class="col-span-full lg:col-span-8 w-full rounded-xl">
           <NewOrder :newOrder="newOrder"></NewOrder>
@@ -156,6 +159,7 @@ watch(
   [selectedBase, selectedQuote],
   async ([newBase, newQuote], [oldBase, OldQuote]) => {
     if (newBase && newQuote) {
+      console.log("trigger")
       loading.value = true;
       await Client.loadPair(
         nameToToken(

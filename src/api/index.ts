@@ -302,7 +302,13 @@ export class Client {
   }
 
   public static async loadPair(base: string, quote: string): Promise<boolean> {
+    const pair = `${base}${quote}`;
     try {
+      if (
+        this.orderStore.$state.makersLoaded[pair] &&
+        this.orderStore.$state.makersLoaded[pair]
+      )
+        return true;
       const makersPromise = axios.get(this.url + this.makerDataPath, {
         params: {
           chain_id: this.accountStore.$state.networkId,
@@ -337,9 +343,9 @@ export class Client {
         base,
         quote
       );
-      this.orderStore.$state.makersLoaded[`${base}${quote}`] = true;
-      this.orderStore.$state.takersLoaded[`${base}${quote}`] = true;
-      console.log(this.orderStore.$state)
+      this.orderStore.$state.makersLoaded[pair] = true;
+      this.orderStore.$state.takersLoaded[pair] = true;
+      console.log(this.orderStore.$state);
     } catch (e) {
       notify({
         text: "An error occured during orders loading check console",

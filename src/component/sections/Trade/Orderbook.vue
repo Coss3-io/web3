@@ -126,7 +126,7 @@ const lastTrade = computed<{
   amount?: number;
   isBuyer?: boolean;
 }>(() => {
-  if (!Client.orderStore.$state.takers[props.pair]) return {};
+  if (!Client.orderStore.$state.takers[props.pair] || Client.orderStore.$state.takers[props.pair].length == 0) return {};
   const taker = Client.orderStore.$state.takers[props.pair][0];
   return {
     price: taker.price,
@@ -139,7 +139,7 @@ const sellContainer = ref<HTMLDivElement | null>(null);
 const buyContainer = ref<HTMLDivElement | null>(null);
 
 const sellOrders = computed(() => {
-  if (!Client.orderStore.$state.makers[props.pair]) {
+  if (!Client.orderStore.$state.makersLoaded[props.pair]) {
     const string = "1234567";
     return [...string].map((v) => {
       return {
@@ -174,7 +174,7 @@ const sellOrders = computed(() => {
 });
 
 const buyOrders = computed(() => {
-  if (!Client.orderStore.$state.makers[props.pair]) {
+  if (!Client.orderStore.$state.makersLoaded[props.pair]) {
     const string = "1234567";
     return [...string].map((v) => {
       return {

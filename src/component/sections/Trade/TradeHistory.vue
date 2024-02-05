@@ -73,6 +73,7 @@
         <div
           class="flex text-center text-[11px] font-bold h-4 -z-10"
           v-for="n in (tradeHistory.length * 24 < tradeContainer?.clientHeight! ? Math.floor((tradeContainer?.clientHeight! - tradeHistory.length * 24 )/16): 0)"
+          :key="'trade' + String(n)"
         >
           <div class="w-1/3">-</div>
           <div class="w-1/3">-</div>
@@ -97,7 +98,7 @@ const props = defineProps<{
 }>();
 
 const tradeHistory = computed(() => {
-  if (!Client.orderStore.$state.takers[props.pair]) {
+  if (!Client.orderStore.$state.takersLoaded[props.pair]) {
     const string = "1234567";
     return [...string].map((v) => {
       return {

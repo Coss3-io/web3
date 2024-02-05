@@ -18,6 +18,8 @@ export function loadOrders(
   quote_token: string
 ): void {
   const pair = base_token + quote_token;
+  if (!this.$state.makers[pair]) this.$state.makers[pair] = [];
+  if (!this.$state.takers[pair]) this.$state.takers[pair] = [];
   if (makers.length) {
     makers.forEach((maker) => {
       maker.amount = unBigNumberify(String(maker.amount));
@@ -26,7 +28,6 @@ export function loadOrders(
       maker.base_fees = unBigNumberify(String(maker.base_fees));
       maker.quote_fees = unBigNumberify(String(maker.quote_fees));
     });
-    if (!this.$state.makers[pair]) this.$state.makers[pair] = [];
     this.$state.makers[pair].splice(
       0,
       this.$state.makers[pair].length,
@@ -34,7 +35,6 @@ export function loadOrders(
     );
   }
   if (takers.length) {
-    if (!this.$state.takers[pair]) this.$state.takers[pair] = [];
     takers.forEach((taker) => {
       taker.taker_amount = unBigNumberify(String(taker.taker_amount));
       taker.price = unBigNumberify(String(taker.price));

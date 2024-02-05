@@ -52,20 +52,23 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ base in cryptoTicker ? cryptoTicker[base] : base }}
+          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : props.base }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6">
-          <img
-            v-if="base in cryptoLogo"
-            :src="<string>cryptoLogo[base]"
-            alt="token"
-            class="w-6 h-6"
-          />
-          <unknownTokenLogo
-            v-else
-            class="fill-primary w-6 h-6"
-          ></unknownTokenLogo>
+          <transition name="fadeNav">
+            <img
+              :key="props.base"
+              v-if="props.base in cryptoTicker"
+              :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.base]"
+              alt="token"
+              class="w-6 h-6"
+            />
+            <unknownTokenLogo
+              v-else
+              class="fill-primary w-6 h-6"
+            ></unknownTokenLogo>
+          </transition>
         </div>
       </div>
       <div
@@ -74,20 +77,23 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
+          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : props.quote }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6">
-          <img
-            v-if="quote in cryptoLogo"
-            :src="<string>cryptoLogo[quote]"
-            alt="token"
-            class="w-6 h-6"
-          />
-          <unknownTokenLogo
-            v-else
-            class="fill-secondary w-6 h-6"
-          ></unknownTokenLogo>
+          <transition name="fadeNav">
+            <img
+              :key="props.quote"
+              v-if="props.quote in cryptoTicker"
+              :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.quote]"
+              alt="token"
+              class="w-6 h-6"
+            />
+            <unknownTokenLogo
+              v-else
+              class="fill-secondary w-6 h-6"
+            ></unknownTokenLogo>
+          </transition>
         </div>
       </div>
     </div>
@@ -120,20 +126,23 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ base in cryptoTicker ? cryptoTicker[base] : base }}
+          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : props.base }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6">
-          <img
-            v-if="base in cryptoLogo"
-            :src="<string>cryptoLogo[base]"
-            alt="token"
-            class="w-6 h-6"
-          />
-          <unknownTokenLogo
-            v-else
-            class="fill-primary w-6 h-6"
-          ></unknownTokenLogo>
+          <transition name="fadeNav">
+            <img
+              :key="props.base"
+              v-if="props.base in cryptoTicker"
+              :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.base]"
+              alt="token"
+              class="w-6 h-6"
+            />
+            <unknownTokenLogo
+              v-else
+              class="fill-primary w-6 h-6"
+            ></unknownTokenLogo>
+          </transition>
         </div>
       </div>
       <div
@@ -142,20 +151,23 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
+          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : props.quote }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6">
-          <img
-            v-if="quote in cryptoLogo"
-            :src="<string>cryptoLogo[quote]"
-            alt="token"
-            class="w-6 h-6"
-          />
-          <unknownTokenLogo
-            v-else
-            class="fill-secondary w-6 h-6"
-          ></unknownTokenLogo>
+          <transition name="fadeNav">
+            <img
+              :key="props.quote"
+              v-if="props.quote in cryptoTicker"
+              :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.quote]"
+              alt="token"
+              class="w-6 h-6"
+            />
+            <unknownTokenLogo
+              v-else
+              class="fill-secondary w-6 h-6"
+            ></unknownTokenLogo>
+          </transition>
         </div>
       </div>
     </div>
@@ -163,15 +175,14 @@
 </template>
 <script setup lang="ts">
 import {
+Values,
   cryptoLogo,
   cryptoTicker,
 } from "../../../types/cryptoSpecs";
 import { unknownTokenLogo } from "../../../asset/images/images";
 
-const base = cryptoTicker.ETH;
-const quote = "0xabc...def";
-
 const props = defineProps<{
-  balancesDetails: Object[];
+  base: string | Values<typeof cryptoTicker>;
+  quote: string | Values<typeof cryptoTicker>;
 }>();
 </script>
