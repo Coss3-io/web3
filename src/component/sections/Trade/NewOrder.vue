@@ -182,14 +182,14 @@
                 class="absolute text-sm font-bold w-full text-center"
                 :class="quote in cryptoTicker ? '' : '-translate-x-3'"
               >
-                {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
+                {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : displayAddress(quote) }}
               </span>
               <span
                 v-else
                 class="absolute text-sm font-bold w-full text-center"
                 :class="base in cryptoTicker ? '' : '-translate-x-3'"
               >
-                {{ base in cryptoTicker ? cryptoTicker[base] : base }}
+                {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : displayAddress(base) }}
               </span>
             </transition>
           </div>
@@ -199,14 +199,14 @@
               isQuoteFeesOrder
                 ? `${
                     quote in cryptoBg
-                      ? cryptoBg[quote]
+                      ? cryptoBg[<Values<typeof cryptoTicker>>props.quote]
                       : 'bg-secondary border-secondary'
-                  } ${quote in cryptoBorder ? cryptoBorder[quote] : ''}`
+                  } ${quote in cryptoBorder ? cryptoBorder[<Values<typeof cryptoTicker>>props.quote] : ''}`
                 : `${
                     base in cryptoBg
-                      ? cryptoBg[base]
+                      ? cryptoBg[<Values<typeof cryptoTicker>>props.base]
                       : 'bg-primary border-primary'
-                  } ${base in cryptoBorder ? cryptoBorder[base] : ''}`
+                  } ${base in cryptoBorder ? cryptoBorder[<Values<typeof cryptoTicker>>props.base] : ''}`
             "
             class="toggle col-start-3 scale-90"
             v-model="isQuoteFeesOrder"
@@ -214,26 +214,26 @@
           <span class="label-text swap-on col-start-1 rounded-full">
             <img
               v-if="quote in cryptoLogo"
-              :src="<string>cryptoLogo[quote]"
+              :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.quote]"
               alt="token"
               class="w-6 h-6"
             />
-            <unknownTokenLogo
+            <unknownSecondaryTokenLogo
               v-else
-              class="fill-secondary w-6 h-6"
-            ></unknownTokenLogo>
+              class="fill-secondary !w-6 !h-6"
+            ></unknownSecondaryTokenLogo>
           </span>
           <span class="label-text swap-off col-start-1 rounded-full">
             <img
               v-if="base in cryptoLogo"
-              :src="<string>cryptoLogo[base]"
+              :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.base]"
               alt="token"
               class="w-6 h-6"
             />
-            <unknownTokenLogo
+            <unknownPrimaryTokenLogo
               v-else
-              class="fill-primary w-6 h-6"
-            ></unknownTokenLogo>
+              class="fill-primary !w-6 !h-6"
+            ></unknownPrimaryTokenLogo>
           </span>
         </label>
       </div>
@@ -250,38 +250,38 @@
             :key="base"
             class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
           >
-            {{ base in cryptoTicker ? cryptoTicker[base] : base }}
+            {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : displayAddress(base) }}
           </div>
           <div
             v-else
             :key="quote"
             class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
           >
-            {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
+            {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : displayAddress(quote) }}
           </div>
         </Transition>
         <div class="w-7 h-7 swap swap-rotate">
           <input v-model="isBuyOrder" type="checkbox" class="hidden" />
           <img
             v-if="quote in cryptoLogo"
-            :src="<string>cryptoLogo[quote]"
+            :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.quote]"
             alt="token"
             class="swap-off w-6 h-6"
           />
-          <unknownTokenLogo
+          <unknownSecondaryTokenLogo
             v-else
-            class="swap-off fill-secondary h-6 w-6"
-          ></unknownTokenLogo>
+            class="swap-off fill-secondary !h-6 !w-6"
+          ></unknownSecondaryTokenLogo>
           <img
             v-if="base in cryptoLogo"
-            :src="<string>cryptoLogo[base]"
+            :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.base]"
             alt="token"
             class="swap-on w-6 h-6"
           />
-          <unknownTokenLogo
+          <unknownPrimaryTokenLogo
             v-else
-            class="swap-on fill-primary h-6 w-6"
-          ></unknownTokenLogo>
+            class="swap-on fill-primary !h-6 !w-6"
+          ></unknownPrimaryTokenLogo>
         </div>
         <input
           class="appearance-none font-sans focus:outline-none grow w-full bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
@@ -308,14 +308,14 @@
             :key="base"
             class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
           >
-            {{ base in cryptoTicker ? cryptoTicker[base] : base }}
+            {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>base] : displayAddress(base) }}
           </div>
           <div
             v-else
             :key="quote"
             class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
           >
-            {{ quote in cryptoTicker ? cryptoTicker[quote] : quote }}
+            {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>quote] : displayAddress(quote) }}
           </div>
         </Transition>
         <div
@@ -331,24 +331,24 @@
           <input v-model="isBuyOrder" type="checkbox" class="hidden" />
           <img
             v-if="base in cryptoLogo"
-            :src="<string>cryptoLogo[base]"
+            :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>base]"
             alt="token"
             class="swap-off w-6 h-6"
           />
-          <unknownTokenLogo
+          <unknownPrimaryTokenLogo
             v-else
-            class="swap-off fill-primary w-6 h-6"
-          ></unknownTokenLogo>
+            class="swap-off fill-primary !w-6 !h-6"
+          ></unknownPrimaryTokenLogo>
           <img
             v-if="quote in cryptoLogo"
-            :src="<string>cryptoLogo[quote]"
+            :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>quote]"
             alt="token"
             class="swap-on w-6 h-6"
           />
-          <unknownTokenLogo
+          <unknownSecondaryTokenLogo
             v-else
-            class="swap-on fill-secondary h-6 w-6"
-          ></unknownTokenLogo>
+            class="swap-on fill-secondary !h-6 !w-6"
+          ></unknownSecondaryTokenLogo>
         </div>
       </div>
     </div>
@@ -379,15 +379,17 @@ import {
   cryptoBg,
   cryptoBorder,
   cryptoTicker,
+Values,
 } from "../../../types/cryptoSpecs";
-import { unknownTokenLogo, dollars } from "../../../asset/images/images";
+import { dollars, unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
+import { displayAddress } from "../../../utils";
 
 const props = defineProps<{
   newOrder: Object[];
+  base: string | Values<typeof cryptoTicker>;
+  quote: string | Values<typeof cryptoTicker>;
 }>();
 
-const base = "0xabc...def";
-const quote = cryptoTicker.AVAX;
 const isBuyOrder = ref(true);
 const isMakerOrder = ref(true);
 const isQuoteFeesOrder = ref(true);

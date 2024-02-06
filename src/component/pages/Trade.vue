@@ -105,7 +105,11 @@
           ></BalancesDetails>
         </div>
         <div class="col-span-full lg:col-span-8 w-full rounded-xl">
-          <NewOrder :newOrder="newOrder"></NewOrder>
+          <NewOrder
+            :newOrder="newOrder"
+            :base="selectedBase"
+            :quote="selectedQuote"
+          ></NewOrder>
         </div>
       </div>
 
@@ -149,17 +153,22 @@ const balancesDetails = reactive([{ price: 0, amount: 0 }]);
 const userOrders: Array<number> = [];
 
 const pair = computed(() => {
-  if (!selectedBase.value || !selectedQuote.value) return "";
+  if (
+    !selectedBase.value ||
+    !selectedQuote.value ||
+    !Client.accountStore.$state.networkId
+  )
+    return "";
   return `${nameToToken(
     selectedBase.value,
     Client.accountStore.$state.networkId!
-  )}${nameToToken(selectedQuote.value, Client.accountStore.$state.networkId!)}`;
+  )}${nameToToken(selectedQuote.value, Client.accountStore.$state.networkId)}`;
 });
 
 watch(
   [selectedBase, selectedQuote],
   async ([newBase, newQuote], [oldBase, OldQuote]) => {
-    if (newBase && newQuote) {
+    if (newBase && newQuote && Client.accountStore.$state.networkId) {
       const baseToken = nameToToken(
         <Values<typeof cryptoTicker>>newBase,
         Client.accountStore.networkId!
@@ -170,17 +179,10 @@ watch(
       );
 
       if (!ethers.isAddress(baseToken) || !ethers.isAddress(quoteToken)) return;
-      console.log("trigger");
       loading.value = true;
       await Client.loadPair(
-        nameToToken(
-          <Values<typeof cryptoTicker>>newBase,
-          Client.accountStore.networkId!
-        ),
-        nameToToken(
-          <Values<typeof cryptoTicker>>newQuote,
-          Client.accountStore.networkId!
-        )
+        nameToToken(baseToken, Client.accountStore.networkId!),
+        nameToToken(quoteToken, Client.accountStore.networkId!)
       );
       loading.value = false;
     }
