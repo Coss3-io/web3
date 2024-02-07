@@ -64,9 +64,9 @@
             }"
           >
             <div class="w-1/3">{{ order.price.toFixed(5) }}</div>
-            <div class="w-1/3">{{ order.taker_amount.toFixed(5) }}</div>
+            <div class="w-1/3">{{ order.amount.toFixed(5) }}</div>
             <div class="w-1/3">
-              {{ (order.price * order.taker_amount).toFixed(5) }}
+              {{ (order.price * order.amount).toFixed(5) }}
             </div>
           </div>
         </div>
@@ -102,7 +102,7 @@ const tradeHistory = computed(() => {
     const string = "1234567";
     return [...string].map((v) => {
       return {
-        taker_amount: Math.round(Math.random() * 10000),
+        amount: Math.round(Math.random() * 10000),
         price: Math.round(Math.random() * 10000),
         is_buyer: Math.random() > 0.5 ? true : false,
       };

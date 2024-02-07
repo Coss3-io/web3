@@ -18,12 +18,13 @@ export type Maker = {
   address: string;
   quote_fees: number;
   base_fees: number;
+  timestamp: number;
 };
 
 export type Taker = {
   block: number;
   price: number,
-  taker_amount: number;
+  amount: number;
   base_fees: boolean;
   fees: number;
   is_buyer: boolean;

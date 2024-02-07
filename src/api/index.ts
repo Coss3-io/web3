@@ -29,8 +29,7 @@ export class Client {
   private static globalStakingPath = "/api/global-stacking";
   private static stakingFeesPath = "/api/stacking-fees";
   private static botDataPath = "/api/bot";
-  private static makerDataPath = "/api/orders";
-  private static takerDataPath = "/api/taker";
+  private static ordersDataPath = "/api/batch-orders";
 
   public static accountStore: ReturnType<typeof useAccountStore>;
   public static stackingStore: ReturnType<typeof useStackingStore>;
@@ -306,30 +305,21 @@ export class Client {
     try {
       if (
         this.orderStore.$state.makersLoaded[pair] &&
-        this.orderStore.$state.makersLoaded[pair]
+        this.orderStore.$state.takersLoaded[pair]
       )
         return true;
-      const makersPromise = axios.get(this.url + this.makerDataPath, {
+      const orders = await axios.get(this.url + this.ordersDataPath, {
         params: {
           chain_id: this.accountStore.$state.networkId,
           base_token: base,
           quote_token: quote,
         },
+        withCredentials: true, 
+        
       });
-      const takersPromise = axios.get(this.url + this.takerDataPath, {
-        params: {
-          chain_id: this.accountStore.$state.networkId,
-          base_token: base,
-          quote_token: quote,
-        },
-      });
-      const [makers, takers] = await Promise.all([
-        makersPromise,
-        takersPromise,
-      ]);
+
       if (
-        makers.status != axios.HttpStatusCode.Ok ||
-        takers.status != axios.HttpStatusCode.Ok
+        orders.status != axios.HttpStatusCode.Ok
       ) {
         notify({
           text: "An error occured during orders loading please refresh the page",
@@ -337,9 +327,10 @@ export class Client {
         });
         return false;
       }
+      console.log(orders.data["makers"])
       this.orderStore[OrderActions.LoadOrders](
-        makers.data,
-        takers.data,
+        orders.data["makers"],
+        orders.data["takers"],
         base,
         quote
       );

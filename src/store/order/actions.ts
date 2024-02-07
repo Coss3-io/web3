@@ -36,7 +36,7 @@ export function loadOrders(
   }
   if (takers.length) {
     takers.forEach((taker) => {
-      taker.taker_amount = unBigNumberify(String(taker.taker_amount));
+      taker.amount = unBigNumberify(String(taker.amount));
       taker.price = unBigNumberify(String(taker.price));
       taker.fees = unBigNumberify(String(taker.fees));
     });

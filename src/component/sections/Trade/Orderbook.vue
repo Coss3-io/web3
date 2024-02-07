@@ -130,7 +130,7 @@ const lastTrade = computed<{
   const taker = Client.orderStore.$state.takers[props.pair][0];
   return {
     price: taker.price,
-    amount: taker.taker_amount,
+    amount: taker.amount,
     isBuyer: taker.is_buyer,
   };
 });

@@ -27,7 +27,7 @@ export const orderStatus = {
   OPEN: "OPEN",
   ALL: "ALL",
   FILLED: "FILLED",
-  CANCEL: "CANCEL",
+  CANCELLED: "CANCELLED",
 } as const;
 
 export const orderSideBg: { [key in Values<typeof orderSide>]: string } = {
@@ -46,7 +46,7 @@ export const orderStatusBg: { [key in Values<typeof orderStatus>]: string } = {
   [orderStatus.OPEN]: "!bg-blue-700",
   [orderStatus.ALL]: "",
   [orderStatus.FILLED]: "!bg-green-700",
-  [orderStatus.CANCEL]: "!bg-red-700",
+  [orderStatus.CANCELLED]: "!bg-red-700",
 } as const;
 
 export const orderSideLogo: { [key in Values<typeof orderSide>]: Component } = {
@@ -67,5 +67,5 @@ export const orderStatusLogo: {
   [orderStatus.OPEN]: openOrderLogo,
   [orderStatus.ALL]: allLogo,
   [orderStatus.FILLED]: filledOrderLogo,
-  [orderStatus.CANCEL]: cancelledOrderLogo,
+  [orderStatus.CANCELLED]: cancelledOrderLogo,
 } as const;

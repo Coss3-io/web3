@@ -114,9 +114,10 @@
       </div>
 
       <UserOrders
-        :userOrders="userOrders"
+        :loading="loading"
         :base="selectedBase"
         :quote="selectedQuote"
+        :pair="pair"
       ></UserOrders>
     </div>
   </div>
@@ -150,7 +151,6 @@ const orderDetails = reactive({ price: 0, amount: 0 });
 const tradeHistory = reactive([{ price: 0, amount: 0 }]);
 const newOrder = reactive([{ price: 0, amount: 0 }]);
 const balancesDetails = reactive([{ price: 0, amount: 0 }]);
-const userOrders: Array<number> = [];
 
 const pair = computed(() => {
   if (
@@ -166,9 +166,14 @@ const pair = computed(() => {
 });
 
 watch(
-  [selectedBase, selectedQuote],
-  async ([newBase, newQuote], [oldBase, OldQuote]) => {
-    if (newBase && newQuote && Client.accountStore.$state.networkId) {
+  [selectedBase, selectedQuote, () => Client.accountStore.$state.appConnected],
+  async ([newBase, newQuote, newConnect], [oldBase, OldQuote, oldConnect]) => {
+    if (
+      newBase &&
+      newQuote &&
+      Client.accountStore.$state.networkId &&
+      newConnect
+    ) {
       const baseToken = nameToToken(
         <Values<typeof cryptoTicker>>newBase,
         Client.accountStore.networkId!

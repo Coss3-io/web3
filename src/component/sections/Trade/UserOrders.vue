@@ -39,6 +39,15 @@
           </div>
         </transition>
       </div>
+      <div
+        v-else-if="props.loading"
+        class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
+      >
+        <div class="btn btn-primary">
+          <span class="loading loading-infinity"></span>
+          Loading
+        </div>
+      </div>
     </Transition>
     <div class="flex justify-start items-center gap-3 flex-wrap">
       <div
@@ -151,7 +160,7 @@
             </a>
           </li>
           <li
-            @click="() => {filterValue = 'Date'; filterElement!.blur(); orders = orders.sort(propertySortFactory('date', false))}"
+            @click="() => {filterValue = 'Date'; filterElement!.blur(); orders = orders.sort(propertySortFactory('timestamp', false))}"
           >
             <a>
               <clock></clock>
@@ -160,7 +169,7 @@
             </a>
           </li>
           <li
-            @click="() => {filterValue = 'Date'; filterElement!.blur(); orders = orders.sort(propertySortFactory('date', true))}"
+            @click="() => {filterValue = 'Date'; filterElement!.blur(); orders = orders.sort(propertySortFactory('timestamp', true))}"
           >
             <a>
               <clock></clock>
@@ -255,8 +264,8 @@
             class="grid grid-cols-[3fr_3fr_3fr_4fr_3fr_3fr] col-span-full place-items-center text-[9px]"
           >
             <div>Price</div>
-            <div @click="delOrder">Amount</div>
-            <div @click="addOrder">Filled</div>
+            <div>Amount</div>
+            <div>Filled</div>
             <div>Date</div>
             <div>Fees</div>
             <div>Status</div>
@@ -272,34 +281,41 @@
                 <div
                   v-if="
                     (filterOrderType == orderType.ALL ||
-                      filterOrderType == order.type) &&
+                      (filterOrderType == orderType.MAKER &&
+                        'orderHash' in order)) &&
                     (filterOrderSide == orderSide.ALL ||
                       filterOrderSide == order.side) &&
                     (filterOrderStatus == orderStatus.ALL ||
                       filterOrderStatus == order.status)
                   "
-                  @click.passive="order.selected = !order.selected"
+                  @click.passive="order.selected.value = !order.selected.value"
                   :class="{
-                    'outline-1 outline outline-primary': order.selected,
+                    'outline-1 outline outline-primary': order.selected.value,
                   }"
                   class="z-10 grid mb-1 w-full even:bg-neutral/50 duration-300 py-1 text-[10px] sm:text-sm grid-cols-[3fr_3fr_3fr_4fr_3fr_3fr] col-span-full place-items-center font-sans-inherit rounded-full bg-neutral hover:bg-base-200 transition-all cursor-pointer shadow-black/20 shadow-md"
                 >
                   <div>{{ order.price }}</div>
                   <div>{{ order.amount }}</div>
-                  <div>{{ order.filled }}</div>
+                  <div>
+                    {{ order.type == orderType.MAKER ? order.filled : "-" }}
+                  </div>
                   <div class="whitespace-nowrap text-[8px] sm:text-xs">
                     {{
                       new Intl.DateTimeFormat("fr-FR", dateOptions).format(
-                        order.date
+                        order.timestamp
                       )
                     }}
                   </div>
                   <div class="w-full flex items-center gap-1 sm:gap-2">
                     <div class="grow text-right">
-                      {{ order.fees }}
+                      {{
+                        order.type == orderType.MAKER
+                          ? order.quote_fees
+                          : order.fees
+                      }}
                     </div>
                     <img
-                      :src="order.baseFees ? aave : usdc"
+                      :src="order.base_fees ? aave : usdc"
                       alt="token"
                       class="w-4 h-4 sm:h-5 sm:w-5"
                     />
@@ -323,7 +339,7 @@
 </template>
 <script setup lang="ts">
 import Dashboard from "../../buttons/Dashboard.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Values } from "../../../types/cryptoSpecs";
 import {
   orderSide,
@@ -344,12 +360,28 @@ import {
   price,
   orderArrow,
 } from "../../../asset/images/images";
+import { Maker, Taker } from "../../../types/order";
 import { Client } from "../../../api";
+import { Ref } from "vue";
+
+interface extendedMaker extends Maker {
+  type: (typeof orderType)["MAKER"];
+  side: Values<typeof orderSide>;
+  selected: Ref<boolean>;
+}
+
+interface extendedTaker extends Taker {
+  type: (typeof orderType)["TAKER"];
+  side: Values<typeof orderSide>;
+  selected: Ref<boolean>;
+  status: Values<typeof orderStatus>;
+}
 
 const props = defineProps<{
+  loading: boolean;
   base: string;
   quote: string;
-  userOrders: Array<number>;
+  pair: string;
 }>();
 
 let filterElement = ref<HTMLInputElement | null>(null);
@@ -393,457 +425,28 @@ const dateOptions = {
   second: "2-digit", // Zero-padded seconds
 } as const;
 
-function delOrder() {
-  orders.value.splice(2, 2);
-}
+const orders = computed(() => {
+  if (
+    !Client.orderStore.makersLoaded[props.pair] ||
+    !Client.orderStore.takersLoaded[props.pair]
+  )
+    return [];
 
-function addOrder() {
-  orders.value.splice(4, 0, {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    selected: false,
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.OPEN,
-    side: orderSide.BUY,
-    type: orderType.MAKER,
+  const response: Array<extendedMaker | extendedTaker> = [
+    ...(<Array<extendedMaker>>Client.orderStore.makers[props.pair]),
+    ...(<Array<extendedTaker>>Client.orderStore.takers[props.pair]),
+  ];
+
+  response.forEach((order) => {
+    order.selected = ref(false);
+    if ("order_hash" in order) {
+      order.type = orderType.MAKER;
+    } else {
+      order.type = orderType.TAKER;
+      order.status = orderStatus.FILLED;
+    }
   });
-}
-
-const orders = ref([
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    selected: false,
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.SELL,
-    status: orderStatus.FILLED,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.OPEN,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.CANCEL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.FILLED,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.CANCEL,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.FILLED,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.OPEN,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.CANCEL,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.FILLED,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    selected: false,
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.OPEN,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    selected: false,
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.CANCEL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.CANCEL,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    selected: false,
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    selected: false,
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.CANCEL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    selected: false,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    selected: false,
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.FILLED,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    selected: false,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    selected: false,
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.FILLED,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.FILLED,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.OPEN,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.FILLED,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.OPEN,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.FILLED,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.OPEN,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.FILLED,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    selected: false,
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    side: orderSide.BUY,
-    status: orderStatus.FILLED,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    selected: false,
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    selected: false,
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    selected: false,
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.FILLED,
-    side: orderSide.SELL,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    selected: false,
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    selected: false,
-    side: orderSide.BUY,
-    status: orderStatus.FILLED,
-    type: orderType.MAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    selected: false,
-    baseFees: Math.random() > 0.5,
-    status: orderStatus.OPEN,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-  {
-    price: Math.round(Math.random() * 2000),
-    amount: Math.round(Math.random() * 2000),
-    filled: Math.round(Math.random() * 2000),
-    date: Date.now() - Math.round(Math.random() * 5000),
-    fees: Math.round(Math.random() * 2000),
-    baseFees: Math.random() > 0.5,
-    selected: false,
-    status: orderStatus.FILLED,
-    side: orderSide.SELL,
-    type: orderType.TAKER,
-  },
-]);
+  console.log(response)
+  return response;
+});
 </script>
