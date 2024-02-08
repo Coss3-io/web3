@@ -182,14 +182,14 @@
                 class="absolute text-sm font-bold w-full text-center"
                 :class="quote in cryptoTicker ? '' : '-translate-x-3'"
               >
-                {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : displayAddress(quote) }}
+                {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : quote ? displayAddress(quote) : '' }}
               </span>
               <span
                 v-else
                 class="absolute text-sm font-bold w-full text-center"
                 :class="base in cryptoTicker ? '' : '-translate-x-3'"
               >
-                {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : displayAddress(base) }}
+                {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : base ? displayAddress(base): '' }}
               </span>
             </transition>
           </div>
@@ -250,14 +250,14 @@
             :key="base"
             class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
           >
-            {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : displayAddress(base) }}
+            {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : base ? displayAddress(base): '' }}
           </div>
           <div
             v-else
             :key="quote"
             class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
           >
-            {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : displayAddress(quote) }}
+            {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : quote ? displayAddress(quote): '' }}
           </div>
         </Transition>
         <div class="w-7 h-7 swap swap-rotate">
@@ -308,14 +308,14 @@
             :key="base"
             class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
           >
-            {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>base] : displayAddress(base) }}
+            {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>base] : base ? displayAddress(base): '' }}
           </div>
           <div
             v-else
             :key="quote"
             class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
           >
-            {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>quote] : displayAddress(quote) }}
+            {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>quote] : quote ? displayAddress(quote): '' }}
           </div>
         </Transition>
         <div

@@ -52,7 +52,7 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : displayAddress(props.base) }}
+          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : props.base ? displayAddress(props.base): '' }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6 flex items-center">
@@ -77,7 +77,7 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : displayAddress(props.quote) }}
+          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : props.quote ?displayAddress(props.quote): '' }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6 flex items-center">
@@ -126,7 +126,7 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : displayAddress(props.base) }}
+          {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : props.base ? displayAddress(props.base): '' }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6 flex items-center">
@@ -151,7 +151,7 @@
         <div
           class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/2"
         >
-          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : displayAddress(props.quote) }}
+          {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : props.quote ? displayAddress(props.quote): '' }}
         </div>
         <div class="grow text-xs text-center font-bold font-sans">13516</div>
         <div class="w-6 h-6 flex items-center">

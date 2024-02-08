@@ -327,7 +327,6 @@ export class Client {
         });
         return false;
       }
-      console.log(orders.data["makers"])
       this.orderStore[OrderActions.LoadOrders](
         orders.data["makers"],
         orders.data["takers"],
@@ -336,7 +335,6 @@ export class Client {
       );
       this.orderStore.$state.makersLoaded[pair] = true;
       this.orderStore.$state.takersLoaded[pair] = true;
-      console.log(this.orderStore.$state);
     } catch (e) {
       notify({
         text: "An error occured during orders loading check console",

@@ -96,14 +96,20 @@
             <div class="grow relative h-full w-full flex items-center">
               <transition name="fadeNav">
                 <div
-                  :key="filterValue"
+                  :key="sortValue"
                   class="capitalize grow w-full flex items-center absolute"
                 >
-                  <clock v-if="filterValue == 'Date'"></clock>
-                  <price v-else-if="filterValue == 'Price'"></price>
+                  <clock v-if="sortValue == sortValues.Date"></clock>
+                  <price v-else-if="sortValue == sortValues.Price"></price>
                   <amount v-else></amount>
-                  <div class="grow">
-                    {{ filterValue }}
+                  <div v-if="sortValue == sortValues.Date" class="grow">
+                    {{ "Date" }}
+                  </div>
+                  <div v-else-if="sortValue == sortValues.Price" class="grow">
+                    {{ "Price" }}
+                  </div>
+                  <div v-else class="grow">
+                    {{ "Amount" }}
                   </div>
                 </div>
               </transition>
@@ -116,11 +122,11 @@
         </label>
         <ul
           tabindex="0"
-          ref="filterElement"
+          ref="sortElement"
           class="dropdown-content z-[1] menu p-2 shadow-md shadow-black/50 bg-base-100 rounded-box w-52"
         >
           <li
-            @click="() => {filterValue = 'Amount'; filterElement!.blur(); orders = orders.sort(propertySortFactory('amount', false))}"
+            @click="() => {sortValue = sortValues.Amount; sortElement!.blur(); sortAscending = false}"
           >
             <a>
               <amount></amount>
@@ -129,7 +135,7 @@
             </a>
           </li>
           <li
-            @click="() => {filterValue = 'Amount'; filterElement!.blur(); orders = orders.sort(propertySortFactory('amount', true))}"
+            @click="() => {sortValue = sortValues.Amount; sortElement!.blur(); sortAscending = true}"
           >
             <a>
               <amount></amount>
@@ -140,7 +146,7 @@
             </a>
           </li>
           <li
-            @click="() => {filterValue = 'Price'; filterElement!.blur(); orders = orders.sort(propertySortFactory('price', false))}"
+            @click="() => {sortValue = sortValues.Price; sortElement!.blur(); sortAscending = false}"
           >
             <a>
               <price></price>
@@ -149,7 +155,7 @@
             </a>
           </li>
           <li
-            @click="() => {filterValue = 'Price'; filterElement!.blur(); orders = orders.sort(propertySortFactory('price', true))}"
+            @click="() => {sortValue = sortValues.Price; sortElement!.blur(); sortAscending = true}"
           >
             <a>
               <price></price>
@@ -160,7 +166,7 @@
             </a>
           </li>
           <li
-            @click="() => {filterValue = 'Date'; filterElement!.blur(); orders = orders.sort(propertySortFactory('timestamp', false))}"
+            @click="() => {sortValue = sortValues.Date; sortElement!.blur(); sortAscending = false}"
           >
             <a>
               <clock></clock>
@@ -169,7 +175,7 @@
             </a>
           </li>
           <li
-            @click="() => {filterValue = 'Date'; filterElement!.blur(); orders = orders.sort(propertySortFactory('timestamp', true))}"
+            @click="() => {sortValue = sortValues.Date; sortElement!.blur(); sortAscending = true}"
           >
             <a>
               <clock></clock>
@@ -281,23 +287,28 @@
                 <div
                   v-if="
                     (filterOrderType == orderType.ALL ||
-                      (filterOrderType == orderType.MAKER &&
-                        'orderHash' in order)) &&
+                      filterOrderType == order.type) &&
                     (filterOrderSide == orderSide.ALL ||
                       filterOrderSide == order.side) &&
                     (filterOrderStatus == orderStatus.ALL ||
                       filterOrderStatus == order.status)
                   "
-                  @click.passive="order.selected.value = !order.selected.value"
+                  @click.passive="
+                    (<boolean>(<unknown>order.selected)) = !order.selected
+                  "
                   :class="{
-                    'outline-1 outline outline-primary': order.selected.value,
+                    'outline-1 outline outline-primary': order.selected,
                   }"
                   class="z-10 grid mb-1 w-full even:bg-neutral/50 duration-300 py-1 text-[10px] sm:text-sm grid-cols-[3fr_3fr_3fr_4fr_3fr_3fr] col-span-full place-items-center font-sans-inherit rounded-full bg-neutral hover:bg-base-200 transition-all cursor-pointer shadow-black/20 shadow-md"
                 >
-                  <div>{{ order.price }}</div>
-                  <div>{{ order.amount }}</div>
+                  <div>{{ order.price.toFixed(5) }}</div>
+                  <div>{{ order.amount.toFixed(5) }}</div>
                   <div>
-                    {{ order.type == orderType.MAKER ? order.filled : "-" }}
+                    {{
+                      order.type == orderType.MAKER
+                        ? order.filled.toFixed(5)
+                        : "-"
+                    }}
                   </div>
                   <div class="whitespace-nowrap text-[8px] sm:text-xs">
                     {{
@@ -310,15 +321,36 @@
                     <div class="grow text-right">
                       {{
                         order.type == orderType.MAKER
-                          ? order.quote_fees
-                          : order.fees
+                          ? order.quote_fees.toFixed(5)
+                          : order.fees.toFixed(5)
                       }}
                     </div>
-                    <img
-                      :src="order.base_fees ? aave : usdc"
-                      alt="token"
-                      class="w-4 h-4 sm:h-5 sm:w-5"
-                    />
+                    <template v-if="order.base_fees">
+                      <img
+                        :key="props.base"
+                        v-if="props.base in cryptoTicker"
+                        :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.base]"
+                        alt="token"
+                        class="w-4 h-4 sm:h-5 sm:w-5"
+                      />
+                      <unknownPrimaryTokenLogo
+                        v-else
+                        class="fill-primary !w-4 !h-4 !sm:h-5 !sm:w-5"
+                      ></unknownPrimaryTokenLogo>
+                    </template>
+                    <template v-else>
+                      <img
+                        :key="props.quote"
+                        v-if="props.quote in cryptoTicker"
+                        :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.quote]"
+                        alt="token"
+                        class="w-4 h-4 sm:h-5 sm:w-5"
+                      />
+                      <unknownSecondaryTokenLogo
+                        v-else
+                        class="fill-secondary !w-4 !h-4 !sm:h-5 !sm:w-5"
+                      ></unknownSecondaryTokenLogo>
+                    </template>
                   </div>
                   <div>{{ order.status }}</div>
                 </div>
@@ -340,7 +372,7 @@
 <script setup lang="ts">
 import Dashboard from "../../buttons/Dashboard.vue";
 import { computed, ref } from "vue";
-import { Values } from "../../../types/cryptoSpecs";
+import { Values, cryptoLogo, cryptoTicker } from "../../../types/cryptoSpecs";
 import {
   orderSide,
   orderSideBg,
@@ -359,6 +391,8 @@ import {
   amount,
   price,
   orderArrow,
+  unknownPrimaryTokenLogo,
+  unknownSecondaryTokenLogo
 } from "../../../asset/images/images";
 import { Maker, Taker } from "../../../types/order";
 import { Client } from "../../../api";
@@ -384,8 +418,15 @@ const props = defineProps<{
   pair: string;
 }>();
 
-let filterElement = ref<HTMLInputElement | null>(null);
-let filterValue = ref<string>("Date");
+const sortValues = {
+  Date: "timestamp",
+  Price: "price",
+  Amount: "amount",
+} as const;
+
+let sortElement = ref<HTMLInputElement | null>(null);
+let sortValue = ref<Values<typeof sortValues>>(sortValues.Date);
+let filterDescending = ref<boolean>(true);
 
 let filterOrderType = ref<Values<typeof orderType>>(orderType.ALL);
 let filterOrderSide = ref<Values<typeof orderSide>>(orderSide.ALL);
@@ -445,8 +486,13 @@ const orders = computed(() => {
       order.type = orderType.TAKER;
       order.status = orderStatus.FILLED;
     }
+    if (order.is_buyer) {
+      order.side = orderSide.BUY;
+    } else {
+      order.side = orderSide.SELL;
+    }
   });
-  console.log(response)
+  response.sort(propertySortFactory(sortValue.value, sortAscending.value));
   return response;
 });
 </script>
