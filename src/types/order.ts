@@ -34,6 +34,8 @@ export type Taker = {
 export type OrderState = {
   makers: { [key in string]: Array<Maker> };
   takers: { [key in string]: Array<Taker> };
+  user_makers: { [key in string]: Array<Maker> };
+  user_takers: { [key in string]: Array<Taker> };
   makersLoaded: { [key in string]: boolean };
   takersLoaded: { [key in string]: boolean };
 };

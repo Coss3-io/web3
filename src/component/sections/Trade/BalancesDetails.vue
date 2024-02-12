@@ -128,7 +128,9 @@
         >
           {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : props.base ? displayAddress(props.base): '' }}
         </div>
-        <div class="grow text-xs text-center font-bold font-sans">13516</div>
+        <div class="grow text-xs text-center font-bold font-sans">
+            {{baseInOrders}}
+      </div>
         <div class="w-6 h-6 flex items-center">
           <transition name="fadeNav">
             <img
@@ -153,7 +155,7 @@
         >
           {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : props.quote ? displayAddress(props.quote): '' }}
         </div>
-        <div class="grow text-xs text-center font-bold font-sans">13516</div>
+        <div class="grow text-xs text-center font-bold font-sans">{{quoteInOrders}}</div>
         <div class="w-6 h-6 flex items-center">
           <transition name="fadeNav">
             <img
@@ -181,9 +183,39 @@ Values,
 } from "../../../types/cryptoSpecs";
 import { unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
 import { displayAddress } from "../../../utils";
+import { computed, ref } from "vue";
+import { Client } from "../../../api";
+import { orderStatus } from "../../../types/orderSpecs";
 
 const props = defineProps<{
   base: string | Values<typeof cryptoTicker>;
   quote: string | Values<typeof cryptoTicker>;
+  pair: string;
 }>();
+
+const baseInOrders = computed(() => {
+  let total = 0
+  if (!Client.orderStore.$state.user_makers[props.pair]) return 0
+   Client.orderStore.$state.user_makers[props.pair].filter((maker) => {
+    return maker.status != orderStatus.FILLED
+   }).forEach((maker) => {
+    if (!maker.is_buyer){
+      total += maker.amount - maker.filled
+    }
+  })
+  return total
+})
+
+const quoteInOrders = computed(() => {
+  let total = 0
+  if (!Client.orderStore.$state.user_makers[props.pair]) return 0
+   Client.orderStore.$state.user_makers[props.pair].filter((maker) => {
+    return maker.status != orderStatus.FILLED
+   }).forEach((maker) => {
+    if (maker.is_buyer) {
+      total += (maker.amount - maker.filled) * maker.price
+    }
+  })
+  return total
+})
 </script>

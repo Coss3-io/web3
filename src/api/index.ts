@@ -43,6 +43,7 @@ export class Client {
    * @dev function used to check if the user is connected to the API
    */
   public static async checkConnection(): Promise<void> {
+    if (!this.accountStore.$state.networkId) return
     Client.accountStore[AccountActions.UpdateLoaded](false);
     try {
       let response = await axios.get(this.url + this.botDataPath, {
@@ -330,6 +331,8 @@ export class Client {
       this.orderStore[OrderActions.LoadOrders](
         orders.data["makers"],
         orders.data["takers"],
+        orders.data["user_makers"],
+        orders.data["user_takers"],
         base,
         quote
       );

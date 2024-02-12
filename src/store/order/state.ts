@@ -5,4 +5,6 @@ export const state: OrderState = {
   takers: {},
   takersLoaded: {},
   makersLoaded: {},
+  user_makers: {},
+  user_takers: {},
 };

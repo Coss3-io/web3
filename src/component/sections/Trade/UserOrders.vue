@@ -426,7 +426,6 @@ const sortValues = {
 
 let sortElement = ref<HTMLInputElement | null>(null);
 let sortValue = ref<Values<typeof sortValues>>(sortValues.Date);
-let filterDescending = ref<boolean>(true);
 
 let filterOrderType = ref<Values<typeof orderType>>(orderType.ALL);
 let filterOrderSide = ref<Values<typeof orderSide>>(orderSide.ALL);
@@ -474,8 +473,8 @@ const orders = computed(() => {
     return [];
 
   const response: Array<extendedMaker | extendedTaker> = [
-    ...(<Array<extendedMaker>>Client.orderStore.makers[props.pair]),
-    ...(<Array<extendedTaker>>Client.orderStore.takers[props.pair]),
+    ...(<Array<extendedMaker>>Client.orderStore.user_makers[props.pair]),
+    ...(<Array<extendedTaker>>Client.orderStore.user_takers[props.pair]),
   ];
 
   response.forEach((order) => {

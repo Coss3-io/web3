@@ -102,6 +102,7 @@
           <BalancesDetails
             :base="selectedBase"
             :quote="selectedQuote"
+            :pair="pair"
           ></BalancesDetails>
         </div>
         <div class="col-span-full lg:col-span-8 w-full rounded-xl">
