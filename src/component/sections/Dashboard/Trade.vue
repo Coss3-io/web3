@@ -40,7 +40,7 @@
               </svg>
             </div>
           </div>
-          <div class="stat-desc">$230 in orders</div>
+          <div class="stat-desc">${{ orderStore[OrderGetters.TotalInOrders] }} in orders</div>
         </div>
         <div class="stat relative">
           <div class="stat-title">Fees earned</div>
@@ -268,6 +268,10 @@ import { tradeLogo, unknownTokenLogo } from "../../../asset/images/images";
 import { RouteNames } from "../../../router";
 import { ref } from "vue";
 import { cryptoLogo, cryptoTicker } from "../../../types/cryptoSpecs";
+import { useOrderStore } from "../../../store/order";
+import { OrderGetters } from "../../../types/order";
+
+const orderStore = useOrderStore()
 
 let rebalance = ref<boolean>(true);
 let copiedIndex = ref<number | null>(null);

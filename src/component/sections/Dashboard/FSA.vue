@@ -34,7 +34,7 @@
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             ></path>
           </svg>
-          <span>~$1200 to be claimed</span>
+          <span>~${{ toBeClaimed }} to be claimed</span>
           <RouterLink :to="{ name: RouteNames.FSA }">
             <button class="btn btn-primary btn-sm hover:scale-105">
               check
@@ -50,4 +50,20 @@ import UserOverview from "../FSA/UserOverview.vue";
 import { RouterLink } from "vue-router";
 import { fsaLogo } from "../../../asset/images/images";
 import { RouteNames } from "../../../router";
+import { useStackingStore } from "../../../store/stacking";
+import { usePriceStore } from "../../../store/price";
+import { computed } from "vue";
+import { StackingGetters } from "../../../types/stacking";
+
+const stackingStore = useStackingStore();
+
+const toBeClaimed = computed(() => {
+  let total = 0;
+  Object.values(stackingStore[StackingGetters.UserAvailableFSA]).forEach(
+    (entry) => {
+      total += entry.dollarsValue;
+    }
+  );
+  return total;
+});
 </script>

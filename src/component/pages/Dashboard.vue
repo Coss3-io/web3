@@ -51,7 +51,7 @@
       </div>
       <FSA></FSA>
       <Trade></Trade>
-      <Bot></Bot>
+      <!-- <Bot></Bot> -->
       <Lending></Lending>
     </div>
   </div>

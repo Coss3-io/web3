@@ -50,6 +50,6 @@ export const OrderActions = {
 export const OrderGetters = {
   TotalVolume: "TotalVolume",
   TotalFees: "TotalFees",
-  TotalYield: "TotalYield",
-  TotalValue: "TotalValue",
-};
+  TotalInOrders: "TotalInOrders",
+  OpenOrders: "OpenOrders",
+} as const;

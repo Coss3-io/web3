@@ -14,6 +14,7 @@ import {
   namesToToken,
 } from "./types/cryptoSpecs";
 import axios, { AxiosResponse } from "axios";
+import { useAccountStore } from "./store/account";
 
 /**
  * @notice - used to display the beginning and the end of an address
@@ -124,6 +125,7 @@ export const nFormatter = (num: number, digits: number): string => {
  */
 export function dollarsValue(tokens: { [key in string]: number }): number {
   const priceStore = usePriceStore();
+  const accountStore = useAccountStore();
   let $value = 0;
   const test: { [key in string]: number } = {
     [COSS_TOKEN]: 1,
@@ -135,11 +137,17 @@ export function dollarsValue(tokens: { [key in string]: number }): number {
     "0x4bbeEB066eD09B7AEd07bF39EEe0460DFa261520": 1,
   };
   Object.entries(tokens).forEach(([token, amount]) => {
+    let name = nameToToken(token, accountStore.$state.networkId?? 0)
     if (token in priceStore.$state) {
       $value += priceStore.$state[token] * amount;
-    }
-    if (token in test) {
+    } else if (token in test){
       $value += test[token] * amount;
+    } else if (name in priceStore.$state) {
+      $value += priceStore.$state[name] * amount;
+    } else if (name in test){
+      $value += test[name] * amount;
+    } else {
+      // TODO load the value of the token from the blockchain in an efficient way
     }
   });
   return Math.round($value * 100) / 100;
