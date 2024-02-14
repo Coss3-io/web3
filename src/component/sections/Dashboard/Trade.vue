@@ -2,6 +2,17 @@
   <div
     class="col-span-full lg:col-span-6 grid grid-cols-[min-content_1fr] grid-rows-[min-content_1fr_min-content] xl:grid-rows-[min-content_1fr] 2xl:grid-rows-[min-content_3fr_2fr] gap-2 items-center bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.5s_forwards]"
   >
+    <Transition name="fadeNav">
+      <div
+        v-if="!props.loaded"
+        class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
+      >
+        <button class="btn btn-primary shadow shadow-black/50">
+          <span class="loading loading-ring"></span>
+          Loading
+        </button>
+      </div>
+    </Transition>
     <div class="flex justify-start">
       <div
         class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
@@ -18,11 +29,13 @@
         <div
           class="stat relative sm:border-r-2 md:border-r-0 lg:border-r-2 xl:border-r-0"
         >
-          <div class="stat-title">Traded Volume</div>
+          <div class="stat-title">Volume Generated</div>
           <div
             class="stat-value py-3 flex items-center w-full justify-center gap-3"
           >
-            <div class="font-sans grow text-left">$1,520,230</div>
+            <div class="font-sans grow text-left">
+              ${{ displayNumber(orderStore[OrderGetters.TotalVolume]) }}
+            </div>
             <div class="text-neutral-content">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -40,14 +53,18 @@
               </svg>
             </div>
           </div>
-          <div class="stat-desc">${{ orderStore[OrderGetters.TotalInOrders] }} in orders</div>
+          <div class="stat-desc">
+            ${{ orderStore[OrderGetters.TotalInOrders] }} in orders
+          </div>
         </div>
         <div class="stat relative">
           <div class="stat-title">Fees earned</div>
           <div
             class="stat-value py-3 flex items-center w-full justify-center gap-3"
           >
-            <div class="font-sans grow text-left">$1,520</div>
+            <div class="font-sans grow text-left">
+              ${{ displayNumber(orderStore[OrderGetters.TotalFees]) }}
+            </div>
             <div class="text-neutral-content">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +91,7 @@
           <div
             class="stat-value py-3 flex gap-2 flex-nowrap items-center justify-evenly w-full max-w-xs"
           >
-            234
+            {{ orderStore[OrderGetters.OpenOrders] }}
             <RouterLink
               :to="{ name: RouteNames.Trade }"
               class="btn btn-sm hover:scale-105"
@@ -192,10 +209,10 @@
               :src="(<any>cryptoLogo)[token]"
               class="w-7 h-7"
             />
-            <unknownTokenLogo
+            <unknownPrimaryTokenLogo
               v-else
-              class="h-8 w-8 fill-secondary"
-            ></unknownTokenLogo>
+              class="!h-8 !w-8 fill-primary"
+            ></unknownPrimaryTokenLogo>
           </div>
           <div
             class="flex flex-wrap gap-1 justify-center items-center grow text-center font-bold font-sans text-xs sm:text-base"
@@ -264,14 +281,22 @@
 </template>
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
-import { tradeLogo, unknownTokenLogo } from "../../../asset/images/images";
+import {
+  tradeLogo,
+  unknownPrimaryTokenLogo,
+} from "../../../asset/images/images";
 import { RouteNames } from "../../../router";
 import { ref } from "vue";
 import { cryptoLogo, cryptoTicker } from "../../../types/cryptoSpecs";
 import { useOrderStore } from "../../../store/order";
 import { OrderGetters } from "../../../types/order";
+import { displayNumber } from "../../../utils";
 
-const orderStore = useOrderStore()
+const props = defineProps<{
+  loaded: boolean;
+}>();
+
+const orderStore = useOrderStore();
 
 let rebalance = ref<boolean>(true);
 let copiedIndex = ref<number | null>(null);

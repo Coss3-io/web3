@@ -31,7 +31,10 @@
           </svg>
           <w3m-button balance="hide" />
         </div>
-        <div class="flex items-center gap-2 btn btn-ghost" @click.stop="open({'view': 'Networks'})">
+        <div
+          class="flex items-center gap-2 btn btn-ghost"
+          @click.stop="open({ view: 'Networks' })"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -49,8 +52,8 @@
           <w3m-network-button />
         </div>
       </div>
-      <FSA></FSA>
-      <Trade></Trade>
+      <FSA :loaded="fsaLoaded"></FSA>
+      <Trade :loaded="tradeLoaded"></Trade>
       <!-- <Bot></Bot> -->
       <Lending></Lending>
     </div>
@@ -64,13 +67,48 @@ import Bot from "../sections/Dashboard/Bot.vue";
 import Lending from "../sections/Dashboard/Lending.vue";
 import { ref } from "vue";
 import { dashboardLogo } from "../../asset/images/images";
-import { networkNames } from "../../types/networkSpecs";
-import { Values } from "../../types/cryptoSpecs";
 import Trade from "../sections/Dashboard/Trade.vue";
 import { useAccountStore } from "../../store/account";
+import { computed } from "vue";
+import { watch } from "vue";
+import { Client } from "../../api";
 
-const accountStore = useAccountStore()
-const { open } = useWeb3Modal()
-let networkElement = ref<HTMLInputElement | null>(null);
-let selectedNetwork = ref<null | Values<typeof networkNames>>(null);
+const accountStore = useAccountStore();
+const { open } = useWeb3Modal();
+
+let fsaLoaded = ref<boolean>(false);
+let tradeLoaded = ref<boolean>(false);
+let botLoaded = ref<boolean>(false);
+
+const accountLoadingReady = computed(
+  () => accountStore.$state.appConnected && accountStore.$state.networkId
+);
+
+async function loadDashboard() {
+  const publicStackingPromise = Client.loadPublicStacking();
+  const userStackingPromise = Client.loadUserStacking();
+  Client.loadUserBots().then((bots) => {
+    if (bots) botLoaded.value = true;
+  });
+  Client.loadUserOrders().then((userOrders) => {
+    if (userOrders) tradeLoaded.value = true;
+  });
+
+  const [publicStacking, userStacking] = await Promise.all([
+    publicStackingPromise,
+    userStackingPromise,
+  ]);
+
+  if (publicStacking && userStacking) fsaLoaded.value = true;
+}
+
+if (accountLoadingReady.value) {
+  loadDashboard();
+} else {
+  watch(accountLoadingReady, (newValue) => {
+    if (newValue) {
+      loadDashboard();
+    }
+  });
+}
 </script>

@@ -2,6 +2,17 @@
   <div
     class="col-span-full lg:col-span-6 grid grid-cols-[min-content_1fr] grid-rows-[min-content_1fr_min-content] xl:grid-rows-[min-content_1fr] 2xl:grid-rows-[min-content_3fr_2fr] gap-2 items-center bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-slideIn"
   >
+    <Transition name="fadeNav">
+      <div
+        v-if="!props.loaded"
+        class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
+      >
+        <button class="btn btn-primary shadow shadow-black/50">
+          <span class="loading loading-ball"></span>
+          Loading
+        </button>
+      </div>
+    </Transition>
     <div class="flex justify-start">
       <div
         class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
@@ -51,9 +62,12 @@ import { RouterLink } from "vue-router";
 import { fsaLogo } from "../../../asset/images/images";
 import { RouteNames } from "../../../router";
 import { useStackingStore } from "../../../store/stacking";
-import { usePriceStore } from "../../../store/price";
 import { computed } from "vue";
 import { StackingGetters } from "../../../types/stacking";
+
+const props = defineProps<{
+  loaded: boolean;
+}>();
 
 const stackingStore = useStackingStore();
 

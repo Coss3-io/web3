@@ -23,12 +23,12 @@ export class Client {
   private static coinGeckoAPIPath = "/api/v3/coins/markets";
 
   private static loginPath = "/api/login";
-  private static takerPath = "/api/taker";
   private static stakingPath = "/api/stacking";
   private static feesWithdrawalPath = "/api/fees-withdrawal";
   private static globalStakingPath = "/api/global-stacking";
   private static stakingFeesPath = "/api/stacking-fees";
   private static botDataPath = "/api/bot";
+  private static makerDataPath = "/api/order";
   private static ordersDataPath = "/api/batch-orders";
 
   public static accountStore: ReturnType<typeof useAccountStore>;
@@ -301,6 +301,14 @@ export class Client {
     return success;
   }
 
+  /**
+   * @notice - Used to loading orders for a given pair, to 
+   * populate the orderbooks and the user orders
+   * 
+   * @param base - The base token of the pair to load
+   * @param quote - The quote token of the pair to load
+   * @returns - The success or failliure of the request
+   */
   public static async loadPair(base: string, quote: string): Promise<boolean> {
     const pair = `${base}${quote}`;
     try {
@@ -349,5 +357,55 @@ export class Client {
     }
 
     return true;
+  }
+
+  public static async loadUserOrders(): Promise<boolean> {
+    if (!this.accountStore.$state.networkId) return false
+    try {
+      const makers = await axios.get(this.url + this.makerDataPath, {
+        params: {
+          chain_id: this.accountStore.$state.networkId,
+          all: true
+        },
+        withCredentials: true, 
+        
+      });
+
+      if (
+        makers.status != axios.HttpStatusCode.Ok
+      ) {
+        notify({
+          text: "An error occured during user orders loading",
+          type: "warn",
+        });
+        return false;
+      }
+
+      let orderGroup : {[key in string]: typeof makers.data} = {}
+      makers.data.forEach((maker: typeof makers.data) => {
+        const pair = maker.base_token + maker.quote_token
+        if (!orderGroup[pair]) orderGroup[pair] = []
+        orderGroup[pair].push(maker)
+      });
+      Object.entries(orderGroup).forEach((entry) => {
+        this.orderStore[OrderActions.LoadOrders](
+          [],
+          [],
+          entry[1],
+          [],
+          entry[1][0].base_token,
+          entry[1][0].quote_token
+        );
+      })
+    } catch (e) {
+      notify({
+        text: "An error occured during user orders loading check console",
+        type: "warn",
+      });
+      console.log("The orders failed to be loaded check console");
+      console.log(e);
+      return false;
+    }
+    return true
   }
 }

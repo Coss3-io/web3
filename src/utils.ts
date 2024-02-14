@@ -137,18 +137,26 @@ export function dollarsValue(tokens: { [key in string]: number }): number {
     "0x4bbeEB066eD09B7AEd07bF39EEe0460DFa261520": 1,
   };
   Object.entries(tokens).forEach(([token, amount]) => {
-    let name = nameToToken(token, accountStore.$state.networkId?? 0)
+    let increment = 0
     if (token in priceStore.$state) {
-      $value += priceStore.$state[token] * amount;
+      increment= priceStore.$state[token] * amount;
     } else if (token in test){
-      $value += test[token] * amount;
-    } else if (name in priceStore.$state) {
-      $value += priceStore.$state[name] * amount;
-    } else if (name in test){
-      $value += test[name] * amount;
-    } else {
-      // TODO load the value of the token from the blockchain in an efficient way
+      increment= test[token] * amount;
     }
+    if (accountStore.$state.networkId){
+      let name = nameToToken(token, accountStore.$state.networkId)
+      if (name in priceStore.$state) {
+        increment = priceStore.$state[name] * amount;
+      } else if (name in test){
+        increment = test[name] * amount;
+      } 
+    }
+
+    if (increment) {
+      $value += increment
+    } else {
+      // TODO compute the value of the token and add it to the total value
+    } 
   });
   return Math.round($value * 100) / 100;
 }
@@ -190,6 +198,7 @@ export function nameToToken(
   name: Values<typeof cryptoTicker> | string,
   chainId: string | number
 ): string {
+
   const token = namesToToken[chainIdToName(chainId)][<Values<typeof cryptoTicker>>name];
   return token || name
 }
