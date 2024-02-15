@@ -7,4 +7,5 @@ export const state: OrderState = {
   makersLoaded: {},
   user_makers: {},
   user_takers: {},
+  userOrdersLoaded: false
 };

@@ -38,6 +38,7 @@ export type OrderState = {
   user_takers: { [key in string]: Array<Taker> };
   makersLoaded: { [key in string]: boolean };
   takersLoaded: { [key in string]: boolean };
+  userOrdersLoaded: boolean;
 };
 
 export const OrderActions = {

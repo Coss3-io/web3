@@ -2,6 +2,17 @@
   <div
     class="col-span-full lg:col-span-6 flex flex-col gap-2 items-start bg-base-100 h-full p-2 rounded-lg shadow-lg shadow-black/50 opacity-0 translate-y-3 animate-[slideIn_0.3s_ease-in-out_0.8s_forwards]"
   >
+    <Transition name="fadeNav">
+      <div
+        v-if="!props.loaded"
+        class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
+      >
+        <button class="btn btn-primary">
+          <span class="loading loading-infinity"></span>
+          Loading
+        </button>
+      </div>
+    </Transition>
     <div class="flex justify-start">
       <div
         class="p-2 px-5 rounded-lg bg-neutral text-xl font-bold shadow-sm shadow-black/50 flex gap-4 items-center"
@@ -11,16 +22,22 @@
         <div>Bot</div>
       </div>
     </div>
-    <div class="flex flex-wrap w-full h-full gap-y-3 gap-x-2 justify-evenly items-center">
+    <div
+      class="flex flex-wrap w-full h-full gap-y-3 gap-x-2 justify-evenly items-center"
+    >
       <BotCard
+        v-if="!props.loaded || bestBots.firstBot.bot"
+        @click="router.push({ name: RouteNames.Bot, params: { index: bestBots.firstBot.index } })"
         :bot="{
-          base: 7593,
-          quote: 384,
-          baseName: cryptoTicker.ETH,
-          quoteName: cryptoTicker.USDC,
-          profits: 679,
-          fees: 1,
+          baseTokenAmount: bestBots.firstBot.bot?.baseTokenAmount ?? 7593,
+          quoteTokenAmount: bestBots.firstBot.bot?.quoteTokenAmount ?? 384,
+          baseToken: bestBots.firstBot.bot?.baseToken ?? cryptoTicker.ETH,
+          quoteToken: bestBots.firstBot.bot?.quoteToken ?? cryptoTicker.USDC,
+          feesEarned: bestBots.firstBot.bot?.feesEarned ?? 679,
+          makerFees: bestBots.firstBot.bot?.makerFees ?? 1,
         }"
+        :chainId="accountStore.$state.networkId ?? 0"
+        :index="bestBots.firstBot.index ?? 1"
         class="max-h-56 xl:max-h-64 w-56 xl:w-1/3 grow place-self-center indicator shadow-lg shadow-black/50"
       >
         <span
@@ -43,15 +60,43 @@
           #1 bot
         </span>
       </BotCard>
+      <div
+        v-else
+        :to="{ name: RouteNames.NewBot }"
+        class="h-56 xl:h-64 w-56 xl:w-1/3 grow place-self-center flex flex-col gap-3 items-center justify-center rounded-box transition-all bg-gradient-to-t from-base-100 via-base-300 to-base-100"
+      >
+        <RouterLink class="btn btn-primary" :to="{ name: RouteNames.NewBot }">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+
+          Create bot
+        </RouterLink>
+      </div>
       <BotCard
+        v-if="!props.loaded || bestBots.secondBot.bot"
+        @click="router.push({ name: RouteNames.Bot, params: { index: bestBots.secondBot.index } })"
         :bot="{
-          base: 5024,
-          quote: 453,
-          baseName: cryptoTicker.COSS,
-          quoteName: cryptoTicker.USDT,
-          profits: 45,
-          fees: 2,
+          baseTokenAmount: bestBots.secondBot.bot?.baseTokenAmount ?? 7593,
+          quoteTokenAmount: bestBots.secondBot.bot?.quoteTokenAmount ?? 384,
+          baseToken: bestBots.secondBot.bot?.baseToken ?? cryptoTicker.COSS,
+          quoteToken: bestBots.secondBot.bot?.quoteToken ?? cryptoTicker.USDT,
+          feesEarned: bestBots.secondBot.bot?.feesEarned ?? 679,
+          makerFees: bestBots.secondBot.bot?.makerFees ?? 1,
         }"
+        :chainId="accountStore.$state.networkId ?? 0"
+        :index="bestBots.secondBot.index ?? 1"
         class="max-h-56 xl:max-h-64 w-56 xl:w-1/3 grow place-self-center indicator shadow-lg shadow-black/50"
       >
         <span
@@ -74,6 +119,29 @@
           #2 bot
         </span>
       </BotCard>
+      <div
+        v-else
+        class="h-56 xl:h-64 w-56 xl:w-1/3 grow place-self-center flex flex-col gap-3 items-center justify-center rounded-box transition-all bg-gradient-to-t from-base-100 via-base-300 to-base-100"
+      >
+        <RouterLink class="btn btn-primary" :to="{ name: RouteNames.NewBot }">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+
+          Create bot
+        </RouterLink>
+      </div>
 
       <div
         class="stats stats-vertical xl:h-full max-h-96 sm:stats-horizontal md:stats-vertical lg:stats-horizontal xl:stats-vertical bg-primary text-primary-content place-self-center shadow-lg shadow-black/50 w-full max-w-[15rem] sm:max-w-none md:max-w-[15rem] lg:max-w-none xl:w-[30%] xl:grow"
@@ -83,7 +151,7 @@
           <div
             class="stat-value text-3xl flex items-center w-full justify-center gap-2"
           >
-            <div class="font-sans grow text-left">31K</div>
+            <div class="font-sans grow text-left">{{ botStore[BotGetters.TotalVolume] }}</div>
             <div class="text-neutral-content">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +169,7 @@
               </svg>
             </div>
           </div>
-          <div class="stat-desc">In order $1,200,230</div>
+          <div class="stat-desc">In order ${{ displayNumber(botStore[BotGetters.TotalValue]) }}</div>
         </div>
 
         <div class="stat py-2.5">
@@ -109,7 +177,7 @@
           <div
             class="stat-value text-3xl flex items-center w-full justify-center gap-2"
           >
-            <div class="font-sans grow text-left">4,200</div>
+            <div class="font-sans grow text-left">${{ displayNumber(botStore[BotGetters.TotalFees]) }}</div>
             <div class="text-neutral-content">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +195,7 @@
               </svg>
             </div>
           </div>
-          <div class="stat-desc">~22% yield/year</div>
+          <div class="stat-desc">~{{ botStore[BotGetters.TotalYield] }}% yield/year</div>
         </div>
 
         <div class="stat py-2.5">
@@ -149,9 +217,52 @@
   </div>
 </template>
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { botLogo } from "../../../asset/images/images";
 import { cryptoTicker } from "../../../types/cryptoSpecs";
 import BotCard from "../Bot/BotCard.vue";
 import { RouteNames } from "../../../router";
+import { computed } from "vue";
+import { useBotStore } from "../../../store/bot";
+import { useAccountStore } from "../../../store/account";
+import { BotGetters } from "../../../types/bot";
+import { displayNumber } from "../../../utils";
+
+const router = useRouter()
+const botStore = useBotStore();
+const accountStore = useAccountStore();
+
+const props = defineProps<{
+  loaded: boolean;
+}>();
+
+const bestBots = computed(() => {
+  let bestFirstBot: undefined | (typeof botStore.$state.bots)[0];
+  let bestSecondBot: undefined | (typeof botStore.$state.bots)[0];
+  let bestFirstBotIndex: undefined | number;
+  let bestSecondBotIndex: undefined | number;
+
+  botStore.$state.bots.forEach((bot, index) => {
+    if (
+      !bestFirstBot ||
+      bot.feesEarned * bot.quotePrice >
+        bestFirstBot.feesEarned * bestFirstBot.quotePrice
+    ) {
+      bestFirstBot = bot;
+      bestFirstBotIndex = index;
+    } else if (
+      !bestSecondBot ||
+      bot.feesEarned * bot.quotePrice >
+        bestSecondBot.feesEarned * bestSecondBot.quotePrice
+    ) {
+      bestSecondBot = bot;
+      bestSecondBotIndex = index;
+    }
+  });
+
+  return {
+    firstBot: { bot: bestFirstBot, index: bestFirstBotIndex },
+    secondBot: { bot: bestSecondBot, index: bestSecondBotIndex },
+  };
+});
 </script>

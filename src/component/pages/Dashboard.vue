@@ -54,7 +54,7 @@
       </div>
       <FSA :loaded="fsaLoaded"></FSA>
       <Trade :loaded="tradeLoaded"></Trade>
-      <!-- <Bot></Bot> -->
+      <Bot :loaded="botLoaded"></Bot>
       <Lending></Lending>
     </div>
   </div>
@@ -90,9 +90,9 @@ async function loadDashboard() {
   Client.loadUserBots().then((bots) => {
     if (bots) botLoaded.value = true;
   });
-  Client.loadUserOrders().then((userOrders) => {
-    if (userOrders) tradeLoaded.value = true;
-  });
+    Client.loadUserOrders().then((userOrders) => {
+      if (userOrders) tradeLoaded.value = true;
+    });
 
   const [publicStacking, userStacking] = await Promise.all([
     publicStackingPromise,

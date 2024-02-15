@@ -361,6 +361,7 @@ export class Client {
 
   public static async loadUserOrders(): Promise<boolean> {
     if (!this.accountStore.$state.networkId) return false
+    if (this.orderStore.$state.userOrdersLoaded) return true
     try {
       const makers = await axios.get(this.url + this.makerDataPath, {
         params: {
@@ -397,6 +398,7 @@ export class Client {
           entry[1][0].quote_token
         );
       })
+    this.orderStore.$state.userOrdersLoaded = true
     } catch (e) {
       notify({
         text: "An error occured during user orders loading check console",

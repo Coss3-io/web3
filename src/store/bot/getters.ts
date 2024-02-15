@@ -46,8 +46,6 @@ export function totalYield(state: BotState): number {
       ((time - bot.timestamp) / (60 * 60 * 24 * 365));
     assets += bot.baseUSD + bot.quoteUSD;
   });
-  console.log(fees)
-  console.log(assets)
   return fees / assets;
 }
 
