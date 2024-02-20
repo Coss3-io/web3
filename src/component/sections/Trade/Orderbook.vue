@@ -152,8 +152,8 @@ const sellOrders = computed(() => {
   const sells = Client.orderStore.$state.makers[props.pair].filter((maker) => {
     return !maker.is_buyer;
   });
-  sells.toSorted((first, second) => {
-    return second.price - first.price;
+  sells.sort((first, second) => {
+    return first.price - second.price;
   });
   const result: Array<{ price: number; total: number; makers: Array<Maker> }> =
     [];
@@ -187,7 +187,7 @@ const buyOrders = computed(() => {
   const buys = Client.orderStore.$state.makers[props.pair].filter((maker) => {
     return maker.is_buyer;
   });
-  buys.toSorted((first, second) => {
+  buys.sort((first, second) => {
     return first.price - second.price;
   });
   const result: Array<{ price: number; total: number; makers: Array<Maker> }> =

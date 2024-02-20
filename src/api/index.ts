@@ -8,7 +8,7 @@ import { useStackingStore } from "../store/stacking";
 import { StackingActions } from "../types/stacking";
 import { usePriceStore } from "../store/price";
 import { PriceActions } from "../types/price";
-import { getSigner } from "../utils";
+import { getSigner, tokenToName } from "../utils";
 import { useBotStore } from "../store/bot";
 import { BotActions, BotState } from "../types/bot";
 import BigNumber from "bignumber.js";
@@ -18,6 +18,7 @@ import { OrderActions } from "../types/order";
 const { notify } = useNotification();
 export class Client {
   private static url = "http://localhost:8000";
+  private static wsUrl = "ws://localhost:8000";
 
   private static coinGeckoAPIUrl = "https://api.coingecko.com/";
   private static coinGeckoAPIPath = "/api/v3/coins/markets";
@@ -37,13 +38,16 @@ export class Client {
   public static botStore: ReturnType<typeof useBotStore>;
   public static orderStore: ReturnType<typeof useOrderStore>;
 
+  private static pairWsPath = "/ws/trade/";
+  private static ws: Array<WebSocket> = [];
+
   constructor() {}
 
   /**
    * @dev function used to check if the user is connected to the API
    */
   public static async checkConnection(): Promise<void> {
-    if (!this.accountStore.$state.networkId) return
+    if (!this.accountStore.$state.networkId) return;
     Client.accountStore[AccountActions.UpdateLoaded](false);
     try {
       let response = await axios.get(this.url + this.botDataPath, {
@@ -236,6 +240,7 @@ export class Client {
         this.botStore[BotActions.AddBot](bot)
       );
       await Promise.all(promises);
+
       this.botStore.loaded = true;
     } catch (e) {
       notify({
@@ -247,6 +252,14 @@ export class Client {
     return success;
   }
 
+  /**
+   * @notice - Function used to create a bot by signing data
+   * @param data - The bot details about to be created
+   * @param baseNeeded - The base token amount needed to create the bot
+   * @param quoteNeeded - The quote token amount needed to create the bot
+   * @param encodedData - Then encoded data for the signature
+   * @returns 
+   */
   public static async createUserBot(
     data: { [key in string]: any },
     baseNeeded: string,
@@ -301,10 +314,77 @@ export class Client {
     return success;
   }
 
+  public static async createUserOrder(
+    data: { [key in string]: any },
+    encodedData: string
+  ): Promise<boolean> {
+    let success = false;
+    let response: AxiosResponse;
+    const signer = await getSigner(
+      this.accountStore.$state.networkId!,
+      this.accountStore.$state.networkName!
+    );
+
+    try {
+      if (!signer) throw new Error("The signer couldn't be loaded properly");
+      const signature = await signer.provider.send("personal_sign", [
+        encodedData,
+        signer.address.toLowerCase(),
+      ]);
+
+      data["signature"] = signature;
+      response = await axios.post(this.url + this.makerDataPath, data);
+      console.log(response)
+      success = true;
+    } catch (e) {
+      notify({
+        text: "An error occured during order creation check console",
+        type: "warn",
+      });
+      console.log(e);
+    }
+    return success;
+  }
+
+
+  private static async connectWsPair(
+    base: string,
+    quote: string
+  ): Promise<void> {
+    const ws = new WebSocket(
+      `${this.wsUrl}${this.pairWsPath}${this.accountStore
+        .networkId!}/${base}/${quote}`
+    );
+
+    ws.addEventListener("open", () => {
+      this.ws.push(ws);
+      console.log(
+        `Connected to the ${tokenToName(
+          base,
+          this.accountStore.networkId!
+        )}/${tokenToName(quote, this.accountStore.networkId!)} pair Ws`
+      );
+    });
+
+    ws.addEventListener("message", (msg) => {
+      console.log(msg);
+    });
+
+    ws.addEventListener("error", (e) => {
+      console.log(
+        `An error occured on the ${tokenToName(
+          base,
+          this.accountStore.networkId!
+        )}/${tokenToName(quote, this.accountStore.networkId!)} pair Ws`
+      );
+      console.log(e);
+    });
+  }
+
   /**
-   * @notice - Used to loading orders for a given pair, to 
+   * @notice - Used to loading orders for a given pair, to
    * populate the orderbooks and the user orders
-   * 
+   *
    * @param base - The base token of the pair to load
    * @param quote - The quote token of the pair to load
    * @returns - The success or failliure of the request
@@ -323,19 +403,17 @@ export class Client {
           base_token: base,
           quote_token: quote,
         },
-        withCredentials: true, 
-        
+        withCredentials: true,
       });
 
-      if (
-        orders.status != axios.HttpStatusCode.Ok
-      ) {
+      if (orders.status != axios.HttpStatusCode.Ok) {
         notify({
           text: "An error occured during orders loading please refresh the page",
           type: "warn",
         });
         return false;
       }
+      this.connectWsPair(base, quote);
       this.orderStore[OrderActions.LoadOrders](
         orders.data["makers"],
         orders.data["takers"],
@@ -360,21 +438,18 @@ export class Client {
   }
 
   public static async loadUserOrders(): Promise<boolean> {
-    if (!this.accountStore.$state.networkId) return false
-    if (this.orderStore.$state.userOrdersLoaded) return true
+    if (!this.accountStore.$state.networkId) return false;
+    if (this.orderStore.$state.userOrdersLoaded) return true;
     try {
       const makers = await axios.get(this.url + this.makerDataPath, {
         params: {
           chain_id: this.accountStore.$state.networkId,
-          all: true
+          all: true,
         },
-        withCredentials: true, 
-        
+        withCredentials: true,
       });
 
-      if (
-        makers.status != axios.HttpStatusCode.Ok
-      ) {
+      if (makers.status != axios.HttpStatusCode.Ok) {
         notify({
           text: "An error occured during user orders loading",
           type: "warn",
@@ -382,11 +457,11 @@ export class Client {
         return false;
       }
 
-      let orderGroup : {[key in string]: typeof makers.data} = {}
+      let orderGroup: { [key in string]: typeof makers.data } = {};
       makers.data.forEach((maker: typeof makers.data) => {
-        const pair = maker.base_token + maker.quote_token
-        if (!orderGroup[pair]) orderGroup[pair] = []
-        orderGroup[pair].push(maker)
+        const pair = maker.base_token + maker.quote_token;
+        if (!orderGroup[pair]) orderGroup[pair] = [];
+        orderGroup[pair].push(maker);
       });
       Object.entries(orderGroup).forEach((entry) => {
         this.orderStore[OrderActions.LoadOrders](
@@ -397,8 +472,8 @@ export class Client {
           entry[1][0].base_token,
           entry[1][0].quote_token
         );
-      })
-    this.orderStore.$state.userOrdersLoaded = true
+      });
+      this.orderStore.$state.userOrdersLoaded = true;
     } catch (e) {
       notify({
         text: "An error occured during user orders loading check console",
@@ -408,6 +483,6 @@ export class Client {
       console.log(e);
       return false;
     }
-    return true
+    return true;
   }
 }

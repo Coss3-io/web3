@@ -260,18 +260,7 @@
             {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : quote ? displayAddress(quote): '' }}
           </div>
         </Transition>
-        <div class="w-7 h-7 swap swap-rotate">
-          <input v-model="isBuyOrder" type="checkbox" class="hidden" />
-          <img
-            v-if="quote in cryptoLogo"
-            :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.quote]"
-            alt="token"
-            class="swap-off w-6 h-6"
-          />
-          <unknownSecondaryTokenLogo
-            v-else
-            class="swap-off fill-secondary !h-6 !w-6"
-          ></unknownSecondaryTokenLogo>
+        <div class="w-6 h-6">
           <img
             v-if="base in cryptoLogo"
             :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>props.base]"
@@ -284,6 +273,7 @@
           ></unknownPrimaryTokenLogo>
         </div>
         <input
+          v-model.number="amount"
           class="appearance-none font-sans focus:outline-none grow w-full bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
           type="text"
           placeholder="amount"
@@ -294,6 +284,7 @@
       >
         <img :src="dollars" alt="dollars" class="w-6 h-6" />
         <input
+          v-model.number="price"
           class="appearance-none font-sans grow w-full focus:outline-none bg-transparent text-center placeholder:text-white/20 placeholder:text-sm text-sm font-bold"
           type="text"
           placeholder="price"
@@ -302,22 +293,12 @@
       <div
         class="rounded-full flex bg-base-100 max-w-xs w-full p-1 h-9 items-center relative shadow-md shadow-black/50"
       >
-        <Transition name="fadeNav">
           <div
-            v-if="!isBuyOrder"
-            :key="base"
-            class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
-          >
-            {{ base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>base] : base ? displayAddress(base): '' }}
-          </div>
-          <div
-            v-else
             :key="quote"
             class="absolute text-[10px] text-white/20 -top-3 left-1/2 lowercase -translate-x-1/4"
           >
             {{ quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>quote] : quote ? displayAddress(quote): '' }}
           </div>
-        </Transition>
         <div
           class="text-xs relative w-16 h-5 font-bold rounded-full px-2 bg-neutral-content/20 flex items-center justify-center shadow shadow-black/50"
         >
@@ -326,19 +307,8 @@
             <div v-else>Receive</div>
           </transition>
         </div>
-        <div class="grow text-xs font-sans font-bold text-center">1234</div>
-        <div class="w-6 h-6 swap swap-rotate">
-          <input v-model="isBuyOrder" type="checkbox" class="hidden" />
-          <img
-            v-if="base in cryptoLogo"
-            :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>base]"
-            alt="token"
-            class="swap-off w-6 h-6"
-          />
-          <unknownPrimaryTokenLogo
-            v-else
-            class="swap-off fill-primary !w-6 !h-6"
-          ></unknownPrimaryTokenLogo>
+        <div class="grow text-xs font-sans font-bold text-center">{{ ((amount ?? 0) * (price ?? 0)) || '' }}</div>
+        <div class="w-6 h-6">
           <img
             v-if="quote in cryptoLogo"
             :src="<string>cryptoLogo[<Values<typeof cryptoTicker>>quote]"
@@ -357,12 +327,14 @@
     >
       <transition name="fadeNav">
         <button
+          @click="createOrder"
           v-if="isBuyOrder"
           class="btn btn-wide bg-green-700 text-white/70 hover:bg-green-800 shadow-lg shadow-black/50"
         >
           Buy
         </button>
         <button
+          @click="createOrder"
           v-else
           class="btn btn-wide bg-red-700 text-white/70 hover:bg-red-800 shadow-lg shadow-black/50"
         >
@@ -382,7 +354,11 @@ import {
 Values,
 } from "../../../types/cryptoSpecs";
 import { dollars, unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
-import { displayAddress } from "../../../utils";
+import { displayAddress, nameToToken } from "../../../utils";
+import { Client } from "../../../api";
+import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
+import { notify } from "@kyvg/vue3-notification";
 
 const props = defineProps<{
   newOrder: Object[];
@@ -393,4 +369,99 @@ const props = defineProps<{
 const isBuyOrder = ref(true);
 const isMakerOrder = ref(true);
 const isQuoteFeesOrder = ref(true);
+const price = ref<undefined | number>();
+const amount = ref<undefined | number>();
+
+async function createOrder() {
+  if (!isMakerOrder.value) return
+  if (!amount.value) return
+  if (!price.value) return
+  const multiplicator = new BigNumber("1e18")
+  const data = {
+    order_hash: "",
+    address: Client.accountStore.$state.address,
+    amount: new BigNumber(amount.value)
+      .multipliedBy(multiplicator)
+      .toFixed(),
+    price: new BigNumber(price.value)
+      .multipliedBy(multiplicator)
+      .toFixed(),
+    step: "0",
+    maker_fees: "0",
+    upper_bound: "0",
+    chain_id: Client.accountStore.$state.networkId,
+    lower_bound: "0",
+    base_token: nameToToken(
+      props.base,
+      Client.accountStore.$state.networkId!
+    ),
+    quote_token: nameToToken(
+      props.quote,
+      Client.accountStore.$state.networkId!
+    ),
+    expiry: String(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365 * 3),
+    is_buyer: isBuyOrder.value,
+    replace_order: false,
+  };
+  console.log([
+    data.address,
+    data.amount,
+    data.price,
+    data.step,
+    data.maker_fees,
+    data.upper_bound,
+    data.lower_bound,
+    data.base_token,
+    data.quote_token,
+    data.expiry,
+    Client.accountStore.$state.networkId,
+    data.is_buyer ? 0 : 1,
+    data.replace_order,
+  ]);
+  const encodedData = ethers.solidityPacked(
+    [
+      "address",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "address",
+      "address",
+      "uint64",
+      "uint64",
+      "uint8",
+      "bool",
+    ],
+    [
+      data.address,
+      data.amount,
+      data.price,
+      data.step,
+      data.maker_fees,
+      data.upper_bound,
+      data.lower_bound,
+      data.base_token,
+      data.quote_token,
+      data.expiry,
+      Client.accountStore.$state.networkId,
+      data.is_buyer ? 0 : 1,
+      data.replace_order,
+    ]
+    );
+    const orderHash = ethers.keccak256(encodedData);
+    data.order_hash = orderHash;
+  if (
+    await Client.createUserOrder(
+      data,
+      encodedData
+    )
+  ) {
+    notify({
+      text: "Order placed successfully",
+      type: "success",
+    });
+  }
+}
 </script>

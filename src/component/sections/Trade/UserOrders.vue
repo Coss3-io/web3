@@ -297,7 +297,7 @@
                     (<boolean>(<unknown>order.selected)) = !order.selected
                   "
                   :class="{
-                    'outline-1 outline outline-primary': order.selected,
+                    'outline-1 outline outline-primary': order.selected && order.status == orderStatus.OPEN
                   }"
                   class="z-10 grid mb-1 w-full even:bg-neutral/50 duration-300 py-1 text-[10px] sm:text-sm grid-cols-[3fr_3fr_3fr_4fr_3fr_3fr] col-span-full place-items-center font-sans-inherit rounded-full bg-neutral hover:bg-base-200 transition-all cursor-pointer shadow-black/20 shadow-md"
                 >
