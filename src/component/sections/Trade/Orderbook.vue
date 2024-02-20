@@ -38,7 +38,7 @@
           <div class="w-1/3">-</div>
         </div>
         <div
-          v-for="entry in buyOrders"
+          v-for="entry in sellOrders"
           :key="entry.price"
           class="relative w-full min-h-6 z-10 group"
         >
@@ -80,7 +80,7 @@
     >
       <TransitionGroup name="listBuy" tag="div">
         <div
-          v-for="(entry, index) in sellOrders"
+          v-for="(entry, index) in buyOrders"
           :key="entry.price"
           class="relative w-full min-h-6 z-10 group"
         >
@@ -95,7 +95,7 @@
           </div>
         </div>
         <div
-          v-for="n in (sellOrders.length * 24 < buyContainer?.clientHeight! ? Math.floor((buyContainer?.clientHeight! - sellOrders.length * 24 )/16): 0)"
+          v-for="n in (buyOrders.length * 24 < buyContainer?.clientHeight! ? Math.floor((buyContainer?.clientHeight! - buyOrders.length * 24 )/16): 0)"
           :key="'buy' + String(n)"
           class="flex text-center text-[11px] font-bold h-4 -z-10"
         >
@@ -153,7 +153,7 @@ const sellOrders = computed(() => {
     return !maker.is_buyer;
   });
   sells.sort((first, second) => {
-    return first.price - second.price;
+    return second.price - first.price;
   });
   const result: Array<{ price: number; total: number; makers: Array<Maker> }> =
     [];
@@ -188,7 +188,7 @@ const buyOrders = computed(() => {
     return maker.is_buyer;
   });
   buys.sort((first, second) => {
-    return first.price - second.price;
+    return second.price - first.price;
   });
   const result: Array<{ price: number; total: number; makers: Array<Maker> }> =
     [];

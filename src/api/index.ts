@@ -346,7 +346,6 @@ export class Client {
     return success;
   }
 
-
   private static async connectWsPair(
     base: string,
     quote: string
@@ -367,7 +366,7 @@ export class Client {
     });
 
     ws.addEventListener("message", (msg) => {
-      console.log(msg);
+      console.log(JSON.parse(msg["data"]));
     });
 
     ws.addEventListener("error", (e) => {
