@@ -203,7 +203,7 @@
           <div
             class="stat-value text-3xl flex gap-2 flex-nowrap mt-1 items-center justify-between"
           >
-            4
+            {{ botStore.$state.bots.length }} 
             <RouterLink
               :to="{ name: RouteNames.NewBot }"
               class="btn btn-sm hover:scale-105"

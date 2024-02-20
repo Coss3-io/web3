@@ -1,7 +1,6 @@
 //@ts-ignore
 import { getWalletClient } from "@wagmi/core";
 import { COSS_TOKEN } from "./api/settings";
-import { aave, avax, bnb, ether, usdc, usdt } from "./asset/images/images";
 import { usePriceStore } from "./store/price";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import BigNumber from "bignumber.js";
@@ -9,7 +8,6 @@ import {
   Values,
   chainIds,
   chainNames,
-  cryptoLogo,
   cryptoTicker,
   namesToToken,
 } from "./types/cryptoSpecs";
@@ -144,7 +142,7 @@ export function dollarsValue(tokens: { [key in string]: number }): number {
       increment= test[token] * amount;
     }
     if (accountStore.$state.networkId){
-      let name = nameToToken(token, accountStore.$state.networkId)
+      let name = tokenToName(token, accountStore.$state.networkId)
       if (name in priceStore.$state) {
         increment = priceStore.$state[name] * amount;
       } else if (name in test){

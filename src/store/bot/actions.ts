@@ -1,6 +1,4 @@
-import BigNumber from "bignumber.js";
 import { useBotStore } from ".";
-import { BotState } from "../../types/bot";
 import { getUsdValue, tokenToName, unBigNumberify } from "../../utils";
 
 /**

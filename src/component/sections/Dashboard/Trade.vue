@@ -54,7 +54,7 @@
             </div>
           </div>
           <div class="stat-desc">
-            ${{ orderStore[OrderGetters.TotalInOrders] }} in orders
+            ${{ displayNumber(orderStore[OrderGetters.TotalInOrders]) }} in orders
           </div>
         </div>
         <div class="stat relative">
