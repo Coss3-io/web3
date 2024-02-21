@@ -14,6 +14,7 @@ import { BotActions, BotState } from "../types/bot";
 import BigNumber from "bignumber.js";
 import { useOrderStore } from "../store/order";
 import { OrderActions } from "../types/order";
+import { message } from "../types/websocket";
 
 const { notify } = useNotification();
 export class Client {
@@ -258,7 +259,7 @@ export class Client {
    * @param baseNeeded - The base token amount needed to create the bot
    * @param quoteNeeded - The quote token amount needed to create the bot
    * @param encodedData - Then encoded data for the signature
-   * @returns 
+   * @returns
    */
   public static async createUserBot(
     data: { [key in string]: any },
@@ -334,7 +335,6 @@ export class Client {
 
       data["signature"] = signature;
       response = await axios.post(this.url + this.makerDataPath, data);
-      console.log(response)
       success = true;
     } catch (e) {
       notify({
@@ -366,7 +366,12 @@ export class Client {
     });
 
     ws.addEventListener("message", (msg) => {
-      console.log(JSON.parse(msg["data"]));
+      const data = JSON.parse(msg["data"]);
+      if (data[message.NEW_MAKER])
+        this.orderStore[OrderActions.AddOrder](
+          data[message.NEW_MAKER],
+          this.accountStore.$state.address!
+        );
     });
 
     ws.addEventListener("error", (e) => {

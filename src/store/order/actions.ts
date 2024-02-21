@@ -1,5 +1,5 @@
 import { useOrderStore } from ".";
-import { Maker, Taker } from "../../types/order";
+import { Maker, OrderState, Taker } from "../../types/order";
 import { unBigNumberify } from "../../utils";
 
 /**
@@ -28,7 +28,7 @@ export function loadOrders(
   if (!this.$state.user_takers[pair]) this.$state.user_takers[pair] = [];
   if (makers.length) {
     makers.forEach((maker) => {
-      unBigNumberifyMaker(maker)
+      unBigNumberifyMaker(maker);
     });
     this.$state.makers[pair].splice(
       0,
@@ -38,7 +38,7 @@ export function loadOrders(
   }
   if (user_makers.length) {
     user_makers.forEach((user_maker) => {
-      unBigNumberifyMaker(user_maker)
+      unBigNumberifyMaker(user_maker);
     });
     this.$state.user_makers[pair].splice(
       0,
@@ -48,7 +48,7 @@ export function loadOrders(
   }
   if (takers.length) {
     takers.forEach((taker) => {
-      unBigNumberifyTaker(taker)
+      unBigNumberifyTaker(taker);
     });
     this.$state.takers[pair].splice(
       0,
@@ -58,7 +58,7 @@ export function loadOrders(
   }
   if (user_takers.length) {
     user_takers.forEach((user_taker) => {
-      unBigNumberifyTaker(user_taker)
+      unBigNumberifyTaker(user_taker);
     });
     this.$state.user_takers[pair].splice(
       0,
@@ -66,6 +66,18 @@ export function loadOrders(
       ...user_takers
     );
   }
+}
+
+export function addOrder(
+  this: ReturnType<typeof useOrderStore>,
+  order: Maker,
+  address: string
+): void {
+  const pair = `${order.base_token}${order.quote_token}`;
+  order = unBigNumberifyMaker(order);
+  this.$state.makers[pair].push(order);
+  if (address == order.address) this.$state.user_makers[pair].push(order);
+  console.log(this.$state.makers)
 }
 
 /**
