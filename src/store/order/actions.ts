@@ -1,6 +1,8 @@
+import BigNumber from "bignumber.js";
 import { useOrderStore } from ".";
 import { Maker, OrderState, Taker } from "../../types/order";
-import { unBigNumberify } from "../../utils";
+import { formatBotFields, unBigNumberify } from "../../utils";
+import { BotAPI } from "../../types/bot";
 
 /**
  * @notice - Used to add the api takers and makers to the state
@@ -91,10 +93,45 @@ export function addOrder(
  */
 function unBigNumberifyMaker(maker: Maker): Maker {
   maker.amount = unBigNumberify(String(maker.amount));
-  maker.price = unBigNumberify(String(maker.price));
   maker.filled = unBigNumberify(String(maker.filled));
   maker.base_fees = unBigNumberify(String(maker.base_fees));
   maker.quote_fees = unBigNumberify(String(maker.quote_fees));
+
+  if (maker.bot) {
+    maker.bot = formatBotFields(<BotAPI>(<unknown>maker.bot));
+    let makerFees = Number(maker.bot.makerFees);
+    console.log(maker.bot);
+    if (makerFees <= 2000) {
+      if (maker.is_buyer) {
+        maker.price = new BigNumber(maker.price)
+          .multipliedBy(1000)
+          .dividedToIntegerBy(makerFees + 1000)
+          .dividedBy(1e18)
+          .toNumber();
+      } else {
+        maker.price = new BigNumber(maker.price)
+          .multipliedBy(makerFees + 1000)
+          .dividedToIntegerBy(1000)
+          .dividedBy(1e18)
+          .toNumber();
+      }
+    } else {
+      if (maker.is_buyer) {
+        maker.price = new BigNumber(maker.price)
+          .minus(makerFees)
+          .dividedBy(1e18)
+          .toNumber();
+      } else {
+        maker.price = new BigNumber(maker.price)
+          .plus(makerFees)
+          .dividedBy(1e18)
+          .toNumber();
+      }
+    }
+  } else {
+    maker.price = unBigNumberify(String(maker.price));
+  }
+
   return maker;
 }
 

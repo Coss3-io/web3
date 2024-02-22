@@ -14,7 +14,7 @@ import {
 import axios, { AxiosResponse } from "axios";
 import { useAccountStore } from "./store/account";
 import { Maker } from "./types/order";
-import { BotState } from "./types/bot";
+import { BotAPI, BotFormatted, BotState } from "./types/bot";
 import { Client } from "./api";
 
 /**
@@ -269,9 +269,7 @@ export async function getUsdValue(
  * @param data - The bot or the order to encode
  * @returns - The encoded data for the signature and the order hash
  */
-export function encodeObject(
-  data: any
-): [string, string] {
+export function encodeObject(data: any): [string, string] {
   const encodedData = ethers.solidityPacked(
     [
       "address",
@@ -306,4 +304,23 @@ export function encodeObject(
   );
   const orderHash = ethers.keccak256(encodedData);
   return [encodedData, orderHash];
+}
+
+/**
+ * @notice - Funtion used to format a bot from the API to the front
+ * @param bot - The bot formatted from the backed
+ * @returns - The bot formatted for the frontend App
+ */
+export function formatBotFields(bot: BotAPI): BotFormatted {
+  return {
+    address: bot.address,
+    chainId: bot.chain_id,
+    feesEarned: unBigNumberify(bot.fees_earned),
+    lowerBound: unBigNumberify(bot.lower_bound),
+    makerFees: Number(bot.maker_fees),
+    price: unBigNumberify(bot.price),
+    step: unBigNumberify(bot.step),
+    timestamp: bot.timestamp,
+    upperBound: unBigNumberify(bot.upper_bound),
+  };
 }

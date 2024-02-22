@@ -1,9 +1,9 @@
-import { BotState } from "./bot";
+import { BotFormatted, BotState } from "./bot";
 import { Values } from "./cryptoSpecs";
 import { orderStatus } from "./orderSpecs";
 
 export type Maker = {
-  bot: undefined | BotState["bots"][0];
+  bot: undefined | BotFormatted;
   base_token: string;
   quote_token: string;
   amount: number;
