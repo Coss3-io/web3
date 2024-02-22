@@ -68,6 +68,12 @@ export function loadOrders(
   }
 }
 
+/**
+ * @notice - Used to add a new order received via ws to the orderbook
+ * @param this - The order state
+ * @param order - The new order received
+ * @param address - The address of the user to add the order to the user orders or not
+ */
 export function addOrder(
   this: ReturnType<typeof useOrderStore>,
   order: Maker,
@@ -77,7 +83,6 @@ export function addOrder(
   order = unBigNumberifyMaker(order);
   this.$state.makers[pair].push(order);
   if (address == order.address) this.$state.user_makers[pair].push(order);
-  console.log(this.$state.makers)
 }
 
 /**

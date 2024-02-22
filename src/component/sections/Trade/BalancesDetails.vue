@@ -203,7 +203,7 @@ const baseInOrders = computed(() => {
       total += maker.amount - maker.filled
     }
   })
-  return total
+  return (Math.floor(total * 1e18)/1e18).toFixed(5)
 })
 
 const quoteInOrders = computed(() => {
@@ -213,9 +213,9 @@ const quoteInOrders = computed(() => {
     return maker.status != orderStatus.FILLED
    }).forEach((maker) => {
     if (maker.is_buyer) {
-      total += (maker.amount - maker.filled) * maker.price
+      total += ((maker.amount - maker.filled) * maker.price)
     }
   })
-  return total
+  return (Math.floor(total * 1e18)/1e18).toFixed(5)
 })
 </script>

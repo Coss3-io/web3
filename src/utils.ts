@@ -2,7 +2,7 @@
 import { getWalletClient } from "@wagmi/core";
 import { COSS_TOKEN } from "./api/settings";
 import { usePriceStore } from "./store/price";
-import { BrowserProvider, JsonRpcSigner } from "ethers";
+import { BrowserProvider, JsonRpcSigner, ethers } from "ethers";
 import BigNumber from "bignumber.js";
 import {
   Values,
@@ -13,6 +13,9 @@ import {
 } from "./types/cryptoSpecs";
 import axios, { AxiosResponse } from "axios";
 import { useAccountStore } from "./store/account";
+import { Maker } from "./types/order";
+import { BotState } from "./types/bot";
+import { Client } from "./api";
 
 /**
  * @notice - used to display the beginning and the end of an address
@@ -135,26 +138,26 @@ export function dollarsValue(tokens: { [key in string]: number }): number {
     "0x4bbeEB066eD09B7AEd07bF39EEe0460DFa261520": 1,
   };
   Object.entries(tokens).forEach(([token, amount]) => {
-    let increment = 0
+    let increment = 0;
     if (token in priceStore.$state) {
-      increment= priceStore.$state[token] * amount;
-    } else if (token in test){
-      increment= test[token] * amount;
+      increment = priceStore.$state[token] * amount;
+    } else if (token in test) {
+      increment = test[token] * amount;
     }
-    if (accountStore.$state.networkId){
-      let name = tokenToName(token, accountStore.$state.networkId)
+    if (accountStore.$state.networkId) {
+      let name = tokenToName(token, accountStore.$state.networkId);
       if (name in priceStore.$state) {
         increment = priceStore.$state[name] * amount;
-      } else if (name in test){
+      } else if (name in test) {
         increment = test[name] * amount;
-      } 
+      }
     }
 
     if (increment) {
-      $value += increment
+      $value += increment;
     } else {
       // TODO compute the value of the token and add it to the total value
-    } 
+    }
   });
   return Math.round($value * 100) / 100;
 }
@@ -196,9 +199,9 @@ export function nameToToken(
   name: Values<typeof cryptoTicker> | string,
   chainId: string | number
 ): string {
-
-  const token = namesToToken[chainIdToName(chainId)][<Values<typeof cryptoTicker>>name];
-  return token || name
+  const token =
+    namesToToken[chainIdToName(chainId)][<Values<typeof cryptoTicker>>name];
+  return token || name;
 }
 
 /**
@@ -259,4 +262,48 @@ export async function getUsdValue(
     console.log(e);
   }
   return 0;
+}
+
+/**
+ * @notice - Function used to encode an order or a bot
+ * @param data - The bot or the order to encode
+ * @returns - The encoded data for the signature and the order hash
+ */
+export function encodeObject(
+  data: any
+): [string, string] {
+  const encodedData = ethers.solidityPacked(
+    [
+      "address",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "address",
+      "address",
+      "uint64",
+      "uint64",
+      "uint8",
+      "bool",
+    ],
+    [
+      data.address,
+      data.amount,
+      data.price,
+      "step" in data ? data.step : "0",
+      "maker_fees" in data ? data.maker_fees : "0",
+      "upper_bound" in data ? data.upper_bound : "0",
+      "lower_bound" in data ? data.lower_bound : "0",
+      "base_token" in data ? data.base_token : "0",
+      "quote_token" in data ? data.quote_token : "0",
+      data.expiry,
+      Client.accountStore.$state.networkId,
+      "is_buyer" in data ? data.is_buyer : true,
+      "replace_order" in data ? data.replace_order : false,
+    ]
+  );
+  const orderHash = ethers.keccak256(encodedData);
+  return [encodedData, orderHash];
 }

@@ -589,7 +589,7 @@ import {
 import CryptoDropdown from "./CryptoDropdown.vue";
 import CryptoRange from "./CryptoRange.vue";
 import { computed, defineComponent, ref, watch } from "vue";
-import { displayAddress, nameToToken } from "../../../utils";
+import { displayAddress, encodeObject, nameToToken } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
@@ -717,38 +717,7 @@ async function createBot() {
     data.is_buyer ? 0 : 1,
     data.replace_order,
   ]);
-  const encodedData = ethers.solidityPacked(
-    [
-      "address",
-      "uint256",
-      "uint256",
-      "uint256",
-      "uint256",
-      "uint256",
-      "uint256",
-      "address",
-      "address",
-      "uint64",
-      "uint64",
-      "uint8",
-      "bool",
-    ],
-    [
-      data.address,
-      data.amount,
-      data.price,
-      data.step,
-      data.maker_fees,
-      data.upper_bound,
-      data.lower_bound,
-      data.base_token,
-      data.quote_token,
-      data.expiry,
-      Client.accountStore.$state.networkId,
-      data.is_buyer ? 0 : 1,
-      data.replace_order,
-    ]
-  );
+  const [encodedData, _] = encodeObject(data);
   if (
     await Client.createUserBot(
       data,

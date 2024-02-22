@@ -354,7 +354,7 @@ import {
 Values,
 } from "../../../types/cryptoSpecs";
 import { dollars, unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
-import { displayAddress, nameToToken } from "../../../utils";
+import { displayAddress, encodeObject, nameToToken } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
@@ -418,39 +418,7 @@ async function createOrder() {
     data.is_buyer ? 0 : 1,
     data.replace_order,
   ]);
-  const encodedData = ethers.solidityPacked(
-    [
-      "address",
-      "uint256",
-      "uint256",
-      "uint256",
-      "uint256",
-      "uint256",
-      "uint256",
-      "address",
-      "address",
-      "uint64",
-      "uint64",
-      "uint8",
-      "bool",
-    ],
-    [
-      data.address,
-      data.amount,
-      data.price,
-      data.step,
-      data.maker_fees,
-      data.upper_bound,
-      data.lower_bound,
-      data.base_token,
-      data.quote_token,
-      data.expiry,
-      Client.accountStore.$state.networkId,
-      data.is_buyer ? 0 : 1,
-      data.replace_order,
-    ]
-    );
-    const orderHash = ethers.keccak256(encodedData);
+  const [encodedData, orderHash] = encodeObject(data) 
     data.order_hash = orderHash;
   if (
     await Client.createUserOrder(

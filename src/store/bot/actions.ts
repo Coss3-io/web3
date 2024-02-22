@@ -1,4 +1,5 @@
 import { useBotStore } from ".";
+import { BotState } from "../../types/bot";
 import { getUsdValue, tokenToName, unBigNumberify } from "../../utils";
 
 /**
@@ -8,7 +9,7 @@ import { getUsdValue, tokenToName, unBigNumberify } from "../../utils";
 export async function addBot(
   this: ReturnType<typeof useBotStore>,
   bot: any
-): Promise<void> {
+): Promise<BotState["bots"][0]> {
   const time = Date.now();
   const chainId = "chainId" in bot ? bot.chainId : bot.chain_id;
   const baseToken = "baseToken" in bot ? bot.baseToken : bot.base_token;
@@ -26,8 +27,7 @@ export async function addBot(
     getUsdValue(tokenToName(baseToken, chainId), time),
     getUsdValue(tokenToName(quoteToken, chainId), time),
   ]);
-
-  this.$state.bots.push({
+  const bot_formatted: BotState["bots"][0] = {
     basePrice: basePrice,
     quotePrice: quotePrice,
     baseUSD: basePrice * baseTokenAmount,
@@ -59,7 +59,9 @@ export async function addBot(
       "upperBound" in bot
         ? unBigNumberify(String(bot.upperBound))
         : unBigNumberify(String(bot.upper_bound)),
-  });
+  };
+  this.$state.bots.push(bot_formatted);
+  return bot_formatted;
 }
 
 /**
