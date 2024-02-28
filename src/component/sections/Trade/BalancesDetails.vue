@@ -200,7 +200,7 @@ const baseInOrders = computed(() => {
     return maker.status != orderStatus.FILLED
    }).forEach((maker) => {
     if (!maker.is_buyer){
-      total += maker.amount - maker.filled
+      total += Number(maker.amount) - maker.filled
     }
   })
   return (Math.floor(total * 1e18)/1e18).toFixed(5)
@@ -213,7 +213,7 @@ const quoteInOrders = computed(() => {
     return maker.status != orderStatus.FILLED
    }).forEach((maker) => {
     if (maker.is_buyer) {
-      total += ((maker.amount - maker.filled) * maker.price)
+      total += ((Number(maker.amount) - maker.filled) * Number(maker.price))
     }
   })
   return (Math.floor(total * 1e18)/1e18).toFixed(5)

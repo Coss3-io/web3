@@ -354,7 +354,7 @@ import {
 Values,
 } from "../../../types/cryptoSpecs";
 import { dollars, unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
-import { displayAddress, encodeObject, nameToToken } from "../../../utils";
+import { displayAddress, encodeOrder, nameToToken } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
@@ -418,7 +418,7 @@ async function createOrder() {
     data.is_buyer ? 0 : 1,
     data.replace_order,
   ]);
-  const [encodedData, orderHash] = encodeObject(data) 
+  const [encodedData, orderHash] = encodeOrder(data) 
     data.order_hash = orderHash;
   if (
     await Client.createUserOrder(

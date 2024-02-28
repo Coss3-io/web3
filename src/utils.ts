@@ -14,8 +14,8 @@ import {
 import axios, { AxiosResponse } from "axios";
 import { useAccountStore } from "./store/account";
 import { Maker } from "./types/order";
-import { BotAPI, BotFormatted, BotState } from "./types/bot";
-import { Client } from "./api";
+import { BotAPI, BotFormatted } from "./types/bot";
+import { orderStatus } from "./types/orderSpecs";
 
 /**
  * @notice - used to display the beginning and the end of an address
@@ -245,6 +245,7 @@ export async function getUsdValue(
   time: number
 ): Promise<number> {
   if (token == cryptoTicker.USDT) return 1;
+  else if (token.length >= 9) return 0;
   try {
     const response: AxiosResponse = await axios.get(
       "https://api.binance.com/api/v3/aggTrades",
@@ -265,11 +266,15 @@ export async function getUsdValue(
 }
 
 /**
- * @notice - Function used to encode an order or a bot
- * @param data - The bot or the order to encode
+ * @notice - Function used to encode an order
+ * @param data - The order to encode
+ * @param replaceOrder - Determine the orderhash schema to use
  * @returns - The encoded data for the signature and the order hash
  */
-export function encodeObject(data: any): [string, string] {
+export function encodeOrder(
+  data: any,
+  replaceOrder?: boolean
+): [string, string] {
   const encodedData = ethers.solidityPacked(
     [
       "address",
@@ -290,20 +295,68 @@ export function encodeObject(data: any): [string, string] {
       data.address,
       data.amount,
       data.price,
-      "step" in data ? data.step : "0",
-      "maker_fees" in data ? data.maker_fees : "0",
-      "upper_bound" in data ? data.upper_bound : "0",
-      "lower_bound" in data ? data.lower_bound : "0",
-      "base_token" in data ? data.base_token : "0",
-      "quote_token" in data ? data.quote_token : "0",
+      replaceOrder ? data.bot.step : "0",
+      replaceOrder ? data.bot.maker_fees : "0",
+      replaceOrder ? data.bot.upper_bound : "0",
+      replaceOrder ? data.bot.lower_bound : "0",
+      data.base_token,
+      data.quote_token,
       data.expiry,
-      Client.accountStore.$state.networkId,
-      "is_buyer" in data ? data.is_buyer : true,
-      "replace_order" in data ? data.replace_order : false,
+      data.chain_id,
+      data.is_buyer ? 1 : 0,
+      replaceOrder ? true : false,
     ]
   );
-  const orderHash = ethers.keccak256(encodedData);
+  const orderHash = replaceOrder
+    ? ethers.solidityPackedKeccak256(
+        ["bytes", "uint256"],
+        [ethers.keccak256(encodedData), data.price]
+      )
+    : ethers.keccak256(encodedData);
   return [encodedData, orderHash];
+}
+
+/**
+ * @notice - Function used to encode a bot
+ * @param data - The bot to encode
+ * @returns - The encoded data for the signature and the order hash
+ */
+export function encodeBot(
+  data: any,
+): string {
+  const encodedData = ethers.solidityPacked(
+    [
+      "address",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+      "address",
+      "address",
+      "uint64",
+      "uint64",
+      "uint8",
+      "bool",
+    ],
+    [
+      data.address,
+      data.amount,
+      data.price,
+      data.step,
+      data.maker_fees,
+      data.upper_bound,
+      data.lower_bound,
+      data.base_token,
+      data.quote_token,
+      data.expiry,
+      data.chain_id,
+      "is_buyer" in data ? (data.is_buyer ? 0 : 1) : 0,
+      true,
+    ]
+  );
+  return encodedData;
 }
 
 /**
@@ -315,6 +368,7 @@ export function formatBotFields(bot: BotAPI): BotFormatted {
   return {
     address: bot.address,
     chainId: bot.chain_id,
+    amount: unBigNumberify(bot.amount),
     feesEarned: unBigNumberify(bot.fees_earned),
     lowerBound: unBigNumberify(bot.lower_bound),
     makerFees: Number(bot.maker_fees),
@@ -323,4 +377,74 @@ export function formatBotFields(bot: BotAPI): BotFormatted {
     timestamp: bot.timestamp,
     upperBound: unBigNumberify(bot.upper_bound),
   };
+}
+
+/**
+ * @notice - Used to round a number and avoid floating point errors
+ * @param n - The number to round
+ * @returns - The rounded number
+ */
+export function round(n: number): number {
+  return Math.floor(n * 1e11) / 1e11;
+}
+
+export function computeBotOrders(bot: BotAPI): Array<Maker> {
+  let result: Array<Maker> = [];
+
+  let price = new BigNumber(bot.price);
+  const step = new BigNumber(bot.step);
+  const lowerBound = new BigNumber(bot.lower_bound);
+  const upperBound = new BigNumber(bot.upper_bound);
+
+  while (price.gte(lowerBound)) {
+    let maker: Maker = {
+      bot: bot,
+      base_token: bot.base_token,
+      quote_token: bot.quote_token,
+      amount: bot.amount,
+      price: price.toFixed(),
+      is_buyer: true,
+      expiry: bot.expiry,
+      chain_id: bot.chain_id,
+      order_hash: "",
+      status: orderStatus.OPEN,
+      filled: 0,
+      signature: bot["signature"],
+      address: bot.address,
+      quote_fees: 0,
+      base_fees: 0,
+      timestamp: bot.timestamp,
+    };
+    const [_, orderHash] = encodeOrder(maker, true)
+    maker.order_hash = orderHash
+    price = price.minus(step);
+    result.push(maker);
+  }
+
+  price = new BigNumber(bot.price).plus(step);
+  while (price.lte(upperBound)) {
+    let maker: Maker = {
+      bot: bot,
+      base_token: bot.base_token,
+      quote_token: bot.quote_token,
+      amount: bot.amount,
+      price: price.toFixed(),
+      is_buyer: false,
+      expiry: bot.expiry,
+      chain_id: bot.chain_id,
+      order_hash: "",
+      status: orderStatus.OPEN,
+      filled: 0,
+      signature: bot["signature"],
+      address: bot.address,
+      quote_fees: 0,
+      base_fees: 0,
+      timestamp: bot.timestamp,
+    };
+    const [_, orderHash] = encodeOrder(maker, true)
+    maker.order_hash = orderHash
+    price = price.plus(step);
+    result.push(maker);
+  }
+  return result;
 }

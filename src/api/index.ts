@@ -8,13 +8,13 @@ import { useStackingStore } from "../store/stacking";
 import { StackingActions } from "../types/stacking";
 import { usePriceStore } from "../store/price";
 import { PriceActions } from "../types/price";
-import { getSigner, tokenToName } from "../utils";
+import { computeBotOrders, getSigner, tokenToName } from "../utils";
 import { useBotStore } from "../store/bot";
-import { BotActions, BotState } from "../types/bot";
-import BigNumber from "bignumber.js";
+import { BotActions, BotAPI } from "../types/bot";
 import { useOrderStore } from "../store/order";
-import { OrderActions } from "../types/order";
+import { Maker, OrderActions } from "../types/order";
 import { message } from "../types/websocket";
+import BigNumber from "bignumber.js";
 
 const { notify } = useNotification();
 export class Client {
@@ -40,7 +40,7 @@ export class Client {
   public static orderStore: ReturnType<typeof useOrderStore>;
 
   private static pairWsPath = "/ws/trade/";
-  private static ws: Array<WebSocket> = [];
+  private static ws: {[key in string]: WebSocket} = {};
 
   constructor() {}
 
@@ -237,7 +237,7 @@ export class Client {
         },
       });
       success = true;
-      const promises = botsList.data.map((bot: BotState["bots"][0]) =>
+      const promises = botsList.data.map((bot: BotAPI) =>
         this.botStore[BotActions.AddBot](bot)
       );
       await Promise.all(promises);
@@ -291,30 +291,39 @@ export class Client {
       });
       console.log(e);
     }
-    this.botStore[BotActions.AddBot]({
-      address: data.address,
-      amount: data.amount,
-      baseToken: data.base_token,
-      chainId: data.chain_id,
-      feesEarned: 0,
-      baseTokenAmount: new BigNumber(baseNeeded)
-        .multipliedBy("1e18")
-        .toNumber(),
-      lowerBound: data.lower_bound,
-      makerFees: data.maker_fees,
-      price: data.price,
-      quoteToken: data.quote_token,
-      quoteTokenAmount: new BigNumber(quoteNeeded)
-        .multipliedBy("1e18")
-        .toNumber(),
-      step: data.step,
-      timestamp: Math.floor(Date.now() / 1000),
-      expiry: Number(data.expiry),
-      upperBound: data.upper_bound,
-    });
+    const pair = `${data.base_token}${data.quote_token}`
+    if (!this.ws[pair]) {
+      this.botStore[BotActions.AddBot]({
+        address: data.address,
+        amount: data.amount,
+        baseToken: data.base_token,
+        chainId: data.chain_id,
+        feesEarned: 0,
+        baseTokenAmount: new BigNumber(baseNeeded)
+          .multipliedBy("1e18")
+          .toNumber(),
+        lowerBound: data.lower_bound,
+        makerFees: data.maker_fees,
+        price: data.price,
+        quoteToken: data.quote_token,
+        quoteTokenAmount: new BigNumber(quoteNeeded)
+          .multipliedBy("1e18")
+          .toNumber(),
+        step: data.step,
+        timestamp: Math.floor(Date.now() / 1000),
+        expiry: Number(data.expiry),
+        upperBound: data.upper_bound,
+      });
+    }
     return success;
   }
 
+  /**
+   * @notice Used to sign a send a new order to the backend
+   * @param data - The order data
+   * @param encodedData - The encoded data to be signed
+   * @returns Booloan - success or failiure of the function
+   */
   public static async createUserOrder(
     data: { [key in string]: any },
     encodedData: string
@@ -346,6 +355,11 @@ export class Client {
     return success;
   }
 
+  /**
+   * @notice - Used to connect to the websocket of the specified pair
+   * @param base - The base token of the pair to connect to
+   * @param quote - The quote token of the pair to connect to
+   */
   private static async connectWsPair(
     base: string,
     quote: string
@@ -354,9 +368,10 @@ export class Client {
       `${this.wsUrl}${this.pairWsPath}${this.accountStore
         .networkId!}/${base}/${quote}`
     );
+    const pair = `${base}${quote}`
 
     ws.addEventListener("open", () => {
-      this.ws.push(ws);
+      this.ws[pair] = ws;
       console.log(
         `Connected to the ${tokenToName(
           base,
@@ -365,13 +380,41 @@ export class Client {
       );
     });
 
-    ws.addEventListener("message", (msg) => {
+    ws.addEventListener("message", async (msg) => {
       const data = JSON.parse(msg["data"]);
       if (data[message.NEW_MAKER])
         this.orderStore[OrderActions.AddOrder](
           data[message.NEW_MAKER],
           this.accountStore.$state.address!
         );
+      if (data[message.NEW_BOT]) {
+        const bot = data[message.NEW_BOT];
+        await this.botStore[BotActions.AddBot]({
+          address: bot.address,
+          amount: bot.amount,
+          baseToken: bot.base_token,
+          chainId: bot.chain_id,
+          feesEarned: 0,
+          baseTokenAmount: bot.base_token_amount,
+          lowerBound: bot.lower_bound,
+          makerFees: bot.maker_fees,
+          price: bot.price,
+          quoteToken: bot.quote_token,
+          quoteTokenAmount: bot.quote_token_amount,
+          step: bot.step,
+          timestamp: Math.floor(Date.now() / 1000),
+          expiry: Number(bot.expiry),
+          upperBound: bot.upper_bound,
+        });
+
+        const makers: Array<Maker> = computeBotOrders(bot);
+        makers.forEach((maker) => {
+          this.orderStore[OrderActions.AddOrder](
+            maker,
+            this.accountStore.$state.address!
+          );
+        });
+      }
     });
 
     ws.addEventListener("error", (e) => {

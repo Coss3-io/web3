@@ -390,7 +390,7 @@ contract Dex {
         assembly {
             chainId := chainid()
         }
-        require(chainId == chainId);
+        require(chainId == order.chainId);
 
         uint orderHash = uint(keccak256(data));
         if (order.replaceOrder) {

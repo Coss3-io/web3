@@ -6,12 +6,12 @@
       <input
         :disabled="!active"
         :value="
-          active && trackedValue
+          active && trackedValue && multiplier
             ? String(Math.round(((multiplier * trackedValue) / 100) * 10 ** 8) /
               10 ** 8) + (percent ? '%' : '') 
-            : ''
+            : display || ''
         "
-        @input="event => $emit('update', parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value) * 100 / multiplier!: 0)"
+        @input="event => $emit('updateText', parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value) * 100 / (multiplier == 0 ? 1 : multiplier)!: 0)"
         type="text"
         :placeholder="name"
         class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
@@ -68,7 +68,8 @@
 import { Component } from "vue";
 
 const props = defineProps<{
-  percent?: boolean
+  percent?: boolean;
+  display?: number | string;
   trackedValue: any;
   visible: boolean;
   active: boolean;
@@ -81,5 +82,6 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: "update", value: any): void;
+  (e: "updateText", value: any): void;
 }>();
 </script>

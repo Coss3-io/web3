@@ -30,6 +30,7 @@ export function loadOrders(
   if (!this.$state.user_takers[pair]) this.$state.user_takers[pair] = [];
   if (makers.length) {
     makers.forEach((maker) => {
+      computeMakerPrice(maker);
       unBigNumberifyMaker(maker);
     });
     this.$state.makers[pair].splice(
@@ -40,6 +41,7 @@ export function loadOrders(
   }
   if (user_makers.length) {
     user_makers.forEach((user_maker) => {
+      computeMakerPrice(user_maker);
       unBigNumberifyMaker(user_maker);
     });
     this.$state.user_makers[pair].splice(
@@ -79,12 +81,45 @@ export function loadOrders(
 export function addOrder(
   this: ReturnType<typeof useOrderStore>,
   order: Maker,
-  address: string
+  address: string,
 ): void {
   const pair = `${order.base_token}${order.quote_token}`;
+  order = computeMakerPrice(order);
   order = unBigNumberifyMaker(order);
   this.$state.makers[pair].push(order);
   if (address == order.address) this.$state.user_makers[pair].push(order);
+}
+
+/**
+ * @notice - Function used to compute the right maker order price
+ * @param maker - The maker order to compute the price w/fees
+ * @returns - The make order with the price adjusted to take the fees in acount
+ */
+function computeMakerPrice(maker: Maker): Maker {
+  if (maker.bot) {
+    maker.bot = formatBotFields(<BotAPI>(<unknown>maker.bot));
+    let makerFees = Number(maker.bot.makerFees);
+    if (makerFees <= 2000) {
+      if (maker.is_buyer) {
+        maker.price = new BigNumber(maker.price)
+          .multipliedBy(1000)
+          .dividedToIntegerBy(makerFees + 1000)
+          .toNumber();
+      } else {
+        maker.price = new BigNumber(maker.price)
+          .multipliedBy(makerFees + 1000)
+          .dividedToIntegerBy(1000)
+          .toNumber();
+      }
+    } else {
+      if (maker.is_buyer) {
+        maker.price = new BigNumber(maker.price).minus(makerFees).toNumber();
+      } else {
+        maker.price = new BigNumber(maker.price).plus(makerFees).toNumber();
+      }
+    }
+  }
+  return maker;
 }
 
 /**
@@ -96,42 +131,7 @@ function unBigNumberifyMaker(maker: Maker): Maker {
   maker.filled = unBigNumberify(String(maker.filled));
   maker.base_fees = unBigNumberify(String(maker.base_fees));
   maker.quote_fees = unBigNumberify(String(maker.quote_fees));
-
-  if (maker.bot) {
-    maker.bot = formatBotFields(<BotAPI>(<unknown>maker.bot));
-    let makerFees = Number(maker.bot.makerFees);
-    console.log(maker.bot);
-    if (makerFees <= 2000) {
-      if (maker.is_buyer) {
-        maker.price = new BigNumber(maker.price)
-          .multipliedBy(1000)
-          .dividedToIntegerBy(makerFees + 1000)
-          .dividedBy(1e18)
-          .toNumber();
-      } else {
-        maker.price = new BigNumber(maker.price)
-          .multipliedBy(makerFees + 1000)
-          .dividedToIntegerBy(1000)
-          .dividedBy(1e18)
-          .toNumber();
-      }
-    } else {
-      if (maker.is_buyer) {
-        maker.price = new BigNumber(maker.price)
-          .minus(makerFees)
-          .dividedBy(1e18)
-          .toNumber();
-      } else {
-        maker.price = new BigNumber(maker.price)
-          .plus(makerFees)
-          .dividedBy(1e18)
-          .toNumber();
-      }
-    }
-  } else {
-    maker.price = unBigNumberify(String(maker.price));
-  }
-
+  maker.price = unBigNumberify(String(maker.price));
   return maker;
 }
 

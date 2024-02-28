@@ -84,7 +84,7 @@
           :key="entry.price"
           class="relative w-full min-h-6 z-10 group"
         >
-          <div
+          <div @click="console.log(entry.makers[0])"
             class="flex w-full font-sans-inherit absolute transition-all duration-500 hover:duration-150 hover:!bg-green-700/30 group-even:bg-green-900/10 group-odd:bg-green-600/10 text-center text-[11px] font-bold rounded-md py-1"
           >
             <div class="w-1/3">{{ entry.price.toFixed(5) }}</div>
@@ -153,19 +153,19 @@ const sellOrders = computed(() => {
     return !maker.is_buyer;
   });
   sells.sort((first, second) => {
-    return second.price - first.price;
+    return Number(second.price) - Number(first.price);
   });
   const result: Array<{ price: number; total: number; makers: Array<Maker> }> =
     [];
   sells.forEach((maker) => {
     const index = result.length - 1;
     if (result.length && result[index].price == maker.price) {
-      result[index]["total"] += maker.amount - maker.filled;
+      result[index]["total"] += Number(maker.amount) - maker.filled;
       result[index]["makers"].push(maker);
     } else {
       result.push({
-        total: maker.amount - maker.filled,
-        price: maker.price,
+        total: Number(maker.amount) - maker.filled,
+        price: Number(maker.price),
         makers: [maker],
       });
     }
@@ -188,19 +188,19 @@ const buyOrders = computed(() => {
     return maker.is_buyer;
   });
   buys.sort((first, second) => {
-    return second.price - first.price;
+    return Number(second.price) - Number(first.price);
   });
   const result: Array<{ price: number; total: number; makers: Array<Maker> }> =
     [];
   buys.forEach((maker) => {
     const index = result.length - 1;
     if (result.length && result[index].price == maker.price) {
-      result[index]["total"] += maker.amount - maker.filled;
+      result[index]["total"] += Number(maker.amount) - maker.filled;
       result[index]["makers"].push(maker);
     } else {
       result.push({
-        total: maker.amount - maker.filled,
-        price: maker.price,
+        total: Number(maker.amount) - maker.filled,
+        price: Number(maker.price),
         makers: [maker],
       });
     }

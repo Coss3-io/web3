@@ -18,9 +18,9 @@ export function totalInOrders(state: OrderState): number {
       if (maker.status != orderStatus.OPEN) return;
       if (maker.is_buyer) {
         tokens[maker.quote_token] +=
-          (maker.amount - maker.filled) * maker.price;
+          (Number(maker.amount) - maker.filled) * Number(maker.price);
       } else {
-        tokens[maker.base_token] += maker.amount - maker.filled;
+        tokens[maker.base_token] += Number(maker.amount) - maker.filled;
       }
     });
   });
@@ -78,7 +78,7 @@ export function totalMakerVolume(state: OrderState): number {
     makers.forEach((maker) => {
       if (!maker.filled) return;
       if (maker.is_buyer) {
-        tokens[maker.quote_token] += maker.filled * maker.price;
+        tokens[maker.quote_token] += maker.filled * Number(maker.price);
       } else {
         tokens[maker.base_token] += maker.filled;
       }

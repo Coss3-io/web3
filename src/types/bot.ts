@@ -25,6 +25,12 @@ export type BotState = {
 
 export type BotAPI = {
     address: string;
+    amount: string;
+    base_token: string;
+    base_token_amount: string;
+    quote_token: string;
+    quote_token_amount: string;
+    signature: string;
     chain_id: number;
     fees_earned: string;
     lower_bound: string;
@@ -32,11 +38,16 @@ export type BotAPI = {
     price: string;
     step: string;
     timestamp: number;
+    expiry: number;
     upper_bound: string;
 }
 
 export type BotFormatted = {
     address: string;
+    amount: number;
+    baseTokenAmount?: number;
+    quoteTokenAmount?: number;
+    signature?: string;
     chainId: number;
     feesEarned: number;
     lowerBound: number;

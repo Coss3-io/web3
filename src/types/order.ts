@@ -1,13 +1,13 @@
-import { BotFormatted, BotState } from "./bot";
+import { BotAPI, BotFormatted, BotState } from "./bot";
 import { Values } from "./cryptoSpecs";
 import { orderStatus } from "./orderSpecs";
 
 export type Maker = {
-  bot: undefined | BotFormatted;
+  bot: undefined | BotFormatted | BotAPI;
   base_token: string;
   quote_token: string;
-  amount: number;
-  price: number;
+  amount: number | string;
+  price: number | string;
   is_buyer: boolean;
   expiry: number;
   chain_id: number;

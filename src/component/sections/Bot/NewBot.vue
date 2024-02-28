@@ -137,6 +137,7 @@
                     : unknownTokenLogo
                   "
                   @update="(v: any) => {lowerBoundValue = v}"
+                  @updateText="(v: any) => {lowerBoundValue = v}"
                 ></CryptoRange>
               </div>
               <div class="col-span-12 flex justify-center">
@@ -152,17 +153,15 @@
                       : ''
                   "
                   logoClass="fill-secondary"
-                  :multiplier="
-                    priceValue
-                      ? priceValue + (priceValue * 100) / upperBoundValue
-                      : 0
-                  "
+                  :multiplier="0"
+                  :display="displayUpperBound"
                   :logo="
                     selectedBase && selectedBase in cryptoTicker
                     ? h('img', { src: String(cryptoLogo[selectedBase!]) })
                     : unknownTokenLogo
                   "
                   @update="(v: any) => {upperBoundValue = v}"
+                  @updateText="(v: any) => {displayUpperBound = round(v/100); upperBoundValue = Math.max(((v/100) - priceValue!)*100/priceValue!, 0)}"
                 ></CryptoRange>
               </div>
             </div>
@@ -239,6 +238,7 @@
                     )
                   "
                   @update="(v: any) => {selectedStep = v}"
+                  @updateText="(v: any) => {selectedStep = v}"
                 ></CryptoRange>
               </div>
               <div class="col-span-12 flex justify-center">
@@ -258,6 +258,7 @@
                   :multiplier="10"
                   :logo="h('img', { src: moneyBag })"
                   @update="(v: any) => {selectedFees = v}"
+                  @updateText="(v: any) => {selectedFees = v}"
                 ></CryptoRange>
               </div>
               <div class="col-span-12 flex justify-center">
@@ -271,83 +272,14 @@
                     !!lowerBoundValue && !!upperBoundValue && !!priceValue
                   "
                   name="amount"
-                  :percent="true"
+                  :percent="false"
                   rangeClass="range-lime-300"
                   logoClass=""
                   :multiplier="100"
                   :logo="h('img', { src: dollars })"
                   @update="(v: any) => {selectedAmount = v}"
+                  @updateText="(v: any) => {selectedAmount = v}"
                 ></CryptoRange>
-                <!-- <div class="grow">
-                  <div
-                    class="flex bg-base-300 rounded-full items-center grow p-1 shadow shadow-black/50"
-                  >
-                    <input
-                      :disabled="
-                        !(lowerBoundValue && upperBoundValue && priceValue)
-                      "
-                      :value="
-                        selectedAmount &&
-                        lowerBoundValue &&
-                        upperBoundValue &&
-                        priceValue
-                          ? selectedAmount
-                          : ''
-                      "
-                      @input="event => selectedAmount = parseFloat((<HTMLInputElement>event.target).value) ? parseFloat((<HTMLInputElement>event.target).value): 0"
-                      type="text"
-                      placeholder="amount"
-                      class="text-center font-sans text-xs p-2 appearance-none outline-0 w-24 h-5 bg-transparent placeholder:text-neutral-content/50"
-                    />
-                    <div
-                      class="flex bg-base-100 rounded-full items-center grow relative"
-                    >
-                      <div
-                        class="pointer-events-none absolute h-full z-10 w-full flex items-center"
-                      >
-                        <div
-                          class="h-full w-full flex items-center relative -translate-x-[0.12rem]"
-                        >
-                          <div
-                            class="h-full"
-                            :style="{
-                              width: `${Math.min(100, selectedAmount)}%`,
-                            }"
-                          ></div>
-                          <transition name="fadeNav" appear>
-                            <img
-                              v-if="
-                                lowerBoundValue && upperBoundValue && priceValue
-                              "
-                              :src="dollars"
-                              class="w-7 h-7 fill-current pointer-events-none absolute rounded-full p-1 bg-base-300 shadow-lg shadow-black/50"
-                              :style="{
-                                transform: `translateX(${String(
-                                  -Math.min(100, selectedAmount) / 1.15
-                                )}%)`,
-                                left: `${Math.min(100, selectedAmount)}%`,
-                              }"
-                            />
-                          </transition>
-                        </div>
-                      </div>
-                      <div class="relative w-full h-5">
-                        <transition name="fadeNav" appear>
-                          <input
-                            v-if="
-                              lowerBoundValue && upperBoundValue && priceValue
-                            "
-                            v-model="selectedAmount"
-                            type="range"
-                            min="0"
-                            max="100"
-                            class="range range-sm w-full absolute range-lime-300"
-                          />
-                        </transition>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
               </div>
             </div>
             <div
@@ -588,11 +520,10 @@ import {
 } from "../../../asset/images/images";
 import CryptoDropdown from "./CryptoDropdown.vue";
 import CryptoRange from "./CryptoRange.vue";
-import { computed, defineComponent, ref, watch } from "vue";
-import { displayAddress, encodeObject, nameToToken } from "../../../utils";
+import { computed, ref, watch } from "vue";
+import {encodeBot, nameToToken, round } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
-import { ethers } from "ethers";
 import { notify } from "@kyvg/vue3-notification";
 import { h } from "vue";
 
@@ -601,6 +532,7 @@ let selectedQuote = ref<Values<typeof cryptoTicker>>();
 
 let lowerBoundValue = ref<number>(0);
 let upperBoundValue = ref<number>(0);
+let displayUpperBound = ref<number>(0);
 let priceValue = ref<number | undefined>();
 
 watch(lowerBoundValue, (newValue) => {
@@ -615,9 +547,10 @@ let selectedStep = ref<number>(0);
 let selectedFees = ref<number>(0);
 let selectedAmount = ref<number>(0);
 
+//TODO fix the floatting point error here
 const upperBoundPrice = computed(() => {
   const price =
-    priceValue.value! + (priceValue.value! * upperBoundValue.value) / 100;
+    priceValue.value! + (priceValue.value! * upperBoundValue.value!) / 100;
   return price ? price : 0;
 });
 
@@ -717,7 +650,7 @@ async function createBot() {
     data.is_buyer ? 0 : 1,
     data.replace_order,
   ]);
-  const [encodedData, _] = encodeObject(data);
+  const encodedData = encodeBot(data);
   if (
     await Client.createUserBot(
       data,
