@@ -303,7 +303,7 @@ export function encodeOrder(
       data.quote_token,
       data.expiry,
       data.chain_id,
-      data.is_buyer ? 1 : 0,
+      replaceOrder ? (data.is_buyer ? 1 : 0) : data.is_buyer ? 0 : 1,
       replaceOrder ? true : false,
     ]
   );
@@ -321,9 +321,7 @@ export function encodeOrder(
  * @param data - The bot to encode
  * @returns - The encoded data for the signature and the order hash
  */
-export function encodeBot(
-  data: any,
-): string {
+export function encodeBot(data: any): string {
   const encodedData = ethers.solidityPacked(
     [
       "address",
@@ -415,8 +413,8 @@ export function computeBotOrders(bot: BotAPI): Array<Maker> {
       base_fees: 0,
       timestamp: bot.timestamp,
     };
-    const [_, orderHash] = encodeOrder(maker, true)
-    maker.order_hash = orderHash
+    const [_, orderHash] = encodeOrder(maker, true);
+    maker.order_hash = orderHash;
     price = price.minus(step);
     result.push(maker);
   }
@@ -441,8 +439,8 @@ export function computeBotOrders(bot: BotAPI): Array<Maker> {
       base_fees: 0,
       timestamp: bot.timestamp,
     };
-    const [_, orderHash] = encodeOrder(maker, true)
-    maker.order_hash = orderHash
+    const [_, orderHash] = encodeOrder(maker, true);
+    maker.order_hash = orderHash;
     price = price.plus(step);
     result.push(maker);
   }
