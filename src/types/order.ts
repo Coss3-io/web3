@@ -44,6 +44,7 @@ export type OrderState = {
 export const OrderActions = {
   Reset: "Reset",
   AddOrder: "AddOrder",
+  DeleteOrder: "DeleteOrder",
   LoadOrders: "LoadOrders",
   UpdateLoaded: "UpdateLoaded",
 } as const;

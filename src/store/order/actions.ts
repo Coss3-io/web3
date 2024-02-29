@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { useOrderStore } from ".";
-import { Maker, OrderState, Taker } from "../../types/order";
+import { Maker, Taker } from "../../types/order";
 import { formatBotFields, unBigNumberify } from "../../utils";
 import { BotAPI } from "../../types/bot";
 
@@ -81,13 +81,41 @@ export function loadOrders(
 export function addOrder(
   this: ReturnType<typeof useOrderStore>,
   order: Maker,
-  address: string,
+  address: string
 ): void {
   const pair = `${order.base_token}${order.quote_token}`;
   order = computeMakerPrice(order);
   order = unBigNumberifyMaker(order);
   this.$state.makers[pair].push(order);
   if (address == order.address) this.$state.user_makers[pair].push(order);
+}
+
+/**
+ * @notice - Used to delete an order received from the ws
+ * @param this - The order state
+ * @param orderHash - The order hash to delete
+ * @param pair - The pair to delete the order from
+ * @param address - The address of the current user
+ */
+export function deleteOrder(
+  this: ReturnType<typeof useOrderStore>,
+  orderHash: string,
+  pair: string,
+  address: string
+): void {
+  let orderAddress: string = "";
+  let index = this.$state.makers[pair].findIndex((maker) => {
+    return maker.order_hash.toLowerCase() == orderHash.toLowerCase();
+  });
+  if (index != -1) {
+    orderAddress = this.$state.makers[pair].splice(index, 1)[0].address.toLowerCase();
+  }
+  if (!(orderAddress == address.toLowerCase())) return;
+
+  index = this.$state.user_makers[pair].findIndex((maker) => {
+    return maker.order_hash.toLowerCase() == orderHash.toLowerCase();
+  });
+  if (index != -1) this.$state.user_makers[pair].splice(index, 1);
 }
 
 /**

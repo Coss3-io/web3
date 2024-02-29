@@ -381,6 +381,7 @@ export class Client {
     });
 
     ws.addEventListener("message", async (msg) => {
+      console.log(msg)
       const data = JSON.parse(msg["data"]);
       if (data[message.NEW_MAKER])
         this.orderStore[OrderActions.AddOrder](
@@ -414,6 +415,10 @@ export class Client {
             this.accountStore.$state.address!
           );
         });
+      }
+      if (data[message.DEL_MAKER]){
+        const deleteHash = data[message.DEL_MAKER]
+        this.orderStore[OrderActions.DeleteOrder](deleteHash, pair, this.accountStore.$state.address!) 
       }
     });
 
