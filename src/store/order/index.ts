@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { state } from "./state";
 import { OrderActions, OrderGetters, OrderState } from "../../types/order";
-import { addOrder, deleteOrder, loadOrders } from "./actions";
+import { addOrder, deleteOrder, loadOrders, updateMaker } from "./actions";
 import {
   totalFeesEarned,
   totalInOrders,
@@ -15,6 +15,7 @@ export const useOrderStore = defineStore("Order", {
     [OrderActions.LoadOrders]: loadOrders,
     [OrderActions.AddOrder]: addOrder,
     [OrderActions.DeleteOrder]: deleteOrder,
+    [OrderActions.UpdateMaker]: updateMaker,
   },
   getters: {
     [OrderGetters.TotalInOrders]: totalInOrders,

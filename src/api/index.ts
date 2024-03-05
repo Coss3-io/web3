@@ -40,7 +40,7 @@ export class Client {
   public static orderStore: ReturnType<typeof useOrderStore>;
 
   private static pairWsPath = "/ws/trade/";
-  private static ws: {[key in string]: WebSocket} = {};
+  private static ws: { [key in string]: WebSocket } = {};
 
   constructor() {}
 
@@ -291,7 +291,7 @@ export class Client {
       });
       console.log(e);
     }
-    const pair = `${data.base_token}${data.quote_token}`
+    const pair = `${data.base_token}${data.quote_token}`;
     if (!this.ws[pair]) {
       this.botStore[BotActions.AddBot]({
         address: data.address,
@@ -368,7 +368,7 @@ export class Client {
       `${this.wsUrl}${this.pairWsPath}${this.accountStore
         .networkId!}/${base}/${quote}`
     );
-    const pair = `${base}${quote}`
+    const pair = `${base}${quote}`;
 
     ws.addEventListener("open", () => {
       this.ws[pair] = ws;
@@ -381,7 +381,7 @@ export class Client {
     });
 
     ws.addEventListener("message", async (msg) => {
-      console.log(msg)
+      console.log(msg);
       const data = JSON.parse(msg["data"]);
       if (data[message.NEW_MAKER])
         this.orderStore[OrderActions.AddOrder](
@@ -416,9 +416,24 @@ export class Client {
           );
         });
       }
-      if (data[message.DEL_MAKER]){
-        const deleteHash = data[message.DEL_MAKER]
-        this.orderStore[OrderActions.DeleteOrder](deleteHash, pair, this.accountStore.$state.address!) 
+      if (data[message.DEL_MAKER]) {
+        const deleteHash = data[message.DEL_MAKER];
+        this.orderStore[OrderActions.DeleteOrder](
+          deleteHash,
+          pair,
+          this.accountStore.$state.address!
+        );
+      }
+      if (data[message.NEW_TAKERS]) {
+      }
+      if (data[message.MAKERS_UPDATE]) {
+        data[message.MAKERS_UPDATE].forEach((maker: Maker) => {
+          this.orderStore[OrderActions.UpdateMaker](
+            maker,
+            pair,
+            this.accountStore.$state.address!
+          );
+        });
       }
     });
 
@@ -429,6 +444,7 @@ export class Client {
           this.accountStore.networkId!
         )}/${tokenToName(quote, this.accountStore.networkId!)} pair Ws`
       );
+      delete this.ws[pair];
       console.log(e);
     });
   }

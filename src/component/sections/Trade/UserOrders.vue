@@ -297,12 +297,13 @@
                     (<boolean>(<unknown>order.selected)) = !order.selected
                   "
                   :class="{
-                    'outline-1 outline outline-primary': order.selected && order.status == orderStatus.OPEN
+                    'outline-1 outline outline-primary':
+                      order.selected && order.status == orderStatus.OPEN,
                   }"
                   class="z-10 grid mb-1 w-full even:bg-neutral/50 duration-300 py-1 text-[10px] sm:text-sm grid-cols-[3fr_3fr_3fr_4fr_3fr_3fr] col-span-full place-items-center font-sans-inherit rounded-full bg-neutral hover:bg-base-200 transition-all cursor-pointer shadow-black/20 shadow-md"
                 >
-                  <div>{{ order.price.toFixed(5) }}</div>
-                  <div>{{ order.amount.toFixed(5) }}</div>
+                  <div>{{ Number(order.price).toFixed(5) }}</div>
+                  <div>{{ Number(order.amount).toFixed(5) }}</div>
                   <div>
                     {{
                       order.type == orderType.MAKER
@@ -313,7 +314,7 @@
                   <div class="whitespace-nowrap text-[8px] sm:text-xs">
                     {{
                       new Intl.DateTimeFormat("fr-FR", dateOptions).format(
-                        order.timestamp
+                        order.timestamp * 1000
                       )
                     }}
                   </div>
@@ -321,7 +322,9 @@
                     <div class="grow text-right">
                       {{
                         order.type == orderType.MAKER
-                          ? order.quote_fees.toFixed(5)
+                          ? order.base_fees
+                            ? order.base_fees.toFixed(5)
+                            : order.quote_fees.toFixed(5)
                           : order.fees.toFixed(5)
                       }}
                     </div>
@@ -392,7 +395,7 @@ import {
   price,
   orderArrow,
   unknownPrimaryTokenLogo,
-  unknownSecondaryTokenLogo
+  unknownSecondaryTokenLogo,
 } from "../../../asset/images/images";
 import { Maker, Taker } from "../../../types/order";
 import { Client } from "../../../api";

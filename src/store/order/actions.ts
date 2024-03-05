@@ -91,6 +91,53 @@ export function addOrder(
 }
 
 /**
+ * @notice - Used to add a new taker received via ws to the orderbook
+ * @param this - The order state
+ * @param order - The new order received
+ * @param address - The address of the user to add the order to the user orders or not
+ */
+export function addTaker(
+  this: ReturnType<typeof useOrderStore>,
+  order: Taker,
+  address: string
+): void {
+  // const pair = `${order.base_token}${order.quote_token}`;
+  // order = computeMakerPrice(order);
+  // order = unBigNumberifyMaker(order);
+  // this.$state.makers[pair].push(order);
+  // if (address == order.address) this.$state.user_makers[pair].push(order);
+}
+
+export function updateMaker(
+  this: ReturnType<typeof useOrderStore>,
+  order: Maker,
+  pair: string,
+  address: string
+): void {
+  const maker = this.$state.makers[pair].find(
+    (maker) => (maker.order_hash == order.order_hash)
+  );
+  if (maker) {
+    maker.filled = unBigNumberify(String(order.filled));
+    maker.base_fees += unBigNumberify(String(order.base_fees));
+    maker.quote_fees += unBigNumberify(String(order.quote_fees));
+    maker.status = order.status;
+  }
+
+  if (address == order.address) {
+    const user_maker = this.$state.user_makers[pair].find(
+      (maker) => (maker.order_hash == order.order_hash)
+    );
+    if (user_maker) {
+      user_maker.filled = unBigNumberify(String(order.filled));
+      user_maker.base_fees += unBigNumberify(String(order.base_fees));
+      user_maker.quote_fees += unBigNumberify(String(order.quote_fees));
+      user_maker.status = order.status;
+    }
+  }
+}
+
+/**
  * @notice - Used to delete an order received from the ws
  * @param this - The order state
  * @param orderHash - The order hash to delete
@@ -108,7 +155,9 @@ export function deleteOrder(
     return maker.order_hash.toLowerCase() == orderHash.toLowerCase();
   });
   if (index != -1) {
-    orderAddress = this.$state.makers[pair].splice(index, 1)[0].address.toLowerCase();
+    orderAddress = this.$state.makers[pair]
+      .splice(index, 1)[0]
+      .address.toLowerCase();
   }
   if (!(orderAddress == address.toLowerCase())) return;
 

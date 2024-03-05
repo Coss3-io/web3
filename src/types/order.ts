@@ -45,6 +45,7 @@ export const OrderActions = {
   Reset: "Reset",
   AddOrder: "AddOrder",
   DeleteOrder: "DeleteOrder",
+  UpdateMaker: "UpdateMaker",
   LoadOrders: "LoadOrders",
   UpdateLoaded: "UpdateLoaded",
 } as const;
