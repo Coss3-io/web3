@@ -12,7 +12,7 @@ import { computeBotOrders, getSigner, tokenToName } from "../utils";
 import { useBotStore } from "../store/bot";
 import { BotActions, BotAPI } from "../types/bot";
 import { useOrderStore } from "../store/order";
-import { Maker, OrderActions } from "../types/order";
+import { Maker, OrderActions, Taker } from "../types/order";
 import { message } from "../types/websocket";
 import BigNumber from "bignumber.js";
 
@@ -381,7 +381,6 @@ export class Client {
     });
 
     ws.addEventListener("message", async (msg) => {
-      console.log(msg);
       const data = JSON.parse(msg["data"]);
       if (data[message.NEW_MAKER])
         this.orderStore[OrderActions.AddOrder](
@@ -425,6 +424,14 @@ export class Client {
         );
       }
       if (data[message.NEW_TAKERS]) {
+        console.log(data)
+        data[message.NEW_TAKERS].forEach((taker: Taker & {"address": string}) => {
+          this.orderStore[OrderActions.AddTaker](
+            taker,
+            pair,
+            this.accountStore.$state.address!
+          );
+        });
       }
       if (data[message.MAKERS_UPDATE]) {
         data[message.MAKERS_UPDATE].forEach((maker: Maker) => {

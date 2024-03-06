@@ -95,17 +95,23 @@ export function addOrder(
  * @param this - The order state
  * @param order - The new order received
  * @param address - The address of the user to add the order to the user orders or not
+ * @param pair - The pair on which to add the new taker order
  */
 export function addTaker(
   this: ReturnType<typeof useOrderStore>,
-  order: Taker,
-  address: string
+  order: Taker & {"address"?: string},
+  pair: string,
+  address: string,
 ): void {
-  // const pair = `${order.base_token}${order.quote_token}`;
-  // order = computeMakerPrice(order);
-  // order = unBigNumberifyMaker(order);
-  // this.$state.makers[pair].push(order);
-  // if (address == order.address) this.$state.user_makers[pair].push(order);
+  const taker_address = order.address
+  delete order.address
+  order = unBigNumberifyTaker(order)
+  console.log(pair)
+  console.log(this.$state.takers)
+  this.$state.takers[pair].push(order)
+  if (address == taker_address) {
+  this.$state.user_takers[pair].push(order)
+  }
 }
 
 export function updateMaker(
