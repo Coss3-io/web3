@@ -424,7 +424,6 @@ export class Client {
         );
       }
       if (data[message.NEW_TAKERS]) {
-        console.log(data)
         data[message.NEW_TAKERS].forEach((taker: Taker & {"address": string}) => {
           this.orderStore[OrderActions.AddTaker](
             taker,

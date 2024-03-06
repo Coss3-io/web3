@@ -106,8 +106,6 @@ export function addTaker(
   const taker_address = order.address
   delete order.address
   order = unBigNumberifyTaker(order)
-  console.log(pair)
-  console.log(this.$state.takers)
   this.$state.takers[pair].push(order)
   if (address == taker_address) {
   this.$state.user_takers[pair].push(order)

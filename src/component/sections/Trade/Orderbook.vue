@@ -84,7 +84,7 @@
           :key="entry.price"
           class="relative w-full min-h-6 z-10 group"
         >
-          <div @click="console.log(entry.makers[0])"
+          <div
             class="flex w-full font-sans-inherit absolute transition-all duration-500 hover:duration-150 hover:!bg-green-700/30 group-even:bg-green-900/10 group-odd:bg-green-600/10 text-center text-[11px] font-bold rounded-md py-1"
           >
             <div class="w-1/3">{{ entry.price.toFixed(5) }}</div>
