@@ -1,7 +1,12 @@
 import BigNumber from "bignumber.js";
 import { useStackingStore } from ".";
 import { ERC20_DIVIDER } from "../../api/settings";
-import { FeesFrame, StackingFrame, StackingGetters } from "../../types/stacking";
+import {
+  FeesFrame,
+  StackingFrame,
+  StackingGetters,
+  WithdrawalFrame,
+} from "../../types/stacking";
 import { unBigNumberify } from "../../utils";
 
 /**
@@ -104,6 +109,33 @@ export function addFees(
     this.$state.public.fees.push({
       slot: entry.slot,
       fees: [{ token: entry.token, amount: unBigNumberify(entry.amount) }],
+    });
+  }
+}
+
+export function addFeesWithdrawal(
+  this: ReturnType<typeof useStackingStore>,
+  entry: WithdrawalFrame,
+  address: string
+): void {
+  if (address.toLowerCase() != entry.address.toLowerCase()) return;
+
+  const slot = this.$state.user.feesWithdrawal.find((slot) => {
+    return slot.slot == entry.slot;
+  });
+
+  if (slot) {
+    if (
+      !slot.tokens.find(
+        (token) => token.toLowerCase() == entry.token.toLowerCase()
+      )
+    ) {
+      slot.tokens.push(entry.token);
+    }
+  } else {
+    this.$state.user.feesWithdrawal.push({
+      slot: entry.slot,
+      tokens: [entry.token],
     });
   }
 }

@@ -483,7 +483,6 @@ export class Client {
 
     ws.addEventListener("message", async (msg) => {
       const data = JSON.parse(msg["data"]);
-      console.log(data);
       if (data[message.NEW_STACKING]) {
         this.stackingStore[StackingActions.AddStack](
           data[message.NEW_STACKING],
@@ -492,6 +491,12 @@ export class Client {
       }
       if (data[message.NEW_FEES]) {
         this.stackingStore[StackingActions.AddFees](data[message.NEW_FEES]);
+      }
+      if (data[message.NEW_FSA_WITHDRAWAL]) {
+        this.stackingStore[StackingActions.AddFeesWithdrawal](
+          data[message.NEW_FSA_WITHDRAWAL],
+          this.accountStore.address!
+        );
       }
     });
 
