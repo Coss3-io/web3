@@ -22,6 +22,13 @@ export type StackingFrame = {
   withdraw: number;
 };
 
+export type FeesFrame = {
+  token: string;
+  amount: string;
+  slot: number;
+  chain_id: number;
+};
+
 export const StackingGetters = {
   BlockNames: "BlockNames",
   BlockAmount: "BlockAmount",
@@ -40,6 +47,7 @@ export const StackingGetters = {
 export const StackingActions = {
   LoadStacks: "LoadStacks",
   AddStack: "AddStack",
+  AddFees: "AddFees",
   LoadUserStacks: "LoadUserStacks",
   LoadFees: "LoadFees",
   LoadUserFeesWithdrawal: "LoadUserFeesWithdrawal",

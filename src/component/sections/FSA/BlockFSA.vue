@@ -89,11 +89,11 @@
             alt="token"
             class="w-6 h-6"
           />
-          <img
+          <component
               v-else
-              :src="index % 2 ? cryptoLogo[cryptoTicker.primaryUnknown] : cryptoLogo[cryptoTicker.secondaryUnknown]"
+              :is="index % 2 ? cryptoLogo[cryptoTicker.primaryUnknown] : cryptoLogo[cryptoTicker.secondaryUnknown]"
               alt="token"
-              class="w-6 h-6"
+              class="!w-6 !h-6"
             />
         </div>
         <div>{{ value.amount.toFixed(2) }}</div>

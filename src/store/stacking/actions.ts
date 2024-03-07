@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { useStackingStore } from ".";
 import { ERC20_DIVIDER } from "../../api/settings";
-import { StackingFrame } from "../../types/stacking";
+import { FeesFrame, StackingFrame, StackingGetters } from "../../types/stacking";
 import { unBigNumberify } from "../../utils";
 
 /**
@@ -76,6 +76,39 @@ export function addStack(
 }
 
 /**
+ * @notice - Function used to add new fees entry to the stacking store
+ * @param this - The stacking store
+ * @param entry - The new fees just received
+ */
+export function addFees(
+  this: ReturnType<typeof useStackingStore>,
+  entry: FeesFrame
+) {
+  const slot = this.$state.public.fees.find((slot) => {
+    slot.slot == entry.slot;
+  });
+
+  if (slot) {
+    const feeEntry = slot.fees.find((fee) => {
+      return fee.token == entry.token;
+    });
+    if (feeEntry) {
+      feeEntry.amount += unBigNumberify(entry.amount);
+    } else {
+      slot.fees.push({
+        token: entry.token,
+        amount: unBigNumberify(entry.amount),
+      });
+    }
+  } else {
+    this.$state.public.fees.push({
+      slot: entry.slot,
+      fees: [{ token: entry.token, amount: unBigNumberify(entry.amount) }],
+    });
+  }
+}
+
+/**
  * @notice - actions to commit the received fees to the state
  * @param this
  * @param stacks - the fees returned by the API
@@ -93,7 +126,7 @@ export function loadFees(
     if (!slotObject[slot]) slotObject[slot] = [];
     slotObject[slot].push({
       token: token,
-      amount: parseInt(amount) / ERC20_DIVIDER,
+      amount: unBigNumberify(amount),
     });
   });
   for (const slot in slotObject) {
@@ -116,7 +149,7 @@ export function loadUserStacking(
   this.$state.user.stacks.splice(0, this.$state.public.stacks.length);
   let totalStacked = 0;
   userStacking.forEach(({ slot, amount }) => {
-    totalStacked += parseInt(amount) / ERC20_DIVIDER;
+    totalStacked += unBigNumberify(amount);
     this.$state.user.stacks.push({ slot: slot, amount: totalStacked });
   });
 }

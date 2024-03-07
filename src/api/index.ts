@@ -183,7 +183,7 @@ export class Client {
       Client.priceStore[PriceActions.LoadPrices](coinGeckoPrices.data);
       success = true;
       this.stackingStore.$state.public.loaded = true;
-      this.connectWsStacking()
+      this.connectWsStacking();
     } catch (e) {
       notify({
         text: "An error occured during public data request check console",
@@ -483,12 +483,15 @@ export class Client {
 
     ws.addEventListener("message", async (msg) => {
       const data = JSON.parse(msg["data"]);
-      console.log(data)
+      console.log(data);
       if (data[message.NEW_STACKING]) {
         this.stackingStore[StackingActions.AddStack](
           data[message.NEW_STACKING],
           this.accountStore.address!
         );
+      }
+      if (data[message.NEW_FEES]) {
+        this.stackingStore[StackingActions.AddFees](data[message.NEW_FEES]);
       }
     });
 

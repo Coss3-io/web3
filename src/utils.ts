@@ -1,6 +1,6 @@
 //@ts-ignore
 import { getWalletClient } from "@wagmi/core";
-import { COSS_TOKEN } from "./api/settings";
+import { COSS_TOKEN, ERC20_DIVIDER } from "./api/settings";
 import { usePriceStore } from "./store/price";
 import { BrowserProvider, JsonRpcSigner, ethers } from "ethers";
 import BigNumber from "bignumber.js";
@@ -174,6 +174,9 @@ export function tokenToName(
   for (var key in namesToToken[chainName]) {
     ret[namesToToken[chainName][<Values<typeof cryptoTicker>>key]] = key;
   }
+  if (token.startsWith("0x")) {
+    token = ethers.getAddress(token.toLowerCase());
+  }
   if (token in ret) {
     return ret[token];
   } else {
@@ -230,7 +233,7 @@ export async function getSigner(
  * @returns - The floatting point number
  */
 export function unBigNumberify(number: string): number {
-  return Number(new BigNumber(number).dividedBy("1e18"));
+  return Number(new BigNumber(number).dividedBy(ERC20_DIVIDER));
 }
 
 /**

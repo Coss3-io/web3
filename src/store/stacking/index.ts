@@ -6,6 +6,7 @@ import {
   StackingGetters,
 } from "../../types/stacking";
 import {
+  addFees,
   addStack,
   loadFees,
   loadStacks,
@@ -34,6 +35,7 @@ export const useStackingStore = defineStore("Stacking", {
     [StackingActions.AddStack]: addStack,
     [StackingActions.Reset]: reset,
     [StackingActions.LoadFees]: loadFees,
+    [StackingActions.AddFees]: addFees,
     [StackingActions.LoadUserStacks]: loadUserStacking,
     [StackingActions.LoadUserFeesWithdrawal]: loadUserFeesWithdrawal,
   },
