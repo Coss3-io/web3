@@ -40,6 +40,7 @@ export class Client {
   public static orderStore: ReturnType<typeof useOrderStore>;
 
   private static pairWsPath = "/ws/trade/";
+  private static stackingWsPath = "/ws/stacking/";
   private static ws: { [key in string]: WebSocket } = {};
 
   constructor() {}
@@ -98,6 +99,14 @@ export class Client {
    */
   public static async logout(): Promise<void> {
     Client.accountStore[AccountActions.UpdateAppConnection](false);
+    this.accountStore[AccountActions.Reset]();
+    this.botStore[BotActions.Reset]();
+    this.stackingStore[StackingActions.Reset]();
+    this.orderStore[OrderActions.Reset]();
+    Object.values(this.ws).forEach((ws) => {
+      ws.close();
+    });
+    this.ws = {};
   }
 
   /**
@@ -174,6 +183,7 @@ export class Client {
       Client.priceStore[PriceActions.LoadPrices](coinGeckoPrices.data);
       success = true;
       this.stackingStore.$state.public.loaded = true;
+      this.connectWsStacking()
     } catch (e) {
       notify({
         text: "An error occured during public data request check console",
@@ -424,13 +434,15 @@ export class Client {
         );
       }
       if (data[message.NEW_TAKERS]) {
-        data[message.NEW_TAKERS].forEach((taker: Taker & {"address": string}) => {
-          this.orderStore[OrderActions.AddTaker](
-            taker,
-            pair,
-            this.accountStore.$state.address!
-          );
-        });
+        data[message.NEW_TAKERS].forEach(
+          (taker: Taker & { address: string }) => {
+            this.orderStore[OrderActions.AddTaker](
+              taker,
+              pair,
+              this.accountStore.$state.address!
+            );
+          }
+        );
       }
       if (data[message.MAKERS_UPDATE]) {
         data[message.MAKERS_UPDATE].forEach((maker: Maker) => {
@@ -451,6 +463,38 @@ export class Client {
         )}/${tokenToName(quote, this.accountStore.networkId!)} pair Ws`
       );
       delete this.ws[pair];
+      console.log(e);
+    });
+  }
+
+  /**
+   * @notice - Used to connect to the staking websocket in order to
+   * receive the onchain stacking updates
+   */
+  public static async connectWsStacking(): Promise<void> {
+    const ws = new WebSocket(
+      `${this.wsUrl}${this.stackingWsPath}${this.accountStore.networkId!}`
+    );
+
+    ws.addEventListener("open", () => {
+      this.ws["stacking"] = ws;
+      console.log(`Connected to the stacking WS`);
+    });
+
+    ws.addEventListener("message", async (msg) => {
+      const data = JSON.parse(msg["data"]);
+      console.log(data)
+      if (data[message.NEW_STACKING]) {
+        this.stackingStore[StackingActions.AddStack](
+          data[message.NEW_STACKING],
+          this.accountStore.address!
+        );
+      }
+    });
+
+    ws.addEventListener("error", (e) => {
+      console.log(`An error occured on the staking WS`);
+      delete this.ws["stacking"];
       console.log(e);
     });
   }

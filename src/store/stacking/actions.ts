@@ -1,5 +1,8 @@
+import BigNumber from "bignumber.js";
 import { useStackingStore } from ".";
 import { ERC20_DIVIDER } from "../../api/settings";
+import { StackingFrame } from "../../types/stacking";
+import { unBigNumberify } from "../../utils";
 
 /**
  * @notice - actions to commit the received stacks to the state
@@ -16,6 +19,60 @@ export function loadStacks(
     totalStacked += amount / ERC20_DIVIDER;
     this.$state.public.stacks.push({ slot: slot, amount: totalStacked });
   });
+}
+
+/**
+ * @notice - Function used to commit new stacking entries
+ * @param this - The stacking store
+ * @param entry - The frame received for the new stacking entry
+ */
+export function addStack(
+  this: ReturnType<typeof useStackingStore>,
+  entry: StackingFrame,
+  address: string
+): void {
+  const stack = this.$state.public.stacks.find((stack) => {
+    return stack.slot == entry.slot;
+  });
+
+  if (stack) {
+    stack.amount = new BigNumber(stack.amount)
+      .plus(unBigNumberify(entry.amount))
+      .toNumber();
+  } else {
+    const length = this.$state.public.stacks.length;
+    const lastStacking = length
+      ? this.$state.public.stacks[length - 1].amount
+      : 0;
+    this.$state.public.stacks.push({
+      amount: new BigNumber(lastStacking)
+        .plus(unBigNumberify(entry.amount))
+        .toNumber(),
+      slot: entry.slot,
+    });
+  }
+
+  if (entry.address == address) {
+    const user_stack = this.$state.user.stacks.find((stack) => {
+      return stack.slot == entry.slot;
+    });
+    if (user_stack) {
+      user_stack.amount = new BigNumber(user_stack.amount)
+        .plus(unBigNumberify(entry.amount))
+        .toNumber();
+    } else {
+      const length = this.$state.user.stacks.length;
+      const lastStacking = length
+        ? this.$state.user.stacks[length - 1].amount
+        : 0;
+      this.$state.user.stacks.push({
+        amount: new BigNumber(lastStacking)
+          .plus(unBigNumberify(entry.amount))
+          .toNumber(),
+        slot: entry.slot,
+      });
+    }
+  }
 }
 
 /**

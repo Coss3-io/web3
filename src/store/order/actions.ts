@@ -99,16 +99,16 @@ export function addOrder(
  */
 export function addTaker(
   this: ReturnType<typeof useOrderStore>,
-  order: Taker & {"address"?: string},
+  order: Taker & { address?: string },
   pair: string,
-  address: string,
+  address: string
 ): void {
-  const taker_address = order.address
-  delete order.address
-  order = unBigNumberifyTaker(order)
-  this.$state.takers[pair].push(order)
+  const taker_address = order.address;
+  delete order.address;
+  order = unBigNumberifyTaker(order);
+  this.$state.takers[pair].push(order);
   if (address == taker_address) {
-  this.$state.user_takers[pair].push(order)
+    this.$state.user_takers[pair].push(order);
   }
 }
 
@@ -119,7 +119,7 @@ export function updateMaker(
   address: string
 ): void {
   const maker = this.$state.makers[pair].find(
-    (maker) => (maker.order_hash == order.order_hash)
+    (maker) => maker.order_hash == order.order_hash
   );
   if (maker) {
     maker.filled = unBigNumberify(String(order.filled));
@@ -130,7 +130,7 @@ export function updateMaker(
 
   if (address == order.address) {
     const user_maker = this.$state.user_makers[pair].find(
-      (maker) => (maker.order_hash == order.order_hash)
+      (maker) => maker.order_hash == order.order_hash
     );
     if (user_maker) {
       user_maker.filled = unBigNumberify(String(order.filled));
@@ -169,6 +169,20 @@ export function deleteOrder(
     return maker.order_hash.toLowerCase() == orderHash.toLowerCase();
   });
   if (index != -1) this.$state.user_makers[pair].splice(index, 1);
+}
+
+/**
+ * @notice - Function used to reset the order store
+ * @param this - The order store
+ */
+export function reset(this: ReturnType<typeof useOrderStore>): void {
+  this.$state.makers = {};
+  this.$state.user_makers = {};
+  this.$state.takers = {};
+  this.$state.user_takers = {};
+  this.$state.makersLoaded = {};
+  this.$state.takersLoaded = {};
+  this.$state.userOrdersLoaded = false;
 }
 
 /**

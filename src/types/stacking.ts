@@ -1,6 +1,6 @@
 export type StackingState = {
   public: {
-    loaded: boolean,
+    loaded: boolean;
     stacks: Array<{ amount: number; slot: number }>;
     fees: Array<{
       slot: number;
@@ -8,10 +8,18 @@ export type StackingState = {
     }>;
   };
   user: {
-    loaded: boolean,
+    loaded: boolean;
     stacks: Array<{ amount: number; slot: number }>;
     feesWithdrawal: Array<{ slot: number; tokens: Array<string> }>;
   };
+};
+
+export type StackingFrame = {
+  address: string;
+  amount: string;
+  chain_id: number;
+  slot: number;
+  withdraw: number;
 };
 
 export const StackingGetters = {
@@ -31,8 +39,9 @@ export const StackingGetters = {
 
 export const StackingActions = {
   LoadStacks: "LoadStacks",
+  AddStack: "AddStack",
   LoadUserStacks: "LoadUserStacks",
   LoadFees: "LoadFees",
   LoadUserFeesWithdrawal: "LoadUserFeesWithdrawal",
-  Reset: "Reset"
+  Reset: "Reset",
 } as const;
