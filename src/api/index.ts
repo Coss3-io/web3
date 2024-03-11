@@ -99,6 +99,14 @@ export class Client {
    */
   public static async logout(): Promise<void> {
     Client.accountStore[AccountActions.UpdateAppConnection](false);
+    this.reset()
+  }
+
+  /**
+   * @notice - Used to restore the state of the store and all ws
+   * for example on network change
+   */
+  public static reset(): void {
     this.accountStore[AccountActions.Reset]();
     this.botStore[BotActions.Reset]();
     this.stackingStore[StackingActions.Reset]();
@@ -193,6 +201,11 @@ export class Client {
     }
     return success;
   }
+
+  /**
+   * @notice - Used to load the user stacking data
+   * @returns - Boolean success or failiure of the stacking loading
+   */
   public static async loadUserStacking(): Promise<boolean> {
     if (this.stackingStore.$state.user.loaded) return true;
     if (!this.accountStore.$state.appConnected) return false;
@@ -563,6 +576,10 @@ export class Client {
     return true;
   }
 
+  /**
+   * @notice - Used to load the user orders
+   * @returns - Boolean success or failiure of the loading of the orders
+   */
   public static async loadUserOrders(): Promise<boolean> {
     if (!this.accountStore.$state.networkId) return false;
     if (this.orderStore.$state.userOrdersLoaded) return true;

@@ -79,9 +79,7 @@ createWeb3Modal({
   ],
 });
 watchAccount(async (account) => {
-  accountStore[AccountActions.Reset]()
-  stackingStore[StackingActions.Reset]()
-  botStore[BotActions.Reset]()
+  Client.reset()
   if (accountStore.$state.blockchainConnected && !account.isConnected) {
       await Client.logout();
   }
@@ -90,8 +88,7 @@ watchAccount(async (account) => {
 });
 
 watchNetwork(async (network) => {
-  stackingStore[StackingActions.Reset]()
-  botStore[BotActions.Reset]()
+  Client.reset()
   accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
   accountStore[AccountActions.UpdateNetworkName](network.chain?.name);
   await Client.checkConnection();
