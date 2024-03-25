@@ -3,11 +3,10 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Stacking.sol";
+import "hardhat/console.sol";
 
-// TODO The price field of a replacement order represents the price of the highest buy order
-// TODO add the order cancellation
-// TODO add an arbitrage function
 // TODO allow contract to send orders
 
 enum Side {
@@ -49,11 +48,19 @@ contract Dex {
     mapping(uint => uint) public hashToFilledAmount;
     mapping(uint => bool) public cancelledOrders;
 
+    event NewTrade(
+        address indexed _taker,
+        uint _orderHash,
+        uint _amount,
+        uint _fees,
+        bool _baseFees,
+        Side _isSeller
+    );
+    event Cancel(uint _orderHash);
+
     constructor(Stacking _stackingContract) {
         stackingContract = _stackingContract;
     }
-
-    // TODO Create a trade event base on accurate price fees and stuff
 
     /**
      * @dev Main function for trading within the dex
@@ -64,20 +71,25 @@ contract Dex {
      */
     function trade(
         Order[] calldata orders,
-        TradeDetails memory tradeDetails
+        TradeDetails calldata tradeDetails
     ) external {
         address owner = orders[0].owner;
         uint amountToOwner = 0;
         uint amountToSender = 0;
         uint tradeFees = 0;
         uint quoteAmount = 0;
+        uint orderHash = 0;
+        uint length = orders.length - 1;
 
         if (tradeDetails.side == Side.SELL) {
             for (uint i = 0; i < orders.length; ++i) {
                 require(orders[i].baseToken == tradeDetails.baseToken);
                 require(orders[i].quoteToken == tradeDetails.quoteToken);
                 require(orders[i].expiry > block.timestamp);
-                quoteAmount = _verifyOrder(orders[i], tradeDetails.side);
+                (quoteAmount, orderHash) = _verifyOrder(
+                    orders[i],
+                    tradeDetails.side
+                );
 
                 if (owner != orders[i].owner) {
                     tradeFees += _createTrade(
@@ -93,6 +105,12 @@ contract Dex {
                     owner = orders[i].owner;
                     amountToOwner = 0;
                     amountToSender = 0;
+                    _triggerTradeEvent(
+                        orders[i],
+                        tradeDetails,
+                        orderHash,
+                        tradeFees
+                    );
                 }
                 amountToSender += quoteAmount;
                 amountToOwner += orders[i].takerAmount;
@@ -109,12 +127,21 @@ contract Dex {
                 tradeDetails.baseFee,
                 false
             );
+            _triggerTradeEvent(
+                orders[length],
+                tradeDetails,
+                orderHash,
+                tradeFees
+            );
         } else {
             for (uint i = 0; i < orders.length; ++i) {
                 require(orders[i].baseToken == tradeDetails.baseToken);
                 require(orders[i].quoteToken == tradeDetails.quoteToken);
                 require(orders[i].expiry > block.timestamp);
-                quoteAmount = _verifyOrder(orders[i], tradeDetails.side);
+                (quoteAmount, orderHash) = _verifyOrder(
+                    orders[i],
+                    tradeDetails.side
+                );
 
                 if (owner != orders[i].owner) {
                     tradeFees += _createTrade(
@@ -130,6 +157,12 @@ contract Dex {
                     owner = orders[i].owner;
                     amountToOwner = 0;
                     amountToSender = 0;
+                    _triggerTradeEvent(
+                        orders[i],
+                        tradeDetails,
+                        orderHash,
+                        tradeFees
+                    );
                 }
                 amountToOwner += quoteAmount;
                 amountToSender += orders[i].takerAmount;
@@ -146,6 +179,12 @@ contract Dex {
                 tradeDetails.baseFee,
                 true
             );
+            _triggerTradeEvent(
+                orders[length],
+                tradeDetails,
+                orderHash,
+                tradeFees
+            );
         }
 
         _handleFees(tradeDetails, tradeFees);
@@ -157,12 +196,16 @@ contract Dex {
     ) external {
         uint tradeFees = 0;
         uint quoteAmount = 0;
+        uint orderHash = 0;
 
         for (uint i = 0; i < orders.length; ++i) {
             require(orders[i].baseToken == tradeDetails[i].baseToken);
             require(orders[i].quoteToken == tradeDetails[i].quoteToken);
             require(orders[i].expiry > block.timestamp);
-            quoteAmount = _verifyOrder(orders[i], tradeDetails[i].side);
+            (quoteAmount, orderHash) = _verifyOrder(
+                orders[i],
+                tradeDetails[i].side
+            );
             if (tradeDetails[i].side == Side.SELL) {
                 tradeFees = _createTrade(
                     orders[i].takerAmount,
@@ -186,6 +229,12 @@ contract Dex {
                     true
                 );
             }
+            _triggerTradeEvent(
+                orders[i],
+                tradeDetails[i],
+                orderHash,
+                tradeFees
+            );
             _handleFees(tradeDetails[i], tradeFees);
         }
     }
@@ -196,21 +245,7 @@ contract Dex {
      */
     function cancelOrders(Order[] calldata orders) external {
         for (uint i = 0; i < orders.length; ++i) {
-            bytes memory data = abi.encodePacked(
-                orders[i].owner,
-                orders[i].amount,
-                orders[i].price,
-                orders[i].step,
-                orders[i].makerFees,
-                orders[i].upperBound,
-                orders[i].lowerBound,
-                orders[i].baseToken,
-                orders[i].quoteToken,
-                orders[i].expiry,
-                orders[i].chainId,
-                orders[i].side,
-                orders[i].replaceOrder
-            );
+            bytes memory data = _encodeOrder(orders[i]);
             uint orderHash = uint(keccak256(data));
             uint256 chainId;
             assembly {
@@ -220,6 +255,7 @@ contract Dex {
             require(orders[i].owner == msg.sender);
             require(!cancelledOrders[orderHash]);
             cancelledOrders[orderHash] = true;
+            emit Cancel(orderHash);
         }
     }
 
@@ -229,7 +265,7 @@ contract Dex {
      * @param tradeFees - The fees for the current trade
      */
     function _handleFees(
-        TradeDetails memory tradeDetails,
+        TradeDetails calldata tradeDetails,
         uint tradeFees
     ) private {
         if (tradeDetails.baseFee) {
@@ -297,10 +333,10 @@ contract Dex {
      * @return quoteAmount - The amount being traded
      */
     function _checkReplaceOrder(
-        Order memory order,
+        Order calldata order,
         uint orderHash,
         Side senderSide
-    ) private returns (uint quoteAmount) {
+    ) private returns (uint quoteAmount, uint newOrderHash) {
         uint price = 0;
         require(
             order.lowerBound <= order.price && order.price <= order.upperBound
@@ -332,7 +368,7 @@ contract Dex {
             }
         }
 
-        orderHash = uint(
+        newOrderHash = uint(
             keccak256(
                 abi.encodePacked(
                     orderHash,
@@ -345,17 +381,17 @@ contract Dex {
 
         if (price <= order.price) {
             if (senderSide == Side.SELL) {
-                hashToFilledAmount[orderHash] += order.takerAmount;
-                require(hashToFilledAmount[orderHash] <= order.amount);
+                hashToFilledAmount[newOrderHash] += order.takerAmount;
+                require(hashToFilledAmount[newOrderHash] <= order.amount);
             } else {
-                hashToFilledAmount[orderHash] -= order.takerAmount;
+                hashToFilledAmount[newOrderHash] -= order.takerAmount;
             }
         } else {
             if (senderSide == Side.BUY) {
-                hashToFilledAmount[orderHash] += order.takerAmount;
-                require(hashToFilledAmount[orderHash] <= order.amount);
+                hashToFilledAmount[newOrderHash] += order.takerAmount;
+                require(hashToFilledAmount[newOrderHash] <= order.amount);
             } else {
-                hashToFilledAmount[orderHash] -= order.takerAmount;
+                hashToFilledAmount[newOrderHash] -= order.takerAmount;
             }
         }
     }
@@ -367,10 +403,63 @@ contract Dex {
      * @return quoteAmount - The amount of quote being exchanged
      */
     function _verifyOrder(
-        Order memory order,
+        Order calldata order,
         Side senderSide
-    ) private returns (uint quoteAmount) {
-        bytes memory data = abi.encodePacked(
+    ) private returns (uint quoteAmount, uint orderHash) {
+        bytes memory data = _encodeOrder(order);
+
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+        require(chainId == order.chainId);
+
+        orderHash = uint(keccak256(data));
+        require(!cancelledOrders[orderHash]);
+
+        if (order.replaceOrder) {
+            (quoteAmount, orderHash) = _checkReplaceOrder(
+                order,
+                orderHash,
+                senderSide
+            );
+        } else {
+            require(order.side != senderSide);
+            quoteAmount = (order.takerAmount * order.price) / 1e18;
+            hashToFilledAmount[orderHash] += order.takerAmount;
+            require(hashToFilledAmount[orderHash] <= order.amount);
+        }
+        if (Address.isContract(order.owner)) {
+            require(
+                Ownable(order.owner).owner() ==
+                    ECDSA.recover(
+                        ECDSA.toEthSignedMessageHash(data),
+                        order.signature
+                    ),
+                "Invalid signature"
+            );
+        } else {
+            require(
+                order.owner ==
+                    ECDSA.recover(
+                        ECDSA.toEthSignedMessageHash(data),
+                        order.signature
+                    ),
+                "Invalid signature"
+            );
+        }
+    }
+
+    /**
+     * @notice - Function used to encode the orders as bytes
+     * to avoid having a too deep stack
+     * @param order - The order to encode
+     * @return data - The encoded order
+     */
+    function _encodeOrder(
+        Order calldata order
+    ) private pure returns (bytes memory data) {
+        data = abi.encodePacked(
             order.owner,
             order.amount,
             order.price,
@@ -385,32 +474,30 @@ contract Dex {
             order.side,
             order.replaceOrder
         );
+    }
 
-        uint256 chainId;
-        assembly {
-            chainId := chainid()
-        }
-        require(chainId == order.chainId);
-
-        uint orderHash = uint(keccak256(data));
-        if (order.replaceOrder) {
-            quoteAmount = _checkReplaceOrder(order, orderHash, senderSide);
-        } else {
-            require(order.side != senderSide);
-            quoteAmount = (order.takerAmount * order.price) / 1e18;
-            hashToFilledAmount[orderHash] += order.takerAmount;
-            require(hashToFilledAmount[orderHash] <= order.amount);
-        }
-        if (!Address.isContract(order.owner)) {
-            require(!cancelledOrders[orderHash]);
-            require(
-                order.owner ==
-                    ECDSA.recover(
-                        ECDSA.toEthSignedMessageHash(data),
-                        order.signature
-                    ),
-                "Invalid signature"
-            );
-        }
+    /**
+     * @notice - Function used to emit the new trade event
+     * the event emitter is inside a function to avoid too
+     * deep stack
+     * @param _order - the maker order of the trade
+     * @param _taker - The taker trade details of the trade
+     * @param _orderHash - The order hash of the trade
+     * @param _fees - The fees paid by the taker
+     */
+    function _triggerTradeEvent(
+        Order calldata _order,
+        TradeDetails calldata _taker,
+        uint _orderHash,
+        uint _fees
+    ) private {
+        emit NewTrade(
+            msg.sender,
+            _orderHash,
+            _order.takerAmount,
+            _fees,
+            _taker.baseFee,
+            _taker.side
+        );
     }
 }

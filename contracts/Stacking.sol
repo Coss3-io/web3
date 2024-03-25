@@ -23,6 +23,11 @@ contract Stacking {
     mapping(address => Stack[]) private myStack; // The stacks entries for every users
     ERC20 public cossToken;
 
+    event NewStackDeposit(uint _slot, uint _amount, address _sender);
+    event NewStackWithdrawal(uint _slot, uint _amount, address _sender);
+    event NewFeesDeposit(uint _slot, uint _amount, ERC20 _token);
+    event NewFeesWithdrawal(uint _slot, address _sender, ERC20[] _tokens);
+
     constructor(ERC20 _cossToken) {
         cossToken = _cossToken;
         slots.push().time = block.timestamp - 7 days;
@@ -51,6 +56,8 @@ contract Stacking {
         Stack storage stack = myStack[msg.sender].push();
         stack.amount = amount;
         stack.slot = slotId;
+
+        emit NewStackDeposit(slotId, slotId, msg.sender);
     }
 
     /**
@@ -61,8 +68,9 @@ contract Stacking {
      * @param token - The token that is being deposited into the stacking contract
      */
     function depositFees(uint256 amount, ERC20 token) external {
-        slots[slots.length - 1].fees[address(token)] += amount;
-        // TODO: Define an event on fees deposit
+        uint slotId = slots.length - 1;
+        slots[slotId].fees[address(token)] += amount;
+        emit NewFeesDeposit(slotId, amount, token);
     }
 
     /**
@@ -104,6 +112,7 @@ contract Stacking {
             if (toTransfer[i] > 0)
                 tokens[i].transfer(msg.sender, toTransfer[i]);
         }
+        emit NewFeesWithdrawal(slotId, msg.sender, tokens);
     }
 
     /**
@@ -111,12 +120,14 @@ contract Stacking {
      */
     function withdrawStack() external {
         uint toTransfer = 0;
+        uint slotId = withdrawnStack.length - 1;
         for (uint i = 0; i < myStack[msg.sender].length; ++i) {
             toTransfer += myStack[msg.sender][i].amount;
         }
         delete myStack[msg.sender];
-        withdrawnStack[withdrawnStack.length - 1] += toTransfer;
+        withdrawnStack[slotId] += toTransfer;
         cossToken.transfer(msg.sender, toTransfer);
+        emit NewStackWithdrawal(slotId, toTransfer, msg.sender);
     }
 
     /**
