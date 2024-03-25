@@ -42,10 +42,16 @@ import {
   optimism,
 } from "viem/chains";
 import { useStackingStore } from "./store/stacking";
-import { StackingActions } from "./types/stacking";
 import { useBotStore } from "./store/bot";
-import { BotActions } from "./types/bot";
+import {
+  chainRPC,
+  dexContract,
+  stackingContract,
+  dexABI,
+  stackingABI,
+} from "./types/contractSpecs";
 import { useOrderStore } from "./store/order";
+import { ethers } from "ethers";
 
 const accountStore = useAccountStore();
 const stackingStore = useStackingStore();
@@ -79,18 +85,32 @@ createWeb3Modal({
   ],
 });
 watchAccount(async (account) => {
-  Client.reset()
+  Client.reset();
   if (accountStore.$state.blockchainConnected && !account.isConnected) {
-      await Client.logout();
+    await Client.logout();
   }
   accountStore[AccountActions.UpdateBlockchainConnection](account.isConnected);
   accountStore[AccountActions.UpdateAddress](account.address);
 });
 
 watchNetwork(async (network) => {
-  Client.reset()
+  Client.reset();
   accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
   accountStore[AccountActions.UpdateNetworkName](network.chain?.name);
+
+  if (!network.chain?.id) return;
+  const rpc = chainRPC[<keyof typeof chainRPC>String(network.chain?.id)];
+  const dexAddress =
+    dexContract[<keyof typeof chainRPC>String(network.chain?.id)];
+  const stackingAddress =
+    stackingContract[<keyof typeof chainRPC>String(network.chain?.id)];
+  const provider = new ethers.JsonRpcProvider(rpc);
+  Client.dexContract = new ethers.Contract(dexAddress, dexABI, provider);
+  Client.stackingContract = new ethers.Contract(
+    stackingAddress,
+    stackingABI,
+    provider
+  );
   await Client.checkConnection();
 });
 

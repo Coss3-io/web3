@@ -15,6 +15,7 @@ import { useOrderStore } from "../store/order";
 import { Maker, OrderActions, Taker } from "../types/order";
 import { message } from "../types/websocket";
 import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
 
 const { notify } = useNotification();
 export class Client {
@@ -39,9 +40,13 @@ export class Client {
   public static botStore: ReturnType<typeof useBotStore>;
   public static orderStore: ReturnType<typeof useOrderStore>;
 
+  public static dexContract: ethers.Contract
+  public static stackingContract: ethers.Contract
+
   private static pairWsPath = "/ws/trade/";
   private static stackingWsPath = "/ws/stacking/";
   private static ws: { [key in string]: WebSocket } = {};
+
 
   constructor() {}
 
@@ -107,7 +112,7 @@ export class Client {
    * for example on network change
    */
   public static reset(): void {
-    this.accountStore[AccountActions.Reset]();
+    //this.accountStore[AccountActions.Reset]();
     this.botStore[BotActions.Reset]();
     this.stackingStore[StackingActions.Reset]();
     this.orderStore[OrderActions.Reset]();
