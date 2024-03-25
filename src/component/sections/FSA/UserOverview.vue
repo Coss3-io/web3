@@ -170,7 +170,7 @@
         </h1>
         <p class="py-4">
           Deposited coss tokens will be taken in account for FSA at
-          <b>the next block start</b>
+          <b>the next slot start</b>
           , check
           <u>the docs</u>
           for more details
