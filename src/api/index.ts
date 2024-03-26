@@ -1,5 +1,5 @@
 //@ts-ignore
-import { signMessage } from "@wagmi/core";
+import { erc20ABI, signMessage } from "@wagmi/core";
 import { useNotification } from "@kyvg/vue3-notification";
 import { useAccountStore } from "../store/account";
 import axios, { AxiosResponse } from "axios";
@@ -16,6 +16,7 @@ import { Maker, OrderActions, Taker } from "../types/order";
 import { message } from "../types/websocket";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
+import { dexContract } from "../types/contractSpecs";
 
 const { notify } = useNotification();
 export class Client {
@@ -40,13 +41,13 @@ export class Client {
   public static botStore: ReturnType<typeof useBotStore>;
   public static orderStore: ReturnType<typeof useOrderStore>;
 
-  public static dexContract: ethers.Contract
-  public static stackingContract: ethers.Contract
+  public static provider: ethers.JsonRpcProvider;
+  public static dexContract: ethers.Contract;
+  public static stackingContract: ethers.Contract;
 
   private static pairWsPath = "/ws/trade/";
   private static stackingWsPath = "/ws/stacking/";
   private static ws: { [key in string]: WebSocket } = {};
-
 
   constructor() {}
 
@@ -104,7 +105,7 @@ export class Client {
    */
   public static async logout(): Promise<void> {
     Client.accountStore[AccountActions.UpdateAppConnection](false);
-    this.reset()
+    this.reset();
   }
 
   /**
@@ -632,5 +633,95 @@ export class Client {
       return false;
     }
     return true;
+  }
+
+  /**
+   * @notice - Function used to get the balances for one or a pair of tokens
+   */
+  public static async getBalances(
+    token: [string, string]
+  ): Promise<[BigNumber, BigNumber]>;
+  public static async getBalances(token: string): Promise<BigNumber>;
+  public static async getBalances(
+    token: string | [string, string]
+  ): Promise<BigNumber | [BigNumber, BigNumber] | void> {
+    if (!this.provider) return;
+
+    try {
+      if (typeof token === "string") {
+        const contract = new ethers.Contract(token, erc20ABI, this.provider);
+        return new BigNumber(
+          await contract.balanceOf(this.accountStore.address)
+        ).dividedBy("1e18");
+      } else {
+        const base = new ethers.Contract(token[0], erc20ABI, this.provider);
+        const quote = new ethers.Contract(token[1], erc20ABI, this.provider);
+        const [baseBalance, quoteBalance] = await Promise.all([
+          base.balanceOf(this.accountStore.address),
+          quote.balanceOf(this.accountStore.address),
+        ]);
+        return [
+          new BigNumber(baseBalance).dividedBy("1e18"),
+          new BigNumber(quoteBalance).dividedBy("1e18"),
+        ];
+      }
+    } catch (e: any) {
+      console.log("An error occured during the balance retrieval");
+      notify({
+        type: "warn",
+        text: "An error occured during the balance retrieval check console",
+      });
+    }
+  }
+
+  /**
+   * @notice - Function used to get the allowance for a given contract for a token or a
+   * pair of tokens
+   * @param token - The token to get the allowance
+   * @param spender - The spender to check for the allowance
+   */
+  public static async getAllowance(
+    token: [string, string],
+    spender: string
+  ): Promise<[BigNumber, BigNumber] | void>;
+  public static async getAllowance(
+    token: string,
+    spender: string
+  ): Promise<BigNumber | void>;
+  public static async getAllowance(
+    token: string | [string, string],
+    spender: string
+  ): Promise<BigNumber | [BigNumber, BigNumber] | void> {
+    if (!this.provider) return;
+    try {
+      if (typeof token === "string") {
+        const contract = new ethers.Contract(token, erc20ABI, this.provider);
+        return new BigNumber(
+          await contract.allowance(
+            this.accountStore.address,
+            dexContract[
+              <keyof typeof dexContract>String(this.accountStore.networkId)
+            ]
+          )
+        ).dividedBy("1e18");
+      } else {
+        const base = new ethers.Contract(token[0], erc20ABI, this.provider);
+        const quote = new ethers.Contract(token[1], erc20ABI, this.provider);
+        const [baseBalance, quoteBalance] = await Promise.all([
+          base.allowance(this.accountStore.address, spender),
+          quote.allowance(this.accountStore.address, spender),
+        ]);
+        return [
+          new BigNumber(baseBalance).dividedBy("1e18"),
+          new BigNumber(quoteBalance).dividedBy("1e18"),
+        ];
+      }
+    } catch (e: any) {
+      console.log(e);
+      notify({
+        type: "warn",
+        text: "An error occured during allowance retrieval check console",
+      });
+    }
   }
 }

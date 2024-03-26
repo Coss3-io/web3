@@ -105,6 +105,7 @@ watchNetwork(async (network) => {
   const stackingAddress =
     stackingContract[<keyof typeof chainRPC>String(network.chain?.id)];
   const provider = new ethers.JsonRpcProvider(rpc);
+  Client.provider = provider;
   Client.dexContract = new ethers.Contract(dexAddress, dexABI, provider);
   Client.stackingContract = new ethers.Contract(
     stackingAddress,

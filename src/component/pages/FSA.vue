@@ -46,7 +46,10 @@
           </div>
         </div>
         <div class="flex justify-center">
-          <UserOverview></UserOverview>
+          <UserOverview
+            :balance="cossBalance"
+            :allowance="cossAllowance"
+          ></UserOverview>
         </div>
 
         <BlockFSA></BlockFSA>
@@ -129,6 +132,9 @@ import Dashboard from "../buttons/Dashboard.vue";
 import { useAccountStore } from "../../store/account";
 import { computed } from "vue";
 import { watch } from "vue";
+import { cryptoTicker } from "../../types/cryptoSpecs";
+import { dexContract } from "../../types/contractSpecs";
+import { nameToToken } from "../../utils";
 
 const accountStore = useAccountStore();
 const loadingReady = computed(
@@ -137,6 +143,8 @@ const loadingReady = computed(
 
 let loading = ref<boolean>(true);
 let privateLoading = ref<boolean>(true);
+let cossAllowance = ref<number>(0);
+let cossBalance = ref<number>(0);
 
 echarts.use([
   ToolboxComponent,
@@ -411,8 +419,23 @@ function loadStacking() {
   Client.loadPublicStacking().then((success: boolean) => {
     if (success) loading.value = false;
   });
-  Client.loadUserStacking().then((success: boolean) => {
-    if (success) privateLoading.value = false;
+  Client.loadUserStacking().then(async (success: boolean) => {
+    if (success) {
+      const balances = await Client.getBalances(
+        nameToToken(cryptoTicker.COSS, String(Client.accountStore.networkId))
+      );
+      const allowance = await Client.getAllowance(
+        nameToToken(cryptoTicker.COSS, String(Client.accountStore.networkId)),
+        dexContract[
+          <keyof typeof dexContract>String(Client.accountStore.networkId)
+        ]
+      );
+      if (balances && allowance) {
+        cossBalance.value = balances.toNumber();
+        cossAllowance.value = allowance.toNumber();
+        privateLoading.value = false;
+      }
+    }
   });
 }
 
