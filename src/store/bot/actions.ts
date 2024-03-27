@@ -1,6 +1,12 @@
+import { ethers } from "ethers";
 import { useBotStore } from ".";
 import { BotState } from "../../types/bot";
-import { getUsdValue, tokenToName, unBigNumberify } from "../../utils";
+import {
+  encodeBot,
+  getUsdValue,
+  tokenToName,
+  unBigNumberify,
+} from "../../utils";
 
 /**
  *  @notice - Used to addd a bot to the bot store
@@ -14,6 +20,9 @@ export async function addBot(
   const chainId = "chainId" in bot ? bot.chainId : bot.chain_id;
   const baseToken = "baseToken" in bot ? bot.baseToken : bot.base_token;
   const quoteToken = "quoteToken" in bot ? bot.quoteToken : bot.quote_token;
+  const lowerBound = "lowerBound" in bot ? bot.lowerBound : bot.lower_bound;
+  const upperBound = "upperBound" in bot ? bot.upperBound : bot.upper_bound;
+  const makerFees = "makerFees" in bot ? bot.makerFees : bot.maker_fees;
   const baseTokenAmount =
     "baseTokenAmount" in bot
       ? unBigNumberify(String(bot.baseTokenAmount))
@@ -27,7 +36,23 @@ export async function addBot(
     getUsdValue(tokenToName(baseToken, chainId), time),
     getUsdValue(tokenToName(quoteToken, chainId), time),
   ]);
+  const encodedData = encodeBot({
+    address: bot.address,
+    amount: bot.amount,
+    price: bot.price,
+    step: bot.step,
+    maker_fees: makerFees,
+    upper_bound: upperBound,
+    lower_bound: lowerBound,
+    base_token: baseToken,
+    quote_token: quoteToken,
+    expiry: bot.expiry,
+    chain_id: chainId,
+  });
+
+  const orderHash = ethers.keccak256(encodedData);
   const bot_formatted: BotState["bots"][0] = {
+    orderHash: orderHash,
     basePrice: basePrice,
     quotePrice: quotePrice,
     baseUSD: basePrice * baseTokenAmount,
@@ -40,14 +65,8 @@ export async function addBot(
       "feesEarned" in bot
         ? unBigNumberify(String(bot.feesEarned))
         : unBigNumberify(String(bot.fees_earned)),
-    lowerBound:
-      "lowerBound" in bot
-        ? unBigNumberify(String(bot.lowerBound))
-        : unBigNumberify(String(bot.lower_bound)),
-    makerFees:
-      "makerFees" in bot
-        ? Number(bot.makerFees) / 100
-        : Number(bot.maker_fees) / 100,
+    lowerBound: unBigNumberify(String(lowerBound)),
+    makerFees: Number(makerFees) / 100,
     price: unBigNumberify(String(bot.price)),
     amount: unBigNumberify(String(bot.amount)),
     quoteToken: quoteToken,
@@ -55,10 +74,7 @@ export async function addBot(
     quoteTokenAmount: quoteTokenAmount,
     timestamp: bot.timestamp,
     expiry: bot.expiry,
-    upperBound:
-      "upperBound" in bot
-        ? unBigNumberify(String(bot.upperBound))
-        : unBigNumberify(String(bot.upper_bound)),
+    upperBound: unBigNumberify(String(bot.upperBound)),
   };
   this.$state.bots.push(bot_formatted);
   return bot_formatted;
@@ -71,4 +87,17 @@ export async function addBot(
 export function reset(this: ReturnType<typeof useBotStore>): void {
   this.$state.loaded = false;
   this.$state.bots.splice(0, this.$state.bots.length);
+}
+
+/**
+ * @notice - Used to delete a specific bot
+ * @param this - The bot store to operate on
+ * @param botHash - The hash of the bot to delete
+ */
+export function deleteBot(
+  this: ReturnType<typeof useBotStore>,
+  botHash: string
+): void {
+  const index = this.$state.bots.findIndex((bot) => bot.orderHash == botHash);
+  this.$state.bots.splice(index, 1);
 }

@@ -7,7 +7,8 @@
       class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
     >
       <button class="btn btn-primary">
-        <span class="loading loading-infinity"></span> Loading
+        <span class="loading loading-infinity"></span>
+        Loading
       </button>
     </div>
   </div>
@@ -459,7 +460,10 @@
             </div>
           </div>
           <div class="card-actions justify-center 2xl:pb-3 p-0.5">
-            <button class="btn btn-neutral shadow-lg shadow-black/50">
+            <SpinnerButton
+              :fn="deleteBot"
+              class="btn btn-neutral shadow-lg shadow-black/50"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -475,7 +479,7 @@
                 />
               </svg>
               Delete
-            </button>
+            </SpinnerButton>
           </div>
         </div>
       </div>
@@ -670,7 +674,7 @@ import {
   cryptoGraph,
   cryptoLogo,
 } from "../../../types/cryptoSpecs";
-import { useRoute } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import * as echarts from "echarts/core";
 import { TooltipComponent, LegendComponent } from "echarts/components";
 import { PieChart } from "echarts/charts";
@@ -678,6 +682,7 @@ import { LabelLayout } from "echarts/features";
 import { CanvasRenderer } from "echarts/renderers";
 import { setGraph } from "../../../asset/scripts/utils";
 import { Client } from "../../../api";
+import { BotActions } from "../../../types/bot";
 import {
   tokenToName,
   displayAddress,
@@ -685,8 +690,13 @@ import {
   displayNumber,
   getUsdValue,
 } from "../../../utils";
+import SpinnerButton from "../../buttons/SpinnerButton.vue";
+import { useNotification } from "@kyvg/vue3-notification";
+import { RouteNames } from "../../../router";
 
 const botLoaded = computed(() => Client.botStore.$state.loaded);
+const { notify } = useNotification();
+const router = useRouter();
 
 let loaded = ref<boolean>(false);
 let usdValueLoaded = ref<boolean>(false);
@@ -960,6 +970,23 @@ async function getPriceUpdatePromise(
   } else {
     const initial = await getUsdValue(token, bot.timestamp * 1000);
     inititalUSDValueRef.value = initial * initialBalanceRef.value;
+  }
+}
+
+async function deleteBot() {
+  try {
+    const tx = await Client.dexContract.cancelOrders([
+      selectedBot.value!.orderHash,
+    ]);
+    await tx.wait(3);
+    Client.botStore[BotActions.DeleteBot](selectedBot.value!.orderHash);
+    router.push({ name: RouteNames.NewBot });
+  } catch (e: any) {
+    notify({
+      type: "warn",
+      text: "An error occured during the bot deletion process check console",
+    });
+    console.log(e);
   }
 }
 </script>

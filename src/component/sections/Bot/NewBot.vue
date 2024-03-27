@@ -160,7 +160,7 @@
                     ? h('img', { src: String(cryptoLogo[selectedBase!]) })
                     : unknownTokenLogo
                   "
-                  @update="(v: any) => {upperBoundValue = v}"
+                  @update="(v: any) => {upperBoundValue = v; displayUpperBound = priceValue! + (priceValue! * upperBoundValue!) / 100;}"
                   @updateText="(v: any) => {displayUpperBound = round(v/100); upperBoundValue = Math.max(((v/100) - priceValue!)*100/priceValue!, 0)}"
                 ></CryptoRange>
               </div>
@@ -432,11 +432,7 @@
                         >
                           <path
                             id="path"
-                            style="
-                              opacity: 1;
-                              vector-effect: none;
-                              fill-opacity: 1;
-                            "
+                            style="opacity: 1; fill-opacity: 1"
                             d="M 500 0C 224 0 0 224 0 500C 0 776 224 1000 500 1000C 776 1000 1000 776 1000 500C 1000 224 776 0 500 0C 500 0 500 0 500 0 M 501 191C 626 191 690 275 690 375C 690 475 639 483 595 513C 573 525 558 553 559 575C 559 591 554 602 541 601C 541 601 460 601 460 601C 446 601 436 581 436 570C 436 503 441 488 476 454C 512 421 566 408 567 373C 566 344 549 308 495 306C 463 303 445 314 411 361C 400 373 384 382 372 373C 372 373 318 333 318 333C 309 323 303 307 312 293C 362 218 401 191 501 191C 501 191 501 191 501 191M 500 625C 541 625 575 659 575 700C 576 742 540 776 500 775C 457 775 426 739 425 700C 425 659 459 625 500 625C 500 625 500 625 500 625"
                             transform=""
                           ></path>
@@ -521,7 +517,7 @@ import {
 import CryptoDropdown from "./CryptoDropdown.vue";
 import CryptoRange from "./CryptoRange.vue";
 import { computed, ref, watch } from "vue";
-import {encodeBot, nameToToken, round } from "../../../utils";
+import { encodeBot, nameToToken, round } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
 import { notify } from "@kyvg/vue3-notification";
@@ -570,7 +566,14 @@ const numOrders = computed(() => {
 });
 
 const baseNeeded = computed(() => {
-  return numOrders ? (numOrders.value * selectedAmount.value).toFixed(10) : 0;
+  if (numOrders) {
+    return new BigNumber(numOrders.value)
+      .multipliedBy(selectedAmount.value)
+      .toNumber()
+      .toFixed(10);
+  } else {
+    return 0;
+  }
 });
 
 const quoteNeeded = computed(() => {
@@ -586,14 +589,16 @@ const quoteNeeded = computed(() => {
 
   let counter = 0;
   let price = priceValue.value!;
-  let amountNeeded = 0;
+  let amountNeeded = new BigNumber(0);
 
   while (counter < 5000 && price >= lowerBoundPrice.value) {
-    amountNeeded += Number((selectedAmount.value * price).toFixed(10));
+    amountNeeded = amountNeeded.plus(
+      new BigNumber(selectedAmount.value).multipliedBy(price)
+    );
     price -= absoluteStep.value;
     ++counter;
   }
-  return amountNeeded.toFixed(10);
+  return amountNeeded.toNumber().toFixed(10);
 });
 
 async function createBot() {

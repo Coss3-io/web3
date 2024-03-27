@@ -1,5 +1,6 @@
 export type BotState = {
     bots: Array<{
+        orderHash: string;
         baseUSD: number;
         quoteUSD: number;
         basePrice: number;
@@ -61,7 +62,8 @@ export type BotFormatted = {
 export const BotActions = {
     Reset: "Reset",
     AddBot: "AddBot",
-    UpdateLoaded: "UpdateLoaded"
+    UpdateLoaded: "UpdateLoaded",
+    DeleteBot: "DeleteBot"
 } as const
 
 export const BotGetters = {
