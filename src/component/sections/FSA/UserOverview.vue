@@ -92,9 +92,13 @@
           </svg>
         </div>
       </div>
-      <div class="stat-desc">~${{ dollarsValue(
-                Client.stackingStore[StackingGetters.UserLastRoundFSA]
-              )*52 }} earning projection</div>
+      <div class="stat-desc">
+        ~${{
+          dollarsValue(Client.stackingStore[StackingGetters.UserLastRoundFSA]) *
+          52
+        }}
+        earning projection
+      </div>
     </div>
     <div
       class="stat xl:p-3 p-5 xl:col-span-1 lg:col-span-2 md:col-span-1 sm:col-span-2 place-items-center md:place-items-start lg:place-items-center xl:place-items-start"
@@ -201,9 +205,21 @@
             ref="depositInput"
             type="text"
             class="appearance-none min-w-0 grow text-center font-bold outline-none rounded-md bg-transparent placeholder:opacity-25 sm:placeholder:text-base placeholder:text-xs"
-            :placeholder="`COSS available: ${3535435}`"
+            :placeholder="`max COSS deposable: ${Math.min(
+              props.balance,
+              props.allowance
+            ).toFixed(5)}`"
           />
-          <div class="btn btn-xs btn-primary m-2">max</div>
+          <div
+            class="btn btn-xs btn-primary m-2"
+            @click="
+              () => {
+                depositAmount = Math.min(props.balance, props.allowance);
+              }
+            "
+          >
+            max
+          </div>
         </div>
         <div class="modal-action justify-center">
           <form method="dialog">
@@ -213,11 +229,12 @@
               ✕
             </button>
           </form>
-          <button
+          <SpinnerButton
+            :fn="depositTokens"
             class="btn btn-primary white-end hover:scale-105 btn-wide shadow-lg shadow-black/50"
           >
             Deposit
-          </button>
+          </SpinnerButton>
         </div>
       </div>
     </dialog>
@@ -237,9 +254,18 @@
           />
         </h1>
         <p class="py-4">
-          Withdrawing coss tokens from the stacking contract is immediate
+          Withdrawing coss tokens from the stacking contract is
+          <u>immediate.</u>
+          <br />
+          <br />
+          All unwithrawn FSA will be
+          <b>lost</b>
+          when withdrawing stack.
+          <br />
+          <br />
+          You can only withdraw all your stack at once for now.
         </p>
-        <div
+        <!-- <div
           class="mt-3 w-full flex justify-between items-center rounded-md bg-base-300 shadow-lg shadow-black/50 relative"
         >
           <div
@@ -268,7 +294,7 @@
             :placeholder="`COSS available: ${3535435}`"
           />
           <div class="btn btn-xs btn-primary m-2">max</div>
-        </div>
+        </div> -->
         <div class="modal-action justify-center">
           <form method="dialog">
             <button
@@ -277,11 +303,12 @@
               ✕
             </button>
           </form>
-          <button
+          <SpinnerButton
+          :fn="withdrawTokens"
             class="btn btn-primary white-end hover:scale-105 btn-wide shadow-lg shadow-black/50"
           >
             Withdraw
-          </button>
+        </SpinnerButton>
         </div>
       </div>
     </dialog>
@@ -294,6 +321,21 @@ import { Client } from "../../../api";
 import { COSS_TOKEN } from "../../../api/settings";
 import { StackingGetters } from "../../../types/stacking";
 import { displayNumber, dollarsValue } from "../../../utils";
+import SpinnerButton from "../../buttons/SpinnerButton.vue";
+import { useNotification } from "@kyvg/vue3-notification";
+import BigNumber from "bignumber.js";
+
+const { notify } = useNotification();
+
+const props = defineProps<{
+  balance: number;
+  allowance: number;
+}>();
+
+const emits = defineEmits<{
+  (e: "balanceUpdate", value: number): void;
+  (e: "allowanceUpdate", value: number): void;
+}>();
 
 let depositAmount = ref<null | number>(null);
 let depositInput = ref<HTMLInputElement | null>(null);
@@ -302,4 +344,48 @@ let depositModalDialog = ref<HTMLDialogElement | null>(null);
 let withdrawAmount = ref<null | number>(null);
 let withdrawInput = ref<HTMLInputElement | null>(null);
 let withdrawModalDialog = ref<HTMLDialogElement | null>(null);
+
+async function depositTokens() {
+  if (!depositAmount.value) {
+    notify({
+      type: "warn",
+      text: "Deposit amount can be empty",
+    });
+    return;
+  }
+  try {
+    const tx = await Client.stackingContract.depositStack(
+      new BigNumber(depositAmount.value).multipliedBy("1e18")
+    );
+    await tx.wait(3);
+  } catch (e: any) {
+    notify({
+      type: "warn",
+      text: "An error occured during deposit check console for details",
+    });
+    console.log(e);
+  }
+  emits(
+    "balanceUpdate",
+    new BigNumber(props.balance).minus(depositAmount.value).toNumber()
+  );
+  emits(
+    "allowanceUpdate",
+    new BigNumber(props.allowance).minus(depositAmount.value).toNumber()
+  );
+  depositAmount.value = null;
+}
+
+async function withdrawTokens() {
+  try {
+    const tx = await Client.stackingContract.withdrawStack();
+    await tx.wait(3);
+  } catch (e: any) {
+    notify({
+      type: "warn",
+      text: "An error occured during deposit check console for details",
+    });
+    console.log(e);
+  }
+}
 </script>

@@ -20,7 +20,7 @@
             v-if="privateLoading"
             class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
           >
-            <Dashboard></Dashboard>
+            <Dashboard :loading="privateLoading"></Dashboard>
           </div>
         </Transition>
         <div class="flex justify-start">
@@ -49,6 +49,8 @@
           <UserOverview
             :balance="cossBalance"
             :allowance="cossAllowance"
+            @balanceUpdate="(balance: number) => cossBalance = balance"
+            @allowanceUpdate="(allowance: number) => cossAllowance = allowance"
           ></UserOverview>
         </div>
 
@@ -421,20 +423,22 @@ function loadStacking() {
   });
   Client.loadUserStacking().then(async (success: boolean) => {
     if (success) {
-      const balances = await Client.getBalances(
-        nameToToken(cryptoTicker.COSS, String(Client.accountStore.networkId))
-      );
-      const allowance = await Client.getAllowance(
-        nameToToken(cryptoTicker.COSS, String(Client.accountStore.networkId)),
-        dexContract[
-          <keyof typeof dexContract>String(Client.accountStore.networkId)
-        ]
-      );
-      if (balances && allowance) {
-        cossBalance.value = balances.toNumber();
-        cossAllowance.value = allowance.toNumber();
-        privateLoading.value = false;
-      }
+      // const balances = await Client.getBalances(
+      //   nameToToken(cryptoTicker.COSS, String(Client.accountStore.networkId))
+      // );
+      // const allowance = await Client.getAllowance(
+      //   nameToToken(cryptoTicker.COSS, String(Client.accountStore.networkId)),
+      //   dexContract[
+      //     <keyof typeof dexContract>String(Client.accountStore.networkId)
+      //   ]
+      // );
+      // if (balances && allowance) {
+      //   cossBalance.value = balances.toNumber();
+      //   cossAllowance.value = allowance.toNumber();
+      // }
+      cossBalance.value = 529;
+      cossAllowance.value = 350;
+      privateLoading.value = false;
     }
   });
 }
