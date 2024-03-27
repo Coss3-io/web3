@@ -21,7 +21,10 @@
       <div>FSA details</div>
     </div>
     <div class="flex items-center gap-3 grow justify-center">
-      <button class="btn btn-primary btn-sm text-sm">
+      <SpinnerButton
+        :fn="withdrawSelected"
+        class="btn btn-primary btn-sm text-sm"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -37,8 +40,8 @@
           />
         </svg>
         Withdraw
-      </button>
-      <button class="btn btn-ghost btn-sm text-sm">
+      </SpinnerButton>
+      <SpinnerButton :fn="withdrawAll" class="btn btn-ghost btn-sm text-sm">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -54,7 +57,7 @@
           />
         </svg>
         All
-      </button>
+      </SpinnerButton>
     </div>
   </div>
   <div
@@ -90,11 +93,15 @@
             class="w-6 h-6"
           />
           <component
-              v-else
-              :is="index % 2 ? cryptoLogo[cryptoTicker.primaryUnknown] : cryptoLogo[cryptoTicker.secondaryUnknown]"
-              alt="token"
-              class="!w-6 !h-6"
-            />
+            v-else
+            :is="
+              index % 2
+                ? cryptoLogo[cryptoTicker.primaryUnknown]
+                : cryptoLogo[cryptoTicker.secondaryUnknown]
+            "
+            alt="token"
+            class="!w-6 !h-6"
+          />
         </div>
         <div>{{ value.amount.toFixed(2) }}</div>
         <div>${{ value.dollarsValue }}</div>
@@ -119,7 +126,10 @@ import { Client } from "../../../api";
 import { StackingGetters } from "../../../types/stacking";
 import { cryptoLogo, cryptoTicker } from "../../../types/cryptoSpecs";
 import { tokenToName } from "../../../utils";
+import { useNotification } from "@kyvg/vue3-notification";
+import SpinnerButton from "../../buttons/SpinnerButton.vue";
 
+const { notify } = useNotification();
 const fsaContainer = ref<HTMLDivElement | null>(null);
 const titleContainer = ref<HTMLDivElement | null>(null);
 
@@ -130,6 +140,38 @@ function selectToken(token: string) {
     selectedTokens.value.splice(selectedTokens.value.indexOf(token), 1);
   } else {
     selectedTokens.value.push(token);
+  }
+}
+
+async function withdrawSelected() {
+  await new Promise((r) => setTimeout(r, 2000));
+  try {
+    const tx = await Client.stackingContract.withdrawFees(selectedTokens.value);
+    tx.wait(3);
+    selectedTokens.value.splice(0, selectedTokens.value.length);
+  } catch (e: any) {
+    notify({
+      type: "warn",
+      text: "An error occured during the fees withdrawal check console",
+    });
+    console.log(e);
+  }
+}
+
+async function withdrawAll() {
+  const tokens = Object.keys(
+    Client.stackingStore[StackingGetters.UserAvailableFSA]
+  );
+  await new Promise((r) => setTimeout(r, 2000));
+  try {
+    const tx = await Client.stackingContract.withdrawFees(selectedTokens.value);
+    tx.wait(3);
+  } catch (e: any) {
+    notify({
+      type: "warn",
+      text: "An error occured during the fees withdrawal check console",
+    });
+    console.log(e);
   }
 }
 </script>
