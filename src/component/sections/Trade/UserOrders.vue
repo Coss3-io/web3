@@ -475,10 +475,12 @@ const orders = computed(() => {
   )
     return [];
 
-  const response: Array<extendedMaker | extendedTaker> = [
+  let response: Array<extendedMaker | extendedTaker> = [
     ...(<Array<extendedMaker>>Client.orderStore.user_makers[props.pair]),
     ...(<Array<extendedTaker>>Client.orderStore.user_takers[props.pair]),
-  ];
+  ].filter((order) => {
+    return !("bot" in order && !!order.bot);
+  });
 
   response.forEach((order) => {
     order.selected = ref(false);
@@ -495,6 +497,7 @@ const orders = computed(() => {
     }
   });
   response.sort(propertySortFactory(sortValue.value, sortAscending.value));
+  console.log(response);
   return response;
 });
 </script>
