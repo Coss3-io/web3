@@ -254,7 +254,7 @@ export class Client {
   public static async loadUserBots(): Promise<boolean> {
     if (this.botStore.loaded) return true;
     if (!this.accountStore.$state.appConnected) return false;
-
+    this.botStore.loaded = true;
     let success = false;
     let botsList: AxiosResponse;
 
@@ -265,19 +265,27 @@ export class Client {
           chain_id: this.accountStore.$state.networkId,
         },
       });
-      success = true;
-      const promises = botsList.data.map((bot: BotAPI) =>
-        this.botStore[BotActions.AddBot](bot)
-      );
-      await Promise.all(promises);
 
-      this.botStore.loaded = true;
+      if (botsList.status != axios.HttpStatusCode.Ok) {
+        notify({
+          text: "An error occured during user bot data request check console",
+          type: "warn",
+        });
+        console.log(botsList.data)
+      } else {
+        success = true;
+        const promises = botsList.data.map((bot: BotAPI) =>
+          this.botStore[BotActions.AddBot](bot)
+        );
+        await Promise.all(promises);
+      }
     } catch (e) {
       notify({
         text: "An error occured during user bot data request check console",
         type: "warn",
       });
       console.log(e);
+      this.botStore.loaded = false;
     }
     return success;
   }
@@ -589,6 +597,8 @@ export class Client {
   public static async loadUserOrders(): Promise<boolean> {
     if (!this.accountStore.$state.networkId) return false;
     if (this.orderStore.$state.userOrdersLoaded) return true;
+    this.orderStore.$state.userOrdersLoaded = true;
+
     try {
       const makers = await axios.get(this.url + this.makerDataPath, {
         params: {
@@ -603,6 +613,7 @@ export class Client {
           text: "An error occured during user orders loading",
           type: "warn",
         });
+        this.orderStore.$state.userOrdersLoaded = false;
         return false;
       }
 
@@ -622,7 +633,6 @@ export class Client {
           entry[1][0].quote_token
         );
       });
-      this.orderStore.$state.userOrdersLoaded = true;
     } catch (e) {
       notify({
         text: "An error occured during user orders loading check console",
@@ -630,6 +640,7 @@ export class Client {
       });
       console.log("The orders failed to be loaded check console");
       console.log(e);
+      this.orderStore.$state.userOrdersLoaded = false;
       return false;
     }
     return true;

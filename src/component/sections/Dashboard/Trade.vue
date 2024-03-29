@@ -4,7 +4,7 @@
   >
     <Transition name="fadeNav">
       <div
-        v-if="!props.loaded"
+        v-if="!props.loaded || !loadingReady"
         class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
       >
         <button class="btn btn-primary shadow shadow-black/50">
@@ -54,7 +54,8 @@
             </div>
           </div>
           <div class="stat-desc">
-            ${{ displayNumber(orderStore[OrderGetters.TotalInOrders]) }} in orders
+            ${{ displayNumber(orderStore[OrderGetters.TotalInOrders]) }} in
+            orders
           </div>
         </div>
         <div class="stat relative">
@@ -89,7 +90,7 @@
         >
           <div class="stat-title">Open Orders</div>
           <div
-            class="stat-value py-3 flex gap-2 flex-nowrap items-center justify-evenly w-full max-w-xs"
+            class="stat-value py-3 flex gap-2 flex-nowrap items-center justify-between w-full max-w-xs"
           >
             {{ orderStore[OrderGetters.OpenOrders] }}
             <RouterLink
@@ -98,6 +99,9 @@
             >
               Trade
             </RouterLink>
+          </div>
+          <div class="stat-desc">
+            ({{ orderStore[OrderGetters.BotOpenOrders] }} from bots)
           </div>
         </div>
       </div>
@@ -291,12 +295,30 @@ import { cryptoLogo, cryptoTicker } from "../../../types/cryptoSpecs";
 import { useOrderStore } from "../../../store/order";
 import { OrderGetters } from "../../../types/order";
 import { displayNumber } from "../../../utils";
+import { useAccountStore } from "../../../store/account";
+import { computed } from "vue";
+import { watch } from "vue";
+import { Client } from "../../../api";
 
 const props = defineProps<{
   loaded: boolean;
 }>();
 
 const orderStore = useOrderStore();
+const accountStore = useAccountStore();
+const loadingReady = computed(
+  () => accountStore.$state.appConnected && accountStore.$state.networkId
+);
+
+if (loadingReady.value) {
+  Client.loadUserBots();
+} else {
+  watch(loadingReady, (newValue) => {
+    if (newValue) {
+      Client.loadUserBots();
+    }
+  });
+}
 
 let rebalance = ref<boolean>(true);
 let copiedIndex = ref<number | null>(null);

@@ -195,7 +195,7 @@
               </svg>
             </div>
           </div>
-          <div class="stat-desc">~{{ botStore[BotGetters.TotalYield] }}% yield/year</div>
+          <div class="stat-desc">~{{ botStore[BotGetters.TotalYield] || 0 }}% yield/year</div>
         </div>
 
         <div class="stat py-2.5">
