@@ -327,6 +327,7 @@ export class Client {
         type: "warn",
       });
       console.log(e);
+      return success
     }
     const pair = `${data.base_token}${data.quote_token}`;
     if (!this.ws[pair]) {

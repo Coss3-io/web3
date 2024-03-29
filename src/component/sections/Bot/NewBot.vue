@@ -561,8 +561,8 @@ const absoluteStep = computed(() => {
 
 const numOrders = computed(() => {
   const range =
-    upperBoundPrice.value + 1 - (priceValue.value! + absoluteStep.value);
-  return Math.ceil(range / absoluteStep.value);
+    upperBoundPrice.value + 0.001 - (priceValue.value! + absoluteStep.value);
+  return range > 0 ? Math.ceil(range / absoluteStep.value) : 0;
 });
 
 const baseNeeded = computed(() => {
@@ -598,7 +598,10 @@ const quoteNeeded = computed(() => {
     price -= absoluteStep.value;
     ++counter;
   }
-  return amountNeeded.toNumber().toFixed(10);
+  return amountNeeded
+    .dividedBy(1 + Math.floor(selectedFees.value))
+    .toNumber()
+    .toFixed(10);
 });
 
 async function createBot() {
@@ -620,7 +623,7 @@ async function createBot() {
     step: new BigNumber(absoluteStep.value)
       .multipliedBy(multiplicator)
       .toFixed(),
-    maker_fees: String(Math.floor(selectedFees.value * 10)),
+    maker_fees: String(Math.floor(selectedFees.value)),
     upper_bound: new BigNumber(upperBoundPrice.value)
       .multipliedBy(multiplicator)
       .toFixed(),

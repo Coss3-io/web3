@@ -28,9 +28,9 @@ export async function addBot(
       ? unBigNumberify(String(bot.baseTokenAmount))
       : unBigNumberify(String(bot.base_token_amount));
   const quoteTokenAmount =
-    "quoteTokenAmount" in bot
+    ("quoteTokenAmount" in bot
       ? unBigNumberify(String(bot.quoteTokenAmount))
-      : unBigNumberify(String(bot.quote_token_amount));
+      : unBigNumberify(String(bot.quote_token_amount))) / (1 + Number(makerFees) / 1000);
 
   const [basePrice, quotePrice] = await Promise.all([
     getUsdValue(tokenToName(baseToken, chainId), time),
