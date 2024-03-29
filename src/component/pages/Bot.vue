@@ -102,9 +102,12 @@
               <div
                 class="absolute backdrop-blur-md top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center"
               >
-                <button class="btn btn-primary">
+              <transition name="fadeNav">
+                <button v-if="Client.accountStore.address" class="btn btn-primary">
                   <span class="loading loading-infinity"></span> Loading
                 </button>
+                <Dashboard v-else></Dashboard>
+              </transition>
               </div>
               <BotsCard></BotsCard>
             </div>
@@ -158,6 +161,7 @@ import { Client } from "../../api";
 import { useAccountStore } from "../../store/account";
 import { computed } from "vue";
 import { watch } from "vue";
+import Dashboard from "../buttons/Dashboard.vue";
 
 const accountStore = useAccountStore();
 const loadingReady = computed(
