@@ -43,6 +43,21 @@ export function totalOpenOrders(state: OrderState): number {
 }
 
 /**
+ * @notice - Function used to count the number of open orders from bots of the user
+ * @param state - The order state
+ * @returns - The number of bot open orders
+ */
+export function totalBotOpenOrders(state: OrderState): number {
+  let count = 0;
+  Object.values(state.user_makers).forEach((makers) => {
+    makers.forEach((maker) => {
+      if (maker.status == orderStatus.OPEN && 'bot' in maker && maker.bot) ++count;
+    });
+  });
+  return count;
+}
+
+/**
  * @notice - Function used to compute the $ value of the fees earned by the user so far
  * @param state - The order state
  * @returns - The total dollars value of the fees earned

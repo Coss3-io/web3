@@ -56,4 +56,5 @@ export const OrderGetters = {
   TotalFees: "TotalFees",
   TotalInOrders: "TotalInOrders",
   OpenOrders: "OpenOrders",
+  BotOpenOrders: "BotOpenOrders",
 } as const;

@@ -10,6 +10,7 @@ import {
   updateMaker,
 } from "./actions";
 import {
+  totalBotOpenOrders,
   totalFeesEarned,
   totalInOrders,
   totalMakerVolume,
@@ -31,5 +32,6 @@ export const useOrderStore = defineStore("Order", {
     [OrderGetters.OpenOrders]: totalOpenOrders,
     [OrderGetters.TotalFees]: totalFeesEarned,
     [OrderGetters.TotalVolume]: totalMakerVolume,
+    [OrderGetters.BotOpenOrders]: totalBotOpenOrders
   },
 });
