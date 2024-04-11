@@ -10,6 +10,10 @@ export const chainRPC = {
   export const stackingContract: { [key in keyof typeof chainRPC]: string } = {
     "56": "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525",
   } as const;
+
+  export const cossContract: { [key in keyof typeof chainRPC]: string } = {
+    "56": "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525",
+  } as const;
   
   export const erc20ABI = [
     "function balanceOf(address owner) view returns (uint256)",

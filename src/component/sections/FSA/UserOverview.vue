@@ -231,9 +231,21 @@
           </form>
           <SpinnerButton
             :fn="depositTokens"
-            class="btn btn-primary white-end hover:scale-105 btn-wide shadow-lg shadow-black/50"
+            :class="
+              !!Number(props.allowance)
+                ? 'btn-primary white-end'
+                : 'btn-disabled'
+            "
+            class="btn hover:scale-105 btn-wide shadow-lg shadow-black/50"
           >
             Deposit
+          </SpinnerButton>
+          <SpinnerButton
+          v-if="props.allowance < props.balance"
+            :fn="approveContract"
+            class="btn btn-primary white-end hover:scale-105 btn-wide shadow-lg shadow-black/50"
+          >
+            Approve
           </SpinnerButton>
         </div>
       </div>
@@ -304,11 +316,11 @@
             </button>
           </form>
           <SpinnerButton
-          :fn="withdrawTokens"
+            :fn="withdrawTokens"
             class="btn btn-primary white-end hover:scale-105 btn-wide shadow-lg shadow-black/50"
           >
             Withdraw
-        </SpinnerButton>
+          </SpinnerButton>
         </div>
       </div>
     </dialog>
@@ -324,6 +336,7 @@ import { displayNumber, dollarsValue } from "../../../utils";
 import SpinnerButton from "../../buttons/SpinnerButton.vue";
 import { useNotification } from "@kyvg/vue3-notification";
 import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
 
 const { notify } = useNotification();
 
@@ -384,6 +397,24 @@ async function withdrawTokens() {
     notify({
       type: "warn",
       text: "An error occured during deposit check console for details",
+    });
+    console.log(e);
+  }
+}
+
+async function approveContract() {
+  try {
+    const stackingAddress = await Client.stackingContract.getAddress();
+    const tx = await Client.cossContract.approve(stackingAddress, ethers.MaxUint256);
+    await tx.wait(3);
+    emits(
+      "allowanceUpdate",
+      new BigNumber(ethers.MaxUint256.toString()).toNumber()
+    );
+  } catch (e: any) {
+    notify({
+      type: "warn",
+      text: "An error occured during token approval check console for details",
     });
     console.log(e);
   }

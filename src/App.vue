@@ -21,7 +21,7 @@
 </template>
 <script setup lang="ts">
 //@ts-ignore
-import { watchAccount, watchNetwork } from "@wagmi/core";
+import { erc20ABI, watchAccount, watchNetwork } from "@wagmi/core";
 //@ts-ignore
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/vue";
 import NavBar from "./component/navigation/NavBar.vue";
@@ -46,6 +46,7 @@ import { useBotStore } from "./store/bot";
 import {
   chainRPC,
   dexContract,
+  cossContract,
   stackingContract,
   dexABI,
   stackingABI,
@@ -102,11 +103,14 @@ watchNetwork(async (network) => {
   const rpc = chainRPC[<keyof typeof chainRPC>String(network.chain?.id)];
   const dexAddress =
     dexContract[<keyof typeof chainRPC>String(network.chain?.id)];
+  const cossAddress =
+    cossContract[<keyof typeof chainRPC>String(network.chain?.id)];
   const stackingAddress =
     stackingContract[<keyof typeof chainRPC>String(network.chain?.id)];
   const provider = new ethers.JsonRpcProvider(rpc);
   Client.provider = provider;
   Client.dexContract = new ethers.Contract(dexAddress, dexABI, provider);
+  Client.cossContract = new ethers.Contract(cossAddress, erc20ABI, provider);
   Client.stackingContract = new ethers.Contract(
     stackingAddress,
     stackingABI,

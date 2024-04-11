@@ -43,6 +43,7 @@ export class Client {
 
   public static provider: ethers.JsonRpcProvider;
   public static dexContract: ethers.Contract;
+  public static cossContract: ethers.Contract;
   public static stackingContract: ethers.Contract;
 
   private static pairWsPath = "/ws/trade/";

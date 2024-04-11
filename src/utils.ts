@@ -93,7 +93,7 @@ export function displayNumber(
  */
 
 export const nFormatter = (num: number, digits: number): string => {
-  if (num < 1) return String(num.toExponential(digits));
+  if (num < 1) return String(num.toFixed(digits));
   const lookup = [
     { value: 1, symbol: "" },
     { value: 1e3, symbol: "k" },
