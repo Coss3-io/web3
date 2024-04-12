@@ -23,7 +23,7 @@ module.exports = {
     themes: [
       {
         dark: {
-          ...require("daisyui/src/theming/themes")["[data-theme=dark]"],
+          ...require("daisyui/src/theming/themes")["dark"],
           primary: "#7e21cf", 
         },
       },
