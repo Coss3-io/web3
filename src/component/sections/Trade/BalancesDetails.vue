@@ -54,7 +54,12 @@
         >
           {{ props.base in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.base] : props.base ? displayAddress(props.base): '' }}
         </div>
-        <div class="grow text-xs text-center font-bold font-sans">13516</div>
+        <div class="grow flex items-center justify-center relative">
+            <transition name="fadeNav">
+              <div v-if="props.walletBase" class="grow text-xs text-center font-bold font-sans">{{new BigNumber(props.walletBase).dividedBy("1e18").toFixed(5)}}</div>
+              <div v-else class="loading loading-ring"></div>
+            </transition>
+        </div>
         <div class="w-6 h-6 flex items-center">
           <transition name="fadeNav">
             <img
@@ -79,7 +84,12 @@
         >
           {{ props.quote in cryptoTicker ? cryptoTicker[<Values<typeof cryptoTicker>>props.quote] : props.quote ?displayAddress(props.quote): '' }}
         </div>
-        <div class="grow text-xs text-center font-bold font-sans">13516</div>
+        <div class="grow flex items-center justify-center relative">
+            <transition name="fadeNav">
+              <div v-if="props.walletQuote" class="grow text-xs text-center font-bold font-sans">{{new BigNumber(props.walletQuote).dividedBy("1e18").toFixed(5)}}</div>
+              <div v-else class="loading loading-ring"></div>
+            </transition>
+        </div>
         <div class="w-6 h-6 flex items-center">
           <transition name="fadeNav">
             <img
@@ -183,13 +193,16 @@ Values,
 } from "../../../types/cryptoSpecs";
 import { unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
 import { displayAddress } from "../../../utils";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { Client } from "../../../api";
 import { orderStatus } from "../../../types/orderSpecs";
+import BigNumber from "bignumber.js";
 
 const props = defineProps<{
   base: string | Values<typeof cryptoTicker>;
   quote: string | Values<typeof cryptoTicker>;
+  walletBase: string;
+  walletQuote: string;
   pair: string;
 }>();
 
@@ -218,4 +231,6 @@ const quoteInOrders = computed(() => {
   })
   return (Math.floor(total * 1e18)/1e18).toFixed(5)
 })
+
+
 </script>

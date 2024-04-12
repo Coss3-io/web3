@@ -101,7 +101,9 @@
         >
           <BalancesDetails
             :base="selectedBase"
+            :walletBase="baseWallet"
             :quote="selectedQuote"
+            :walletQuote="quoteWallet"
             :pair="pair"
           ></BalancesDetails>
         </div>
@@ -138,6 +140,9 @@ import { Client } from "../../api";
 import { nameToToken } from "../../utils";
 import { watch, computed } from "vue";
 import { ethers } from "ethers";
+import { erc20ABI } from "@wagmi/core";
+import { notify } from "@kyvg/vue3-notification";
+import BigNumber from "bignumber.js";
 
 const route = useRoute();
 let selectedBase = ref<Values<typeof cryptoTicker>>(
@@ -151,7 +156,9 @@ let loading = ref<boolean>(false);
 const orderDetails = reactive({ price: 0, amount: 0 });
 const tradeHistory = reactive([{ price: 0, amount: 0 }]);
 const newOrder = reactive([{ price: 0, amount: 0 }]);
-const balancesDetails = reactive([{ price: 0, amount: 0 }]);
+
+const baseWallet = ref<string>("");
+const quoteWallet = ref<string>("");
 
 const pair = computed(() => {
   if (
@@ -186,12 +193,37 @@ watch(
 
       if (!ethers.isAddress(baseToken) || !ethers.isAddress(quoteToken)) return;
       loading.value = true;
-      await Client.loadPair(
-        nameToToken(baseToken, Client.accountStore.networkId!),
-        nameToToken(quoteToken, Client.accountStore.networkId!)
-      );
+      loadBalances(baseToken, quoteToken)
+      await Client.loadPair(baseToken, quoteToken);
       loading.value = false;
     }
   }
 );
+
+async function loadBalances(
+  baseToken: string,
+  quoteToken: string
+): Promise<void> {
+  baseWallet.value = ""
+  quoteWallet.value = ""
+  const base = new ethers.Contract(baseToken, erc20ABI, Client.provider);
+  const quote = new ethers.Contract(quoteToken, erc20ABI, Client.provider);
+  try {
+    const [baseValue, quoteValue] = await Promise.all([
+      base.balanceOf(Client.accountStore.address),
+      quote.balanceOf(Client.accountStore.address),
+    ]);
+    baseWallet.value = baseValue;
+    quoteWallet.value = quoteValue;
+    // await new Promise(r => setTimeout(r, 3000))
+    // baseWallet.value = new BigNumber("20e18").toFixed();
+    // quoteWallet.value = new BigNumber("15e18").toFixed();
+  } catch (e: any) {
+    console.log(e);
+    notify({
+      type: "warn",
+      text: "An error occured during your on chain data retrieval check console.",
+    });
+  }
+}
 </script>
