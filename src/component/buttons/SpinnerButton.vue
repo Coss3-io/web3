@@ -1,5 +1,5 @@
 <template>
-  <button class="w-40" @click="excecute()">
+  <button class="w-40" @click.passive="execute()">
     <span v-if="spinner" class="loading loading-ring"></span>
     <slot v-else></slot>
   </button>
@@ -14,7 +14,7 @@ const props = defineProps<{
   fn: Function;
 }>();
 
-async function excecute() {
+async function execute() {
   spinner.value = true;
   try {
     await props.fn();

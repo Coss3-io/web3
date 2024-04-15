@@ -294,7 +294,9 @@
                       filterOrderStatus == order.status)
                   "
                   @click.passive="
-                    (<boolean>(<unknown>order.selected)) = !order.selected
+                    order.type == orderType.MAKER
+                      ? ((<boolean>(<unknown>order.selected)) = !order.selected)
+                      : ''
                   "
                   :class="{
                     'outline-1 outline outline-primary':
@@ -361,11 +363,12 @@
             </TransitionGroup>
           </div>
           <div class="col-span-full flex justify-center pt-2">
-            <button
+            <SpinnerButton
+              :fn="cancelOrders"
               class="btn btn-wide btn-primary btn-xs sm:btn-sm md:btn-md xl:btn-sm 2xl:btn-md"
             >
               Cancel
-            </button>
+            </SpinnerButton>
           </div>
         </div>
       </div>
@@ -397,9 +400,12 @@ import {
   unknownPrimaryTokenLogo,
   unknownSecondaryTokenLogo,
 } from "../../../asset/images/images";
+import SpinnerButton from "../../buttons/SpinnerButton.vue"
 import { Maker, Taker } from "../../../types/order";
 import { Client } from "../../../api";
 import { Ref } from "vue";
+import BigNumber from "bignumber.js";
+import { useNotification } from "@kyvg/vue3-notification";
 
 interface extendedMaker extends Maker {
   type: (typeof orderType)["MAKER"];
@@ -413,6 +419,8 @@ interface extendedTaker extends Taker {
   selected: Ref<boolean>;
   status: Values<typeof orderStatus>;
 }
+
+const { notify } = useNotification();
 
 const props = defineProps<{
   loading: boolean;
@@ -497,7 +505,40 @@ const orders = computed(() => {
     }
   });
   response.sort(propertySortFactory(sortValue.value, sortAscending.value));
-  console.log(response);
   return response;
 });
+
+async function cancelOrders(): Promise<void> {
+  const cancelOrder: Array<any> = [];
+
+  orders.value.forEach((order) => {
+    if (order.selected && order.type == orderType.MAKER) {
+      cancelOrder.push({
+        owner: order.address,
+        amount: new BigNumber(order.amount).multipliedBy("10e18").toFixed(),
+        price: new BigNumber(order.price).multipliedBy("10e18").toFixed(),
+        step: "0",
+        makerFees: "0",
+        upperBound: "0",
+        lowerBound: "0",
+        baseToken: order.base_token,
+        quoteToken: order.quote_token,
+        expiry: order.expiry.toFixed(),
+        chainId: order.chain_id,
+        side: !order.is_buyer,
+        replaceOrder: false,
+      });
+    }
+  });
+  try {
+    const tx = await Client.dexContract.cancelOrders(cancelOrders);
+    await tx.wait(3);
+  } catch (e: any) {
+    console.log(e);
+    notify({
+      type: "warn",
+      text: "The order cancellation failed check blockchain",
+    });
+  }
+}
 </script>
