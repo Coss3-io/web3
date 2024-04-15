@@ -1,64 +1,64 @@
 .range-emerald-700 {
-  --range-shdw: 161.4, 93.5%, 30.4%;
+  --range-shdw: rgb(5, 150, 105);
 }
 
 .range-slate-400 {
-  --range-shdw: 215, 20.2%, 65.1%;
+  --range-shdw: rgb(148, 163, 184);
 }
 
 .range-blue-300 {
-  --range-shdw: 211.7, 96.4%, 78.4%;
+  --range-shdw: rgb(147, 197, 253);
 }
 
 .range-red-500 {
-  --range-shdw: 0, 84.2%, 60.2%;
+  --range-shdw: rgb(239, 68, 68);
 }
 
 .range-yellow-400 {
-  --range-shdw: 47.9,95.8%,53.1%;
+  --range-shdw: rgb(250, 204, 21);
 }
 
 .range-violet-600 {
-  --range-shdw: 262.1,83.3%,57.8%
+  --range-shdw: rgb(124, 58, 237);
 }
 
 .range-blue-500 {
-  --range-shdw: 217.2,91.2%,59.8%
+  --range-shdw: rgb(59, 130, 246);
 }
 
 .range-fuchsia-300 {
-  --range-shdw: 291.1,93.1%,82.9%
+  --range-shdw: rgb(240, 171, 252);
 }
 
 .range-gray-400 {
-  --range-shdw: 217.9,10.6%,64.9%
+  --range-shdw: rgb(156, 163, 175);
 }
 
 .range-gray-700 {
-  --range-shdw: 216.9,19.1%,26.7%
+  --range-shdw: rgb(55, 65, 81);
 }
 
 .range-amber-400 {
-  --range-shdw: 43.3,96.4%,56.3%
+  --range-shdw: rgb(251, 191, 36);
 }
 
 .range-lime-300 {
-  --range-shdw: 82,84.5%,67.1%
+  --range-shdw: rgb(190, 242, 100);
 }
 
 .range-primary {
-  --range-shdw: 262, 80%, 50%
+  --range-shdw: rgb(100, 25, 230);
 }
 
 .range-secondary {
-  --range-shdw: 316, 70%, 50%
+  --range-shdw: rgb(217, 38, 169);
 }
 
 .greenTrade.even {
   @apply bg-green-600/10;
 }
 
-.greenTrade.odd{
+.greenTrade.odd {
   @apply bg-green-900/10;
 }
 
@@ -66,6 +66,6 @@
   @apply bg-red-600/10;
 }
 
-.redTrade.odd{
+.redTrade.odd {
   @apply bg-red-900/10;
 }
