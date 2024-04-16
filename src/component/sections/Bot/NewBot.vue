@@ -572,7 +572,7 @@ const baseNeeded = computed(() => {
       .toNumber()
       .toFixed(10);
   } else {
-    return 0;
+    return "0.0000000000";
   }
 });
 
@@ -585,7 +585,7 @@ const quoteNeeded = computed(() => {
       selectedAmount.value
     )
   )
-    return 0;
+    return "0.0000000000";
 
   let counter = 0;
   let price = priceValue.value!;
