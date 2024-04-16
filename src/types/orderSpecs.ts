@@ -11,6 +11,13 @@ import {
 } from "../asset/images/images";
 import { Values } from "./cryptoSpecs";
 
+export type TakerEvent = {
+  amount: number,
+  price: number,
+  baseFees: boolean, 
+  isBuyer: boolean
+}
+
 export const orderType = {
   MAKER: "MAKER",
   ALL: "ALL",
