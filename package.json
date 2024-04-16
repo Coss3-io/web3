@@ -17,7 +17,7 @@
     "core-js": "^3.36.1",
     "crypto-browserify": "^3.12.0",
     "daisyui": "^4.10.1",
-    "echarts": "^5.5.0",
+    "echarts": "^5.4.3",
     "glob-all": "^3.3.1",
     "https-browserify": "^1.0.0",
     "lodash.clonedeep": "^4.5.0",
