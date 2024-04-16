@@ -711,7 +711,12 @@ let initialBaseUSD = ref<number>();
 let initialQuoteUSD = ref<number>();
 
 const initialBaseToken = computed<number>(() => {
-  if (!selectedBot.value) return 0;
+  if (
+    !selectedBot.value ||
+    selectedBot.value.upperBound <
+      selectedBot.value.price + selectedBot.value.step
+  )
+    return 0;
   const numOrders = Math.ceil(
     (selectedBot.value.upperBound +
       1 -
@@ -737,10 +742,11 @@ const initialQuoteToken = computed<number>(() => {
 
 const baseBalanceDiff = computed<string>(() => {
   if (!initialBaseToken) return "0";
-  const percent =
-    ((selectedBot.value!.baseTokenAmount - initialBaseToken.value) /
-      initialBaseToken.value) *
-    100;
+  const percent = initialBaseToken.value
+    ? ((selectedBot.value!.baseTokenAmount - initialBaseToken.value) /
+        initialBaseToken.value) *
+      100
+    : 0;
   return percent.toFixed(1);
 });
 
