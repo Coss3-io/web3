@@ -90,7 +90,6 @@ import { Client } from "../../../api";
 
 const tradeContainer = ref<HTMLDivElement | null>(null);
 const props = defineProps<{
-  tradeHistory: Object[];
   loading: boolean;
   pair: string;
   base: string | Values<typeof cryptoTicker>;
