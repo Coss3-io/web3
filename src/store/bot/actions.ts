@@ -66,7 +66,7 @@ export async function addBot(
         ? unBigNumberify(String(bot.feesEarned))
         : unBigNumberify(String(bot.fees_earned)),
     lowerBound: unBigNumberify(String(lowerBound)),
-    makerFees: Number(makerFees) / 100,
+    makerFees: Number(makerFees) / 10,
     price: unBigNumberify(String(bot.price)),
     amount: unBigNumberify(String(bot.amount)),
     quoteToken: quoteToken,
@@ -74,7 +74,7 @@ export async function addBot(
     quoteTokenAmount: quoteTokenAmount,
     timestamp: bot.timestamp,
     expiry: bot.expiry,
-    upperBound: unBigNumberify(String(bot.upperBound)),
+    upperBound: unBigNumberify(String(upperBound)),
   };
   this.$state.bots.push(bot_formatted);
   return bot_formatted;
