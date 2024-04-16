@@ -50,6 +50,8 @@ export class Client {
   private static stackingWsPath = "/ws/stacking/";
   private static ws: { [key in string]: WebSocket } = {};
 
+  private static loadingBots: boolean = false;
+
   constructor() {}
 
   /**
@@ -253,10 +255,10 @@ export class Client {
    * @returns - The succes or the failiure of the bot retrieval
    */
   public static async loadUserBots(): Promise<boolean> {
-    if (this.botStore.loaded) return true;
+    if (this.botStore.loaded || this.loadingBots) return true;
     if (!this.accountStore.$state.appConnected) return false;
-    this.botStore.loaded = true;
     let success = false;
+    this.loadingBots = true;
     let botsList: AxiosResponse;
 
     try {
@@ -272,7 +274,7 @@ export class Client {
           text: "An error occured during user bot data request check console",
           type: "warn",
         });
-        console.log(botsList.data)
+        console.log(botsList.data);
       } else {
         success = true;
         const promises = botsList.data.map((bot: BotAPI) =>
@@ -285,9 +287,11 @@ export class Client {
         text: "An error occured during user bot data request check console",
         type: "warn",
       });
+      this.loadingBots = false;
       console.log(e);
-      this.botStore.loaded = false;
     }
+    this.loadingBots = false;
+    this.botStore.loaded = true;
     return success;
   }
 
@@ -328,7 +332,7 @@ export class Client {
         type: "warn",
       });
       console.log(e);
-      return success
+      return success;
     }
     const pair = `${data.base_token}${data.quote_token}`;
     if (!this.ws[pair]) {
