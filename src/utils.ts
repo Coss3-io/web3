@@ -365,11 +365,11 @@ export function encodeBot(data: any): string {
  * @param bot - The bot formatted from the backed
  * @returns - The bot formatted for the frontend App
  */
-export function formatBotFields(bot: BotAPI): BotFormatted {
+export function formatBotFields(bot: BotAPI, amount: string): BotFormatted {
   return {
     address: bot.address,
     chainId: bot.chain_id,
-    amount: unBigNumberify(bot.amount),
+    amount: unBigNumberify(amount),
     feesEarned: unBigNumberify(bot.fees_earned),
     lowerBound: unBigNumberify(bot.lower_bound),
     makerFees: Number(bot.maker_fees),
