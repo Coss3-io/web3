@@ -353,18 +353,21 @@ import {
   cryptoTicker,
 Values,
 } from "../../../types/cryptoSpecs";
+import type { TakerEvent } from "../../../types/orderSpecs"; 
 import { dollars, unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
 import { displayAddress, encodeOrder, nameToToken } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
-import { ethers } from "ethers";
 import { notify } from "@kyvg/vue3-notification";
 
 const props = defineProps<{
-  newOrder: Object[];
   base: string | Values<typeof cryptoTicker>;
   quote: string | Values<typeof cryptoTicker>;
 }>();
+
+const emits = defineEmits<{
+  (e: "newOrder", order: TakerEvent): void;
+}>()
 
 const isBuyOrder = ref(true);
 const isMakerOrder = ref(true);
@@ -373,9 +376,12 @@ const price = ref<undefined | number>();
 const amount = ref<undefined | number>();
 
 async function createOrder() {
-  if (!isMakerOrder.value) return
   if (!amount.value) return
   if (!price.value) return
+  if (!isMakerOrder.value) {
+    emits("newOrder", {isBuyer: isBuyOrder.value, baseFees: !isQuoteFeesOrder.value, price: price.value, amount: amount.value})
+    return
+  }
   const multiplicator = new BigNumber("1e18")
   const data = {
     order_hash: "",
