@@ -192,6 +192,7 @@ export function reset(this: ReturnType<typeof useOrderStore>): void {
  */
 function computeMakerPrice(maker: Maker): Maker {
   if (maker.bot) {
+    maker.initialPrice = new BigNumber(maker.price)
     maker.bot = formatBotFields(<BotAPI>(<unknown>maker.bot), String(maker.amount));
     let makerFees = Number(maker.bot.makerFees);
     if (makerFees <= 2000) {

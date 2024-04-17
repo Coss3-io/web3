@@ -1,9 +1,11 @@
+import BigNumber from "bignumber.js";
 import { BotAPI, BotFormatted, BotState } from "./bot";
 import { Values } from "./cryptoSpecs";
 import { orderStatus } from "./orderSpecs";
 
 export type Maker = {
-  bot: undefined | BotFormatted | BotAPI;
+  bot: BotFormatted | BotAPI | undefined;
+  initialPrice?: BigNumber;
   base_token: string;
   quote_token: string;
   amount: number | string;
@@ -23,7 +25,7 @@ export type Maker = {
 
 export type Taker = {
   block: number;
-  price: number,
+  price: number;
   amount: number;
   base_fees: boolean;
   fees: number;
