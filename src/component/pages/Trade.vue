@@ -78,18 +78,17 @@
           class="col-span-full sm:col-span-6 lg:col-span-4 sm:row-span-2 h-[calc(100vh-250px)] min-h-full xl:h-auto w-full rounded-xl"
         >
           <Orderbook
-            :orderDetails="orderDetails"
             :base="selectedBase"
             :quote="selectedQuote"
             :pair="pair"
             :loading="loading"
+            :newOrder="newOrder"
           ></Orderbook>
         </div>
         <div
           class="col-span-full sm:col-span-6 lg:col-span-4 min-h-full h-[calc(50vh-125px)] sm:h-[calc(50vh-50px)] lg:h-[calc(50vh-100px)] xl:h-full overflow-hidden w-full rounded-xl"
         >
           <TradeHistory
-            :tradeHistory="tradeHistory"
             :base="selectedBase"
             :quote="selectedQuote"
             :pair="pair"
@@ -109,7 +108,11 @@
         </div>
         <div class="col-span-full lg:col-span-8 w-full rounded-xl">
           <NewOrder
-            :newOrder="newOrder"
+            @newOrder="
+              (order) => {
+                newOrder = order;
+              }
+            "
             :base="selectedBase"
             :quote="selectedQuote"
           ></NewOrder>
@@ -126,7 +129,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { ref } from "vue";
 import Orderbook from "../sections/Trade/Orderbook.vue";
 import UserOrders from "../sections/Trade/UserOrders.vue";
 import CryptoDropdown from "../sections/Bot/CryptoDropdown.vue";
@@ -143,6 +146,7 @@ import { ethers } from "ethers";
 import { erc20ABI } from "@wagmi/core";
 import { notify } from "@kyvg/vue3-notification";
 import BigNumber from "bignumber.js";
+import { TakerEvent } from "../../types/orderSpecs";
 
 const route = useRoute();
 let selectedBase = ref<Values<typeof cryptoTicker>>(
@@ -151,12 +155,9 @@ let selectedBase = ref<Values<typeof cryptoTicker>>(
 let selectedQuote = ref<Values<typeof cryptoTicker>>(
   <Values<typeof cryptoTicker>>route.params.quote
 );
+
 let loading = ref<boolean>(false);
-
-const orderDetails = reactive({ price: 0, amount: 0 });
-const tradeHistory = reactive([{ price: 0, amount: 0 }]);
-const newOrder = reactive([{ price: 0, amount: 0 }]);
-
+const newOrder = ref<TakerEvent | undefined>();
 const baseWallet = ref<string>("");
 const quoteWallet = ref<string>("");
 
@@ -193,7 +194,7 @@ watch(
 
       if (!ethers.isAddress(baseToken) || !ethers.isAddress(quoteToken)) return;
       loading.value = true;
-      loadBalances(baseToken, quoteToken)
+      loadBalances(baseToken, quoteToken);
       await Client.loadPair(baseToken, quoteToken);
       loading.value = false;
     }
@@ -204,8 +205,8 @@ async function loadBalances(
   baseToken: string,
   quoteToken: string
 ): Promise<void> {
-  baseWallet.value = ""
-  quoteWallet.value = ""
+  baseWallet.value = "";
+  quoteWallet.value = "";
   const base = new ethers.Contract(baseToken, erc20ABI, Client.provider);
   const quote = new ethers.Contract(quoteToken, erc20ABI, Client.provider);
   try {

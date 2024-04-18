@@ -46,6 +46,7 @@ export class Client {
   public static cossContract: ethers.Contract;
   public static stackingContract: ethers.Contract;
 
+  public static watchTowerURL = "http://localhost:8080"
   private static pairWsPath = "/ws/trade/";
   private static stackingWsPath = "/ws/stacking/";
   private static ws: { [key in string]: WebSocket } = {};
