@@ -130,7 +130,7 @@ const props = defineProps<{
 }>();
 
 const emits = defineEmits<{
-  (e: "updateBalance", base: number, quote: number): void;
+  (e: "updateBalance"): void;
 }>();
 
 let baseContract: ethers.Contract;
@@ -253,7 +253,7 @@ const buyOrders = computed(() => {
 
 async function takeSellOrders(): Promise<void> {
   const takers: any[] = [];
-  let takerAmount = new BigNumber(props.newOrder!.amount);
+  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy("10e18");
 
   await sellOrders.value.every(
     async (entry: { price: number; total: number; makers: Array<Maker> }) => {
@@ -261,7 +261,9 @@ async function takeSellOrders(): Promise<void> {
         return false;
       }
       await entry.makers.every(async (maker) => {
-        const remainingAmount = new BigNumber(maker.amount).minus(maker.filled);
+        const remainingAmount = new BigNumber(maker.amount)
+          .minus(maker.filled)
+          .multipliedBy("10e18");
         const tradeAmount = remainingAmount.gte(takerAmount)
           ? takerAmount
           : remainingAmount;
@@ -271,7 +273,7 @@ async function takeSellOrders(): Promise<void> {
             takers.push(
               takeBotOrder(
                 tradeAmount,
-                new BigNumber(props.newOrder!.price),
+                new BigNumber(props.newOrder!.price).multipliedBy("10e18"),
                 maker
               )
             );
@@ -298,13 +300,18 @@ async function takeSellOrders(): Promise<void> {
       baseFees: props.newOrder?.baseFees,
     });
     await tx.wait(3);
-    await axios.post("", {
+    axios.post("", {
       orders: Object.entries(faultyMakers).map((entry) => {
         return { address: entry[0], amount: entry[1] };
       }),
       token: await baseContract.getAddress(),
       chainId: Client.accountStore.networkId!,
     });
+    notify({
+      type: "success",
+      text: "Trade successfull",
+    });
+    emits("updateBalance");
   } catch (e: any) {
     console.log(e);
     notify({
@@ -319,7 +326,7 @@ async function takeSellOrders(): Promise<void> {
 
 async function takeBuyOrders(): Promise<void> {
   const takers: any[] = [];
-  let takerAmount = new BigNumber(props.newOrder!.amount);
+  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy("10e18");
 
   await buyOrders.value.every(
     async (entry: { price: number; total: number; makers: Array<Maker> }) => {
@@ -327,7 +334,9 @@ async function takeBuyOrders(): Promise<void> {
         return false;
       }
       await entry.makers.every(async (maker) => {
-        const remainingAmount = new BigNumber(maker.amount).minus(maker.filled);
+        const remainingAmount = new BigNumber(maker.amount)
+          .minus(maker.filled)
+          .multipliedBy("10e18");
         const tradeAmount = remainingAmount.gte(takerAmount)
           ? takerAmount
           : remainingAmount;
@@ -336,9 +345,7 @@ async function takeBuyOrders(): Promise<void> {
           await checkOrder(
             quoteContract,
             maker.address,
-            new BigNumber(maker.price)
-              .multipliedBy(tradeAmount)
-              .dividedBy("10e18")
+            new BigNumber(maker.price).multipliedBy(tradeAmount)
           )
         ) {
           if (maker.bot) {
@@ -384,6 +391,11 @@ async function takeBuyOrders(): Promise<void> {
       token: await quoteContract.getAddress(),
       chainId: Client.accountStore.networkId!,
     });
+    notify({
+      type: "success",
+      text: "Trade successfull",
+    });
+    emits("updateBalance");
   } catch (e: any) {
     console.log(e);
     notify({

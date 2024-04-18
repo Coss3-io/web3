@@ -331,14 +331,20 @@
           v-if="isBuyOrder"
           class="btn btn-wide bg-green-700 text-white/70 hover:bg-green-800 shadow-lg shadow-black/50"
         >
-          Buy
+        <transition name="fadeNav">
+            <span v-if="!props.tradeLoad">Buy</span>
+            <span v-else class="loading loading-ring"></span>
+          </transition>
         </button>
         <button
           @click="createOrder"
           v-else
           class="btn btn-wide bg-red-700 text-white/70 hover:bg-red-800 shadow-lg shadow-black/50"
         >
-          Sell
+          <transition name="fadeNav">
+            <span v-if="!props.tradeLoad">Sell</span>
+            <span v-else class="loading loading-ring"></span>
+          </transition>
         </button>
       </transition>
     </div>
@@ -363,6 +369,7 @@ import { notify } from "@kyvg/vue3-notification";
 const props = defineProps<{
   base: string | Values<typeof cryptoTicker>;
   quote: string | Values<typeof cryptoTicker>;
+  tradeLoad: boolean
 }>();
 
 const emits = defineEmits<{
@@ -378,6 +385,7 @@ const amount = ref<undefined | number>();
 async function createOrder() {
   if (!amount.value) return
   if (!price.value) return
+  if (props.tradeLoad) return
   if (!isMakerOrder.value) {
     emits("newOrder", {isBuyer: isBuyOrder.value, baseFees: !isQuoteFeesOrder.value, price: price.value, amount: amount.value})
     return

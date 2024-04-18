@@ -83,6 +83,12 @@
             :pair="pair"
             :loading="loading"
             :newOrder="newOrder"
+            @update-balance="
+              async () => {
+                newOrder = undefined;
+                await loadBalances(baseToken, quoteToken);
+              }
+            "
           ></Orderbook>
         </div>
         <div
@@ -115,6 +121,7 @@
             "
             :base="selectedBase"
             :quote="selectedQuote"
+            :tradeLoad="tradeLoad"
           ></NewOrder>
         </div>
       </div>
@@ -155,7 +162,10 @@ let selectedBase = ref<Values<typeof cryptoTicker>>(
 let selectedQuote = ref<Values<typeof cryptoTicker>>(
   <Values<typeof cryptoTicker>>route.params.quote
 );
+let baseToken = "";
+let quoteToken = "";
 
+let tradeLoad = ref<boolean>(false); 
 let loading = ref<boolean>(false);
 const newOrder = ref<TakerEvent | undefined>();
 const baseWallet = ref<string>("");
@@ -174,6 +184,11 @@ const pair = computed(() => {
   )}${nameToToken(selectedQuote.value, Client.accountStore.$state.networkId)}`;
 });
 
+watch(newOrder, (newValue, oldValue) => {
+  if (!oldValue && newValue) tradeLoad.value = true
+  if (oldValue && !newValue) tradeLoad.value = false
+})
+
 watch(
   [selectedBase, selectedQuote, () => Client.accountStore.$state.appConnected],
   async ([newBase, newQuote, newConnect], [oldBase, OldQuote, oldConnect]) => {
@@ -183,11 +198,11 @@ watch(
       Client.accountStore.$state.networkId &&
       newConnect
     ) {
-      const baseToken = nameToToken(
+      baseToken = nameToToken(
         <Values<typeof cryptoTicker>>newBase,
         Client.accountStore.networkId!
       );
-      const quoteToken = nameToToken(
+      quoteToken = nameToToken(
         <Values<typeof cryptoTicker>>newQuote,
         Client.accountStore.networkId!
       );
