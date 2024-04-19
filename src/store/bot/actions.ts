@@ -17,6 +17,7 @@ export async function addBot(
   bot: any
 ): Promise<BotState["bots"][0]> {
   const time = Date.now();
+  const botHash = "botHash" in bot ? bot.botHash : bot.bot_hash;
   const chainId = "chainId" in bot ? bot.chainId : bot.chain_id;
   const baseToken = "baseToken" in bot ? bot.baseToken : bot.base_token;
   const quoteToken = "quoteToken" in bot ? bot.quoteToken : bot.quote_token;
@@ -36,23 +37,9 @@ export async function addBot(
     getUsdValue(tokenToName(baseToken, chainId), time),
     getUsdValue(tokenToName(quoteToken, chainId), time),
   ]);
-  const encodedData = encodeBot({
-    address: bot.address,
-    amount: bot.amount,
-    price: bot.price,
-    step: bot.step,
-    maker_fees: makerFees,
-    upper_bound: upperBound,
-    lower_bound: lowerBound,
-    base_token: baseToken,
-    quote_token: quoteToken,
-    expiry: bot.expiry,
-    chain_id: chainId,
-  });
 
-  const orderHash = ethers.keccak256(encodedData);
   const bot_formatted: BotState["bots"][0] = {
-    orderHash: orderHash,
+    botHash: botHash,
     basePrice: basePrice,
     quotePrice: quotePrice,
     baseUSD: basePrice * baseTokenAmount,
@@ -98,6 +85,6 @@ export function deleteBot(
   this: ReturnType<typeof useBotStore>,
   botHash: string
 ): void {
-  const index = this.$state.bots.findIndex((bot) => bot.orderHash == botHash);
+  const index = this.$state.bots.findIndex((bot) => bot.botHash == botHash);
   this.$state.bots.splice(index, 1);
 }

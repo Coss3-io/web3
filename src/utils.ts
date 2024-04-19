@@ -367,6 +367,7 @@ export function encodeBot(data: any): string {
  */
 export function formatBotFields(bot: BotAPI, amount: string): BotFormatted {
   return {
+    botHash: bot.bot_hash,
     address: bot.address,
     chainId: bot.chain_id,
     amount: unBigNumberify(amount),

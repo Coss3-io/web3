@@ -1,6 +1,6 @@
 export type BotState = {
     bots: Array<{
-        orderHash: string;
+        botHash: string;
         baseUSD: number;
         quoteUSD: number;
         basePrice: number;
@@ -41,6 +41,7 @@ export type BotAPI = {
     timestamp: number;
     expiry: number;
     upper_bound: string;
+    bot_hash: string;
 }
 
 export type BotFormatted = {
@@ -57,6 +58,7 @@ export type BotFormatted = {
     step: number;
     timestamp: number;
     upperBound: number;
+    botHash: string;
 }
 
 export const BotActions = {

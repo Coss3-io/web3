@@ -982,10 +982,10 @@ async function getPriceUpdatePromise(
 async function deleteBot() {
   try {
     const tx = await Client.dexContract.cancelOrders([
-      selectedBot.value!.orderHash,
+      selectedBot.value!.botHash,
     ]);
     await tx.wait(3);
-    Client.botStore[BotActions.DeleteBot](selectedBot.value!.orderHash);
+    Client.botStore[BotActions.DeleteBot](selectedBot.value!.botHash);
     router.push({ name: RouteNames.NewBot });
   } catch (e: any) {
     notify({

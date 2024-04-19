@@ -46,7 +46,7 @@ export class Client {
   public static cossContract: ethers.Contract;
   public static stackingContract: ethers.Contract;
 
-  public static watchTowerURL = "http://localhost:8080"
+  public static watchTowerURL = "http://localhost:8080";
   private static pairWsPath = "/ws/trade/";
   private static stackingWsPath = "/ws/stacking/";
   private static ws: { [key in string]: WebSocket } = {};
@@ -338,6 +338,7 @@ export class Client {
     const pair = `${data.base_token}${data.quote_token}`;
     if (!this.ws[pair]) {
       this.botStore[BotActions.AddBot]({
+        botHash: ethers.keccak256(encodedData),
         address: data.address,
         amount: data.amount,
         baseToken: data.base_token,
