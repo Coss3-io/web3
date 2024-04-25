@@ -3,6 +3,7 @@ import { useOrderStore } from ".";
 import { Maker, Taker } from "../../types/order";
 import { formatBotFields, unBigNumberify } from "../../utils";
 import { BotAPI } from "../../types/bot";
+import { orderStatus } from "../../types/orderSpecs";
 
 /**
  * @notice - Used to add the api takers and makers to the state
@@ -150,25 +151,29 @@ export function updateMaker(
  */
 export function deleteOrder(
   this: ReturnType<typeof useOrderStore>,
-  orderHash: string,
+  orderHashes: string[],
   pair: string,
   address: string
 ): void {
-  let orderAddress: string = "";
-  let index = this.$state.makers[pair].findIndex((maker) => {
-    return maker.order_hash.toLowerCase() == orderHash.toLowerCase();
-  });
-  if (index != -1) {
-    orderAddress = this.$state.makers[pair]
-      .splice(index, 1)[0]
-      .address.toLowerCase();
-  }
-  if (!(orderAddress == address.toLowerCase())) return;
+  orderHashes.forEach((orderHash) => {
+    let orderAddress: string = "";
+    let index = this.$state.makers[pair].findIndex((maker) => {
+      return maker.order_hash.toLowerCase() == orderHash.toLowerCase();
+    });
+    if (index != -1) {
+      orderAddress = this.$state.makers[pair]
+        .splice(index, 1)[0]
+        .address.toLowerCase();
+    }
+    if (!(orderAddress == address.toLowerCase())) return;
 
-  index = this.$state.user_makers[pair].findIndex((maker) => {
-    return maker.order_hash.toLowerCase() == orderHash.toLowerCase();
+    index = this.$state.user_makers[pair].findIndex((maker) => {
+      if (maker.order_hash.toLowerCase() == orderHash.toLowerCase()) {
+        maker.status = orderStatus.CANCELLED;
+        return true;
+      }
+    });
   });
-  if (index != -1) this.$state.user_makers[pair].splice(index, 1);
 }
 
 /**
@@ -192,8 +197,11 @@ export function reset(this: ReturnType<typeof useOrderStore>): void {
  */
 function computeMakerPrice(maker: Maker): Maker {
   if (maker.bot) {
-    maker.initialPrice = new BigNumber(maker.price)
-    maker.bot = formatBotFields(<BotAPI>(<unknown>maker.bot), String(maker.amount));
+    maker.initialPrice = new BigNumber(maker.price);
+    maker.bot = formatBotFields(
+      <BotAPI>(<unknown>maker.bot),
+      String(maker.amount)
+    );
     let makerFees = Number(maker.bot.makerFees);
     if (makerFees <= 2000) {
       if (maker.is_buyer) {

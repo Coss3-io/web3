@@ -460,10 +460,10 @@ export class Client {
           );
         });
       }
-      if (data[message.DEL_MAKER]) {
-        const deleteHash = data[message.DEL_MAKER];
+      if (data[message.DEL_MAKERS]) {
+        const deleteHashes = data[message.DEL_MAKERS];
         this.orderStore[OrderActions.DeleteOrder](
-          deleteHash,
+          deleteHashes,
           pair,
           this.accountStore.$state.address!
         );

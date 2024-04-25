@@ -2,6 +2,7 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Stacking.sol";
@@ -56,7 +57,7 @@ contract Dex {
         bool _baseFees,
         Side _isSeller
     );
-    event Cancel(uint _orderHash);
+    event Cancel(uint _orderHash, ERC20 _base_token, ERC20 _quote_token);
 
     constructor(Stacking _stackingContract) {
         stackingContract = _stackingContract;
@@ -255,7 +256,7 @@ contract Dex {
             require(orders[i].owner == msg.sender);
             require(!cancelledOrders[orderHash]);
             cancelledOrders[orderHash] = true;
-            emit Cancel(orderHash);
+            emit Cancel(orderHash, orders[i].baseToken, orders[i].quoteToken);
         }
     }
 
@@ -429,11 +430,11 @@ contract Dex {
             hashToFilledAmount[orderHash] += order.takerAmount;
             require(hashToFilledAmount[orderHash] <= order.amount);
         }
-        if (Address.isContract(order.owner)) {
+        if (order.owner.code.length > 0) {
             require(
                 Ownable(order.owner).owner() ==
                     ECDSA.recover(
-                        ECDSA.toEthSignedMessageHash(data),
+                        MessageHashUtils.toEthSignedMessageHash(data),
                         order.signature
                     ),
                 "Invalid signature"
@@ -442,7 +443,7 @@ contract Dex {
             require(
                 order.owner ==
                     ECDSA.recover(
-                        ECDSA.toEthSignedMessageHash(data),
+                        MessageHashUtils.toEthSignedMessageHash(data),
                         order.signature
                     ),
                 "Invalid signature"
