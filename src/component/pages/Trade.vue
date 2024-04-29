@@ -86,7 +86,7 @@
             @update-balance="
               async () => {
                 newOrder = undefined;
-                await loadBalances(baseToken, quoteToken);
+                await loadWallet(baseToken, quoteToken);
               }
             "
           ></Orderbook>
@@ -147,7 +147,7 @@ import { tradeLogo } from "../../asset/images/images";
 import { Values, cryptoTicker } from "../../types/cryptoSpecs";
 import { useRoute } from "vue-router";
 import { Client } from "../../api";
-import { nameToToken } from "../../utils";
+import { loadBalances, nameToToken } from "../../utils";
 import { watch, computed } from "vue";
 import { ethers } from "ethers";
 import { erc20ABI } from "@wagmi/core";
@@ -165,7 +165,7 @@ let selectedQuote = ref<Values<typeof cryptoTicker>>(
 let baseToken = "";
 let quoteToken = "";
 
-let tradeLoad = ref<boolean>(false); 
+let tradeLoad = ref<boolean>(false);
 let loading = ref<boolean>(false);
 const newOrder = ref<TakerEvent | undefined>();
 const baseWallet = ref<string>("");
@@ -185,9 +185,9 @@ const pair = computed(() => {
 });
 
 watch(newOrder, (newValue, oldValue) => {
-  if (!oldValue && newValue) tradeLoad.value = true
-  if (oldValue && !newValue) tradeLoad.value = false
-})
+  if (!oldValue && newValue) tradeLoad.value = true;
+  if (oldValue && !newValue) tradeLoad.value = false;
+});
 
 watch(
   [selectedBase, selectedQuote, () => Client.accountStore.$state.appConnected],
@@ -209,37 +209,22 @@ watch(
 
       if (!ethers.isAddress(baseToken) || !ethers.isAddress(quoteToken)) return;
       loading.value = true;
-      loadBalances(baseToken, quoteToken);
+      loadWallet(baseToken, quoteToken);
       await Client.loadPair(baseToken, quoteToken);
       loading.value = false;
     }
   }
 );
 
-async function loadBalances(
+async function loadWallet(
   baseToken: string,
   quoteToken: string
 ): Promise<void> {
   baseWallet.value = "";
   quoteWallet.value = "";
-  const base = new ethers.Contract(baseToken, erc20ABI, Client.provider);
-  const quote = new ethers.Contract(quoteToken, erc20ABI, Client.provider);
-  try {
-    const [baseValue, quoteValue] = await Promise.all([
-      base.balanceOf(Client.accountStore.address),
-      quote.balanceOf(Client.accountStore.address),
-    ]);
-    baseWallet.value = baseValue;
-    quoteWallet.value = quoteValue;
-    // await new Promise(r => setTimeout(r, 3000))
-    // baseWallet.value = new BigNumber("20e18").toFixed();
-    // quoteWallet.value = new BigNumber("15e18").toFixed();
-  } catch (e: any) {
-    console.log(e);
-    notify({
-      type: "warn",
-      text: "An error occured during your on chain data retrieval check console.",
-    });
-  }
+  const balances = await loadBalances([baseToken, quoteToken]);
+
+  if (balances[baseToken]) baseWallet.value = balances[baseToken];
+  if (balances[quoteToken]) baseWallet.value = balances[quoteToken];
 }
 </script>

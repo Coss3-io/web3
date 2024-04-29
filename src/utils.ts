@@ -1,5 +1,5 @@
 //@ts-ignore
-import { getWalletClient } from "@wagmi/core";
+import { erc20ABI, getWalletClient } from "@wagmi/core";
 import { COSS_TOKEN, ERC20_DIVIDER } from "./api/settings";
 import { usePriceStore } from "./store/price";
 import { BrowserProvider, JsonRpcSigner, ethers } from "ethers";
@@ -16,7 +16,10 @@ import { useAccountStore } from "./store/account";
 import { Maker } from "./types/order";
 import { BotAPI, BotFormatted } from "./types/bot";
 import { orderStatus } from "./types/orderSpecs";
+import { Client } from "./api";
+import { useNotification } from "@kyvg/vue3-notification";
 
+const { notify } = useNotification();
 /**
  * @notice - used to display the beginning and the end of an address
  * if the address is not recognized as a known token, if the address
@@ -449,4 +452,38 @@ export function computeBotOrders(bot: BotAPI): Array<Maker> {
     result.push(maker);
   }
   return result;
+}
+
+/**
+ * 
+ * @param tokens - The tokens to load the balance 
+ * @returns - The tokens list with the associated balances
+ */
+export async function loadBalances(
+  tokens: string[]
+): Promise<{ [key in string]: string }> {
+  const promises: Promise<any>[] = [];
+
+  for (let token of tokens) {
+    promises.push(
+      new ethers.Contract(token, erc20ABI, Client.provider).balanceOf(
+        Client.accountStore.address
+      )
+    );
+  }
+  try {
+    const balances = await Promise.all(promises);
+    const tokensObject: { [key in string]: string } = {}
+    return tokens.reduce((acc, key, index) => {
+      acc[key] = balances[index];
+      return acc;
+    }, tokensObject);
+  } catch (e: any) {
+    console.log(e);
+    notify({
+      type: "warn",
+      text: "An error occured during your on chain data retrieval check console.",
+    });
+    return {};
+  }
 }

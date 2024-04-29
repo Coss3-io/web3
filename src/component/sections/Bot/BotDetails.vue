@@ -548,9 +548,33 @@
         >
           {{ nFormatter(selectedBot!.baseTokenAmount, 1) }}
         </div>
-        <div class="stat-desc relative">
-          +21% above needs
-          <svg
+        <div
+          class="stat-desc relative"
+          v-if="baseBalance && selectedBot && selectedBot.baseTokenAmount"
+        >
+          {{ baseBalance > selectedBot!.baseTokenAmount ? "+" : ""
+          }}{{
+            ((baseBalance! - selectedBot!.baseTokenAmount)* 100 /
+            selectedBot!.baseTokenAmount).toFixed(2)
+          }}%
+          {{
+            baseBalance > selectedBot!.baseTokenAmount ? "above" : "below"
+          }}
+          needs
+          <svg v-if="baseBalance < selectedBot.baseTokenAmount"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            class="stroke-error w-5 h-5 absolute top-0 -right-1 translate-x-full -translate-y-0.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+            />
+          </svg>
+          <svg v-else
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -584,9 +608,20 @@
         >
           {{ nFormatter(selectedBot!.quoteTokenAmount, 1) }}
         </div>
-        <div class="stat-desc relative">
-          -21% below needs
-          <svg
+        <div
+          class="stat-desc relative"
+          v-if="quoteBalance && selectedBot && selectedBot.quoteTokenAmount"
+        >
+          {{ quoteBalance > selectedBot!.quoteTokenAmount ? "+" : ""
+          }}{{
+            ((quoteBalance! - selectedBot!.quoteTokenAmount)* 100 /
+            selectedBot!.quoteTokenAmount).toFixed(2)
+          }}%
+          {{
+            quoteBalance > selectedBot!.quoteTokenAmount ? "above" : "below"
+          }}
+          needs
+          <svg v-if="quoteBalance < selectedBot.quoteTokenAmount"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -599,11 +634,48 @@
               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
             />
           </svg>
+          <svg v-else
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            class="stroke-success w-5 h-5 absolute top-0 -right-1 translate-x-full -translate-y-0.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
         </div>
       </div>
-
       <div
-        v-if="baseTokenName!.toLowerCase() == 'avax'"
+        v-if="!quoteBalance || !selectedBot"
+        class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 2xl:col-span-1 xl:col-start-1 xl:col-span-2 place-items-center xl:!border-t-[1px] xl:!border-solid grid-cols-[1fr_max-content] xl:grid-cols-2 2xl:grid-cols-[1fr_max-content]"
+      >
+        <div class="stat-figure text-secondary xl:justify-self-center">
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              class="stroke-yellow-600 w-10 h-10"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div class="stat-title row-span-2 whitespace-normal">
+          Failed to load Balances
+        </div>
+      </div>
+      <div
+        v-else-if="quoteBalance && selectedBot && quoteBalance < selectedBot!.quoteTokenAmount"
         class="stat xl:row-start-2 2xl:row-start-1 2xl:col-start-3 2xl:col-span-1 xl:col-start-1 xl:col-span-2 place-items-center xl:!border-t-[1px] xl:!border-solid grid-cols-[1fr_max-content] xl:grid-cols-2 2xl:grid-cols-[1fr_max-content]"
       >
         <div class="stat-figure text-secondary xl:justify-self-center">
@@ -689,6 +761,8 @@ import {
   nFormatter,
   displayNumber,
   getUsdValue,
+  loadBalances,
+  unBigNumberify,
 } from "../../../utils";
 import SpinnerButton from "../../buttons/SpinnerButton.vue";
 import { useNotification } from "@kyvg/vue3-notification";
@@ -709,6 +783,27 @@ let quoteLogo = ref<string>();
 
 let initialBaseUSD = ref<number>();
 let initialQuoteUSD = ref<number>();
+
+let baseBalance = ref<number | undefined>(undefined);
+let quoteBalance = ref<number | undefined>(undefined);
+
+watch(selectedBot, async (newValue) => {
+  if (newValue) {
+    const balances = await loadBalances([
+      selectedBot.value?.baseToken!,
+      selectedBot.value?.quoteToken!,
+    ]);
+
+    if (balances[selectedBot.value?.baseToken!])
+      baseBalance.value = unBigNumberify(
+        balances[selectedBot.value?.baseToken!]
+      );
+    if (balances[selectedBot.value?.quoteToken!])
+      quoteBalance.value = unBigNumberify(
+        balances[selectedBot.value?.quoteToken!]
+      );
+  }
+});
 
 const initialBaseToken = computed<number>(() => {
   if (
