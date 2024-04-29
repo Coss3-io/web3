@@ -987,6 +987,10 @@ async function deleteBot() {
     await tx.wait(3);
     Client.botStore[BotActions.DeleteBot](selectedBot.value!.botHash);
     router.push({ name: RouteNames.NewBot });
+    notify({
+      type: "success",
+      text: "Bot deleted successfully",
+    });
   } catch (e: any) {
     notify({
       type: "warn",

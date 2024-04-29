@@ -468,6 +468,12 @@ export class Client {
           this.accountStore.$state.address!
         );
       }
+      if (data[message.DEL_BOTS]) {
+        const deleteBotHashes = data[message.DEL_BOTS];
+        this.botStore[BotActions.DeleteBot](
+          deleteBotHashes,
+        );
+      }
       if (data[message.NEW_TAKERS]) {
         data[message.NEW_TAKERS].forEach(
           (taker: Taker & { address: string }) => {

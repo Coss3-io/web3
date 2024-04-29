@@ -588,18 +588,19 @@ const quoteNeeded = computed(() => {
     return "0.0000000000";
 
   let counter = 0;
-  let price = priceValue.value!;
+  let price = new BigNumber(priceValue.value!);
   let amountNeeded = new BigNumber(0);
 
-  while (counter < 5000 && price >= lowerBoundPrice.value) {
+  while (counter < 5000 && price.gte(lowerBoundPrice.value)) {
     amountNeeded = amountNeeded.plus(
       new BigNumber(selectedAmount.value).multipliedBy(price)
     );
-    price -= absoluteStep.value;
+    price = price.minus(absoluteStep.value);
     ++counter;
   }
+
   return amountNeeded
-    .dividedBy(1 + Math.floor(selectedFees.value))
+    .dividedBy(1 + selectedFees.value / 1000)
     .toNumber()
     .toFixed(10);
 });
