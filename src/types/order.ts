@@ -57,6 +57,7 @@ export const OrderGetters = {
   TotalVolume: "TotalVolume",
   TotalFees: "TotalFees",
   TotalInOrders: "TotalInOrders",
+  TotalInOrdersRaw: "TotalInOrdersRaw",
   OpenOrders: "OpenOrders",
   BotOpenOrders: "BotOpenOrders",
 } as const;

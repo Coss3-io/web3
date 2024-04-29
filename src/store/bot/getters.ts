@@ -39,7 +39,6 @@ export function totalYield(state: BotState): number {
   let time = Math.floor(Date.now() / 1000);
 
   state.bots.forEach((bot) => {
-
     if (!(bot.baseUSD && bot.quoteUSD)) return;
     fees +=
       (bot.quotePrice * bot.feesEarned) /
@@ -60,4 +59,25 @@ export function totalValue(state: BotState): number {
     value += bot.baseUSD + bot.quoteUSD;
   });
   return value;
+}
+
+/**
+ * 
+ * @param state - The bot state
+ * @returns - The tokens list of balance needed to run the bots
+ */
+export function totalInOrdersRaw(state: BotState): { [key in string]: number } {
+  let tokens: { [key in string]: number } = {};
+  state.bots.forEach(bot => {
+    if (!tokens[bot.baseToken]) {
+      tokens[bot.baseToken] = 0
+    }
+    tokens[bot.baseToken] += bot.baseTokenAmount
+
+    if (!tokens[bot.quoteToken]) {
+      tokens[bot.quoteToken] = 0
+    }
+    tokens[bot.quoteToken] += bot.quoteTokenAmount
+  })
+  return tokens
 }

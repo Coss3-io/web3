@@ -73,4 +73,5 @@ export const BotGetters = {
     TotalFees: "TotalFees",
     TotalYield: "TotalYield",
     TotalValue: "TotalValue",
+    TotalInOrdersRaw: "TotalInOrdersRaw",
 }

@@ -3,7 +3,13 @@ import { state } from "./state";
 import { BotActions, BotGetters, BotState } from "../../types/bot";
 import { addBot, deleteBot, reset } from "./actions";
 import { updateLoaded } from "../account/actions";
-import { totalFees, totalValue, totalVolume, totalYield } from "./getters";
+import {
+  totalFees,
+  totalInOrdersRaw,
+  totalValue,
+  totalVolume,
+  totalYield,
+} from "./getters";
 
 export const useBotStore = defineStore("Bot", {
   state: (): BotState => state,
@@ -18,5 +24,6 @@ export const useBotStore = defineStore("Bot", {
     [BotGetters.TotalValue]: totalValue,
     [BotGetters.TotalVolume]: totalVolume,
     [BotGetters.TotalYield]: totalYield,
+    [BotGetters.TotalInOrdersRaw]: totalInOrdersRaw,
   },
 });

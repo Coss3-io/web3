@@ -5,9 +5,11 @@ import { dollarsValue } from "../../utils";
 /**
  *
  * @param state - The order state to check the orders in
- * @returns - The dollars value of the open orders
+ * @returns - The tokens balances needed by all the user orders
  */
-export function totalInOrders(state: OrderState): number {
+export function totalInOrdersRaw(state: OrderState): {
+  [key in string]: number;
+} {
   let tokens: { [key in string]: number } = {};
   Object.values(state.user_makers).forEach((makers) => {
     if (makers.length) {
@@ -24,7 +26,16 @@ export function totalInOrders(state: OrderState): number {
       }
     });
   });
-  return dollarsValue(tokens);
+  return tokens;
+}
+
+/**
+ * 
+ * @param state - The order state to check the orders in
+ * @returns - The dollars value of all the user orders
+ */
+export function totalInOrders(state: OrderState): number {
+  return dollarsValue(totalInOrdersRaw(state));
 }
 
 /**
@@ -51,7 +62,8 @@ export function totalBotOpenOrders(state: OrderState): number {
   let count = 0;
   Object.values(state.user_makers).forEach((makers) => {
     makers.forEach((maker) => {
-      if (maker.status == orderStatus.OPEN && 'bot' in maker && maker.bot) ++count;
+      if (maker.status == orderStatus.OPEN && "bot" in maker && maker.bot)
+        ++count;
     });
   });
   return count;

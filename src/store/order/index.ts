@@ -13,6 +13,7 @@ import {
   totalBotOpenOrders,
   totalFeesEarned,
   totalInOrders,
+  totalInOrdersRaw,
   totalMakerVolume,
   totalOpenOrders,
 } from "./getters";
@@ -29,6 +30,7 @@ export const useOrderStore = defineStore("Order", {
   },
   getters: {
     [OrderGetters.TotalInOrders]: totalInOrders,
+    [OrderGetters.TotalInOrdersRaw]: totalInOrdersRaw,
     [OrderGetters.OpenOrders]: totalOpenOrders,
     [OrderGetters.TotalFees]: totalFeesEarned,
     [OrderGetters.TotalVolume]: totalMakerVolume,
