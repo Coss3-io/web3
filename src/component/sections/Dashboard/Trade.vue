@@ -113,61 +113,94 @@
         class="flex justify-center items-center min-w-[60%] font-bold relative"
       >
         <span
-          v-if="rebalance"
+          v-if="Object.values(rebalanceList).length"
           class="absolute w-3 h-3 rounded-full bg-error top-0 right-0 z-10"
         ></span>
         <span
-          v-if="rebalance"
+          v-if="Object.values(rebalanceList).length"
           class="absolute w-3 h-3 rounded-full bg-error top-0 right-0 border-error animate-ping z-10"
         ></span>
         <div
-          class="alert shadow-md shadow-black/50 grid-flow-col xl:p-2.5 2xl:p-4 xl:scale-90 2xl:scale-100"
+          class="alert grid-cols-[min-content_1fr_min-content] h-14 shadow-md shadow-black/50 grid-flow-col xl:p-2.5 2xl:p-4 xl:scale-90 2xl:scale-100"
         >
-          <svg
-            v-if="!rebalance"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6 stroke-success"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <svg
-            v-else
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6 stroke-error"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-
-          <span v-if="!rebalance">balance situation valid</span>
-          <span v-else>rebalance needed</span>
-          <RouterLink v-if="!rebalance" :to="{ name: RouteNames.Trade }">
-            <button class="btn btn-success btn-sm hover:scale-105">
+        <div class="relative w-6 h-6 flex items-center justify-center">
+          <transition name="fadeNav">
+            <svg
+              v-if="!balanceLoaded"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="stroke-yellow-600 w-6 h-6 absolute"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+              />
+            </svg>
+            <svg
+              v-else-if="!Object.values(rebalanceList).length"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6 stroke-success absolute"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6 stroke-error absolute"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </transition>
+        </div>
+        <div class="relative flex items-center h-full w-full">
+          <transition name="fadeNav">
+            <span v-if="!balanceLoaded" class="absolute">Failed to load on chain balances</span>
+            <span v-else-if="!Object.values(rebalanceList).length" class="absolute">
+              balance situation valid
+            </span>
+            <span v-else class="absolute">rebalance needed</span>
+          </transition>
+        </div>
+        <div class="relative w-20 h-full flex items-center">
+          <transition name="fadeNav">
+            <RouterLink
+              v-if="!Object.values(rebalanceList).length && balanceLoaded"
+              :to="{ name: RouteNames.Trade }"
+              class="absolute"
+            >
+              <button class="btn btn-success btn-sm hover:scale-105">
+                Details
+              </button>
+            </RouterLink>
+            <button
+              v-else-if="balanceLoaded"
+              class="btn btn-error btn-sm hover:scale-105 absolute"
+              onclick="tradeModal.showModal()"
+            >
               Details
             </button>
-          </RouterLink>
-          <button
-            v-else
-            class="btn btn-error btn-sm hover:scale-105"
-            onclick="tradeModal.showModal()"
-          >
-            Details
-          </button>
+          </transition>
+        </div>
         </div>
       </div>
     </div>
@@ -175,7 +208,7 @@
   <Teleport to="body">
     <dialog id="tradeModal" class="modal" onclick="tradeModal.close()">
       <div
-        class="modal-box shadow-lg shadow-black/50 max-h-96 bg-gradient-to-b from-transparent via-transparent to-red-500/10"
+        class="modal-box shadow-lg shadow-black/50 max-h-96 max-w-[42rem] bg-gradient-to-b from-transparent via-transparent to-red-500/10"
         @click.stop=""
       >
         <h1 class="font-bold text-xl flex items-center gap-2">
@@ -194,7 +227,7 @@
             />
           </svg>
 
-          Rebalance
+          List
         </h1>
         <p class="py-4">
           To prevent your orders from being deleted please refill your wallet
@@ -294,11 +327,12 @@ import { ref } from "vue";
 import { cryptoLogo, cryptoTicker } from "../../../types/cryptoSpecs";
 import { useOrderStore } from "../../../store/order";
 import { OrderGetters } from "../../../types/order";
-import { displayNumber } from "../../../utils";
+import { displayNumber, loadBalances } from "../../../utils";
 import { useAccountStore } from "../../../store/account";
 import { computed } from "vue";
 import { watch } from "vue";
-import { Client } from "../../../api";
+import BigNumber from "bignumber.js";
+import { reactive } from "vue";
 
 const props = defineProps<{
   loaded: boolean;
@@ -307,20 +341,24 @@ const props = defineProps<{
 const orderStore = useOrderStore();
 const accountStore = useAccountStore();
 const loadingReady = computed(
-  () => accountStore.$state.appConnected && accountStore.$state.networkId
+  () =>
+    accountStore.$state.appConnected &&
+    accountStore.$state.networkId &&
+    props.loaded
 );
 
 if (loadingReady.value) {
-  Client.loadUserBots();
+  computeRebalance();
 } else {
   watch(loadingReady, (newValue) => {
     if (newValue) {
-      Client.loadUserBots();
+      computeRebalance();
     }
   });
 }
 
-let rebalance = ref<boolean>(true);
+let balanceLoaded = ref<boolean>(true);
+let rebalanceList = reactive<{ [key in string]: number }>({});
 let copiedIndex = ref<number | null>(null);
 
 async function copy(text: string) {
@@ -328,13 +366,32 @@ async function copy(text: string) {
     await navigator.clipboard.writeText(text);
   }
 }
-const rebalanceList = {
-  [cryptoTicker.COSS]: 5456,
-  [cryptoTicker.BNB]: 26844,
-  [cryptoTicker.AAVE]: 4654,
-  [cryptoTicker.USDT]: 75643,
-  "0x55b0A...199B9fA5": 876896,
-  "0x51b0A...199B9fA5": 2508,
-  "0x55b0A...19919fA5": 986987,
-};
+
+async function computeRebalance(): Promise<void> {
+  const orderBalance = orderStore[OrderGetters.TotalInOrdersRaw];
+  const tokenBalances = await loadBalances(Object.keys(orderBalance));
+
+  if (!Object.keys(tokenBalances).length) {
+    balanceLoaded.value = false;
+    return;
+  }
+  for (let t in orderBalance) {
+    const onChain = tokenBalances[t]
+      ? new BigNumber(tokenBalances[t]).dividedBy("10e18").toNumber()
+      : 0;
+    if (orderBalance[t] > onChain) {
+      balanceLoaded.value = true;
+      rebalanceList[t] = Math.round((orderBalance[t] - onChain) * 10e8) / 10e8;
+    }
+  }
+}
+// const rebalanceList = {
+//   [cryptoTicker.COSS]: 5456,
+//   [cryptoTicker.BNB]: 26844,
+//   [cryptoTicker.AAVE]: 4654,
+//   [cryptoTicker.USDT]: 75643,
+//   "0x55b0A...199B9fA5": 876896,
+//   "0x51b0A...199B9fA5": 2508,
+//   "0x55b0A...19919fA5": 986987,
+// };
 </script>

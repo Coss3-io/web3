@@ -278,8 +278,8 @@ export class Client {
         console.log(botsList.data);
       } else {
         success = true;
-        const promises = botsList.data.map((bot: BotAPI) =>
-          this.botStore[BotActions.AddBot](bot)
+        const promises = botsList.data.map(async (bot: BotAPI) =>
+          await this.botStore[BotActions.AddBot](bot)
         );
         await Promise.all(promises);
       }

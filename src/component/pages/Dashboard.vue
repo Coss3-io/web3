@@ -54,7 +54,7 @@
       </div>
       <FSA :loaded="fsaLoaded"></FSA>
       <Trade :loaded="tradeLoaded"></Trade>
-      <Bot :loaded="botLoaded"></Bot>
+      <Bot :loaded="botLoaded && tradeLoaded"></Bot>
       <Lending></Lending>
     </div>
   </div>
