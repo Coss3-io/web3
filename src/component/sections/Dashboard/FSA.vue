@@ -23,7 +23,12 @@
       </div>
     </div>
     <div class="w-full col-span-full flex justify-center">
-      <UserOverview></UserOverview>
+      <UserOverview
+        :balance="cossBalance"
+        :allowance="cossAllowance"
+        @balanceUpdate="(balance: number) => cossBalance = balance"
+        @allowanceUpdate="(allowance: number) => cossAllowance = allowance"
+      ></UserOverview>
     </div>
     <div
       class="col-span-full flex justify-center self-center xl:row-start-1 2xl:row-start-auto xl:col-span-1 2xl:col-span-full xl:col-start-2 2xl:col-start-auto"
@@ -64,12 +69,17 @@ import { RouteNames } from "../../../router";
 import { useStackingStore } from "../../../store/stacking";
 import { computed } from "vue";
 import { StackingGetters } from "../../../types/stacking";
+import { watch } from "vue";
+import { ref } from "vue";
 
 const props = defineProps<{
   loaded: boolean;
 }>();
 
 const stackingStore = useStackingStore();
+
+let cossAllowance = ref<number>(0);
+let cossBalance = ref<number>(0);
 
 const toBeClaimed = computed(() => {
   let total = 0;
@@ -80,4 +90,27 @@ const toBeClaimed = computed(() => {
   );
   return total;
 });
+
+watch(
+  () => props.loaded,
+  (newValue) => {
+    if (newValue) {
+      // const balances = await Client.getBalances(
+      //   nameToToken(cryptoTicker.COSS, String(Client.accountStore.networkId))
+      // );
+      // const allowance = await Client.getAllowance(
+      //   nameToToken(cryptoTicker.COSS, String(Client.accountStore.networkId)),
+      //   dexContract[
+      //     <keyof typeof dexContract>String(Client.accountStore.networkId)
+      //   ]
+      // );
+      // if (balances && allowance) {
+      //   cossBalance.value = balances.toNumber();
+      //   cossAllowance.value = allowance.toNumber();
+      // }
+      cossBalance.value = 529;
+      cossAllowance.value = 350;
+    }
+  }
+);
 </script>
