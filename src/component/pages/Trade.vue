@@ -150,9 +150,6 @@ import { Client } from "../../api";
 import { loadBalances, nameToToken } from "../../utils";
 import { watch, computed } from "vue";
 import { ethers } from "ethers";
-import { erc20ABI } from "@wagmi/core";
-import { notify } from "@kyvg/vue3-notification";
-import BigNumber from "bignumber.js";
 import { TakerEvent } from "../../types/orderSpecs";
 
 const route = useRoute();
