@@ -101,14 +101,14 @@ export const chainNames: { [key in string]: string } = {
   Avalanche: "Avalanche",
   Polygon: "Polygon",
   Local: "Local",
-};
+} as const;
 
 export const chainIds: { [key in Values<typeof chainNames>]: string } = {
   [chainNames.BSC]: "56",
   [chainNames.Ethereum]: "1",
   [chainNames.Avalanche]: "43114",
   [chainNames.Polygon]: "137",
-  [chainNames.Local]: "31337",
+  [chainNames.Local]: "1337",
 };
 
 export const namesToToken: {
@@ -135,6 +135,34 @@ export const namesToToken: {
     ),
     [cryptoTicker.COSS]: ethers.getAddress(
       "0x5bbeEB066eD09B7AEd07bF39EEe0460DFa261520".toLowerCase()
+    ),
+    [cryptoTicker.MATIC]: ethers.getAddress(
+      "0x6bbeEB066eD09B7AEd07bF39EEe0460DFa261520".toLowerCase()
+    ),
+    [cryptoTicker.primaryUnknown]: "",
+    [cryptoTicker.secondaryUnknown]: "",
+  },
+  [chainNames.Local]: {
+    [cryptoTicker.USDC]: ethers.getAddress(
+      "0x4BBEEB066ED09B7AeD07bf39eEE0460DFA261525".toLowerCase()
+    ),
+    [cryptoTicker.USDT]: ethers.getAddress(
+      "0x5FbDB2315678afecb367f032d93F642f64180aa3".toLowerCase()
+    ),
+    [cryptoTicker.ETH]: ethers.getAddress(
+      "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261524".toLowerCase()
+    ),
+    [cryptoTicker.AVAX]: ethers.getAddress(
+      "0x4BBeeB066ed09B7AeD07bf39EeE0460dfA261522".toLowerCase()
+    ),
+    [cryptoTicker.BNB]: ethers.getAddress(
+      "0x4bbeEB066ED09b7Aed07Bf39EeE0460DFA261521".toLowerCase()
+    ),
+    [cryptoTicker.AAVE]: ethers.getAddress(
+      "0x4BBeEB066ED09B7Aed07bF39eEe0460DFa261530".toLowerCase()
+    ),
+    [cryptoTicker.COSS]: ethers.getAddress(
+      "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512".toLowerCase()
     ),
     [cryptoTicker.MATIC]: ethers.getAddress(
       "0x6bbeEB066eD09B7AEd07bF39EEe0460DFa261520".toLowerCase()

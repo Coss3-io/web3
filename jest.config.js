@@ -20,6 +20,6 @@ module.exports = {
     "^.+\\.(js|jsx)$": "babel-jest",
   },
   globals: {
-
+    //DEXABIHERE
   }
 };

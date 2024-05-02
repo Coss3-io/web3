@@ -144,9 +144,29 @@ module.exports = {
     }),
     new DefinePlugin({
       CONFIG: JSON.stringify(config),
-      __VUE_OPTIONS_API__: 'false',
-      __VUE_PROD_DEVTOOLS__: "DEV" in process.env ? 'true': 'false',
-      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "DEV" in process.env ? 'true': 'false'
+      DEX_ABI: JSON.stringify(
+        JSON.parse(
+          fs.readFileSync(
+            path.resolve(__dirname, "./artifacts/contracts/Dex.sol/Dex.json"),
+            "utf8"
+          )
+        ).abi
+      ),
+      STACKING_ABI: JSON.stringify(
+        JSON.parse(
+          fs.readFileSync(
+            path.resolve(
+              __dirname,
+              "./artifacts/contracts/Stacking.sol/Stacking.json"
+            ),
+            "utf8"
+          )
+        ).abi
+      ),
+      __VUE_OPTIONS_API__: "false",
+      __VUE_PROD_DEVTOOLS__: "DEV" in process.env ? "true" : "false",
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__:
+        "DEV" in process.env ? "true" : "false",
     }),
     new NodePolyfillPlugin(),
     new WebpackPwaManifest({
