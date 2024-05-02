@@ -42,6 +42,7 @@ export class Client {
   public static orderStore: ReturnType<typeof useOrderStore>;
 
   public static provider: ethers.JsonRpcProvider;
+  public static signer: ethers.JsonRpcSigner;
   public static dexContract: ethers.Contract;
   public static cossContract: ethers.Contract;
   public static stackingContract: ethers.Contract;
@@ -110,7 +111,7 @@ export class Client {
    */
   public static async logout(): Promise<void> {
     Client.accountStore[AccountActions.UpdateAppConnection](false);
-    this.loggedOut = true
+    this.loggedOut = true;
     this.reset();
   }
 
@@ -161,7 +162,7 @@ export class Client {
 
       if (response.status == axios.HttpStatusCode.Ok) {
         notify({ text: "Successfull log in", type: "success" });
-        this.loggedOut = false
+        this.loggedOut = false;
         success = true;
       } else {
         notify({ text: "Log in failed (check console)", type: "warn" });
@@ -281,8 +282,8 @@ export class Client {
         console.log(botsList.data);
       } else {
         success = true;
-        const promises = botsList.data.map(async (bot: BotAPI) =>
-          await this.botStore[BotActions.AddBot](bot)
+        const promises = botsList.data.map(
+          async (bot: BotAPI) => await this.botStore[BotActions.AddBot](bot)
         );
         await Promise.all(promises);
       }
@@ -473,9 +474,7 @@ export class Client {
       }
       if (data[message.DEL_BOTS]) {
         const deleteBotHashes = data[message.DEL_BOTS];
-        this.botStore[BotActions.DeleteBot](
-          deleteBotHashes,
-        );
+        this.botStore[BotActions.DeleteBot](deleteBotHashes);
       }
       if (data[message.NEW_TAKERS]) {
         data[message.NEW_TAKERS].forEach(

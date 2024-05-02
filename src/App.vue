@@ -52,6 +52,8 @@ import {
 } from "./types/contractSpecs";
 import { useOrderStore } from "./store/order";
 import { ethers } from "ethers";
+import { getSigner } from "./utils";
+import { notify } from "@kyvg/vue3-notification";
 
 const accountStore = useAccountStore();
 const stackingStore = useStackingStore();
@@ -82,8 +84,9 @@ const chains = [
   optimism,
   localhost,
 ];
+
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
-createWeb3Modal({
+const modal = createWeb3Modal({
   wagmiConfig,
   projectId,
   chains,
@@ -116,18 +119,31 @@ watchNetwork(async (network) => {
   const stackingAddress =
     stackingContract[<keyof typeof chainRPC>String(network.chain?.id)];
   const provider = new ethers.JsonRpcProvider(rpc);
+
   Client.provider = provider;
-  Client.dexContract = new ethers.Contract(
-    dexAddress,
-    DEX_ABI,
-    provider
-  );
-  Client.cossContract = new ethers.Contract(cossAddress, erc20ABI, provider);
-  Client.stackingContract = new ethers.Contract(
-    stackingAddress,
-    STACKING_ABI,
-    provider
-  );
+  const signer = await getSigner(network.chain?.id, network.chain?.name);
+
+  if (signer) {
+    Client.signer = signer;
+    Client.dexContract = new ethers.Contract(
+      dexAddress,
+      DEX_ABI,
+      Client.signer
+    );
+
+    Client.cossContract = new ethers.Contract(
+      cossAddress,
+      erc20ABI,
+      Client.signer
+    );
+    Client.stackingContract = new ethers.Contract(
+      stackingAddress,
+      STACKING_ABI,
+      Client.signer
+    );
+  } else {
+    notify({ text: "An error occured with wallet connection", type: "warn" });
+  }
   await Client.checkConnection();
 });
 
