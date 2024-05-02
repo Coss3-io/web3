@@ -40,6 +40,7 @@ import {
   polygon,
   avalanche,
   optimism,
+  localhost,
 } from "viem/chains";
 import { useStackingStore } from "./store/stacking";
 import { useBotStore } from "./store/bot";
@@ -48,8 +49,6 @@ import {
   dexContract,
   cossContract,
   stackingContract,
-  dexABI,
-  stackingABI,
 } from "./types/contractSpecs";
 import { useOrderStore } from "./store/order";
 import { ethers } from "ethers";
@@ -74,7 +73,15 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
-const chains = [mainnet, arbitrum, bsc, polygon, avalanche, optimism];
+const chains = [
+  mainnet,
+  arbitrum,
+  bsc,
+  polygon,
+  avalanche,
+  optimism,
+  localhost,
+];
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
 createWeb3Modal({
   wagmiConfig,
@@ -85,8 +92,10 @@ createWeb3Modal({
     "19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927",
   ],
 });
+
 watchAccount(async (account) => {
   Client.reset();
+  console.log(account);
   if (accountStore.$state.blockchainConnected && !account.isConnected) {
     await Client.logout();
   }
@@ -98,7 +107,6 @@ watchNetwork(async (network) => {
   Client.reset();
   accountStore[AccountActions.UpdateNetworkId](network.chain?.id);
   accountStore[AccountActions.UpdateNetworkName](network.chain?.name);
-
   if (!network.chain?.id) return;
   const rpc = chainRPC[<keyof typeof chainRPC>String(network.chain?.id)];
   const dexAddress =
@@ -109,11 +117,15 @@ watchNetwork(async (network) => {
     stackingContract[<keyof typeof chainRPC>String(network.chain?.id)];
   const provider = new ethers.JsonRpcProvider(rpc);
   Client.provider = provider;
-  Client.dexContract = new ethers.Contract(dexAddress, dexABI, provider);
+  Client.dexContract = new ethers.Contract(
+    dexAddress,
+    DEX_ABI,
+    provider
+  );
   Client.cossContract = new ethers.Contract(cossAddress, erc20ABI, provider);
   Client.stackingContract = new ethers.Contract(
     stackingAddress,
-    stackingABI,
+    STACKING_ABI,
     provider
   );
   await Client.checkConnection();

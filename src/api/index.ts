@@ -52,6 +52,7 @@ export class Client {
   private static ws: { [key in string]: WebSocket } = {};
 
   private static loadingBots: boolean = false;
+  private static loggedOut: boolean = false;
 
   constructor() {}
 
@@ -59,7 +60,7 @@ export class Client {
    * @dev function used to check if the user is connected to the API
    */
   public static async checkConnection(): Promise<void> {
-    if (!this.accountStore.$state.networkId) return;
+    if (!this.accountStore.$state.networkId || this.loggedOut) return;
     Client.accountStore[AccountActions.UpdateLoaded](false);
     try {
       let response = await axios.get(this.url + this.botDataPath, {
@@ -109,6 +110,7 @@ export class Client {
    */
   public static async logout(): Promise<void> {
     Client.accountStore[AccountActions.UpdateAppConnection](false);
+    this.loggedOut = true
     this.reset();
   }
 
@@ -159,6 +161,7 @@ export class Client {
 
       if (response.status == axios.HttpStatusCode.Ok) {
         notify({ text: "Successfull log in", type: "success" });
+        this.loggedOut = false
         success = true;
       } else {
         notify({ text: "Log in failed (check console)", type: "warn" });

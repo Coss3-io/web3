@@ -455,8 +455,8 @@ export function computeBotOrders(bot: BotAPI): Array<Maker> {
 }
 
 /**
- * 
- * @param tokens - The tokens to load the balance 
+ *
+ * @param tokens - The tokens to load the balance
  * @returns - The tokens list with the associated balances
  */
 export async function loadBalances(
@@ -473,7 +473,7 @@ export async function loadBalances(
   }
   try {
     const balances = await Promise.all(promises);
-    const tokensObject: { [key in string]: string } = {}
+    const tokensObject: { [key in string]: string } = {};
     return tokens.reduce((acc, key, index) => {
       acc[key] = balances[index];
       return acc;
