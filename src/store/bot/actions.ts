@@ -7,6 +7,8 @@ import {
   tokenToName,
   unBigNumberify,
 } from "../../utils";
+import { useOrderStore } from "../order";
+import { OrderActions } from "../../types/order";
 
 /**
  *  @notice - Used to addd a bot to the bot store
@@ -29,9 +31,10 @@ export async function addBot(
       ? unBigNumberify(String(bot.baseTokenAmount))
       : unBigNumberify(String(bot.base_token_amount));
   const quoteTokenAmount =
-    ("quoteTokenAmount" in bot
+    "quoteTokenAmount" in bot
       ? unBigNumberify(String(bot.quoteTokenAmount))
-      : unBigNumberify(String(bot.quote_token_amount)) / (1 + Number(makerFees) / 1000));
+      : unBigNumberify(String(bot.quote_token_amount)) /
+        (1 + Number(makerFees) / 1000);
 
   const [basePrice, quotePrice] = await Promise.all([
     getUsdValue(tokenToName(baseToken, chainId), time),
@@ -80,11 +83,18 @@ export function reset(this: ReturnType<typeof useBotStore>): void {
  * @notice - Used to delete a specific bot
  * @param this - The bot store to operate on
  * @param botHash - The hash of the bot to delete
+ * @param pair - The pair from which to delete the bots
  */
 export function deleteBot(
   this: ReturnType<typeof useBotStore>,
-  botHash: string
+  botHash: string,
+  pair: string,
 ): void {
+  const orderStore = useOrderStore();
   const index = this.$state.bots.findIndex((bot) => bot.botHash == botHash);
+  orderStore[OrderActions.DeleteBotOrders](
+    botHash,
+    pair
+  );
   this.$state.bots.splice(index, 1);
 }

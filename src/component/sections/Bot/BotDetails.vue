@@ -87,7 +87,10 @@
         </div>
         <div class="relative w-full">
           <transition name="fadeNav">
-            <div v-if="USDValue && startUSDValue" class="absolute">
+            <div
+              v-if="USDValue && startUSDValue"
+              class="absolute w-full text-center"
+            >
               <div class="stat-value">
                 {{ usdPerformance > 0 ? "+" : "" }}{{ usdPerformance }}%
               </div>
@@ -98,7 +101,7 @@
                 USD raw
               </div>
             </div>
-            <div v-else class="absolute">
+            <div v-else class="absolute w-full text-center">
               <div class="stat-value">+??%</div>
               <div class="stat-title">USD value</div>
               <div class="stat-desc text-secondary">+??? USD raw</div>
@@ -554,14 +557,15 @@
         >
           {{ baseBalance > selectedBot!.baseTokenAmount ? "+" : ""
           }}{{
-            ((baseBalance! - selectedBot!.baseTokenAmount)* 100 /
-            selectedBot!.baseTokenAmount).toFixed(2)
+            (
+              ((baseBalance! - selectedBot!.baseTokenAmount) * 100) /
+              selectedBot!.baseTokenAmount
+            ).toFixed(2)
           }}%
-          {{
-            baseBalance > selectedBot!.baseTokenAmount ? "above" : "below"
-          }}
+          {{ baseBalance > selectedBot!.baseTokenAmount ? "above" : "below" }}
           needs
-          <svg v-if="baseBalance < selectedBot.baseTokenAmount"
+          <svg
+            v-if="baseBalance < selectedBot.baseTokenAmount"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -574,7 +578,8 @@
               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
             />
           </svg>
-          <svg v-else
+          <svg
+            v-else
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -614,14 +619,15 @@
         >
           {{ quoteBalance > selectedBot!.quoteTokenAmount ? "+" : ""
           }}{{
-            ((quoteBalance! - selectedBot!.quoteTokenAmount)* 100 /
-            selectedBot!.quoteTokenAmount).toFixed(2)
+            (
+              ((quoteBalance! - selectedBot!.quoteTokenAmount) * 100) /
+              selectedBot!.quoteTokenAmount
+            ).toFixed(2)
           }}%
-          {{
-            quoteBalance > selectedBot!.quoteTokenAmount ? "above" : "below"
-          }}
+          {{ quoteBalance > selectedBot!.quoteTokenAmount ? "above" : "below" }}
           needs
-          <svg v-if="quoteBalance < selectedBot.quoteTokenAmount"
+          <svg
+            v-if="quoteBalance < selectedBot.quoteTokenAmount"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -634,7 +640,8 @@
               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
             />
           </svg>
-          <svg v-else
+          <svg
+            v-else
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -763,7 +770,7 @@ import {
   getUsdValue,
   loadBalances,
   unBigNumberify,
-  multiplicator
+  multiplicator,
 } from "../../../utils";
 import SpinnerButton from "../../buttons/SpinnerButton.vue";
 import { useNotification } from "@kyvg/vue3-notification";
@@ -1079,33 +1086,55 @@ async function getPriceUpdatePromise(
 async function deleteBot() {
   try {
     console.log([
-        new BigNumber(selectedBot.value!.amount).multipliedBy(multiplicator).toFixed(),
-        "0",
-        new BigNumber(selectedBot.value!.price).multipliedBy(multiplicator).toFixed(),
-        new BigNumber(selectedBot.value!.step).multipliedBy(multiplicator).toFixed(),
-        new BigNumber(selectedBot.value!.makerFees).multipliedBy("10").toFixed(),
-        "0",
-        new BigNumber(selectedBot.value!.upperBound).multipliedBy(multiplicator).toFixed(),
-        new BigNumber(selectedBot.value!.lowerBound).multipliedBy(multiplicator).toFixed(),
-        selectedBot.value!.botHash,
-        selectedBot.value!.baseToken,
-        selectedBot.value!.quoteToken,
-        selectedBot.value!.address,
-        selectedBot.value!.expiry.toString(),
-        selectedBot.value!.chainId.toString(),
-        1,
-        true
-      ])
+      new BigNumber(selectedBot.value!.amount)
+        .multipliedBy(multiplicator)
+        .toFixed(),
+      "0",
+      new BigNumber(selectedBot.value!.price)
+        .multipliedBy(multiplicator)
+        .toFixed(),
+      new BigNumber(selectedBot.value!.step)
+        .multipliedBy(multiplicator)
+        .toFixed(),
+      new BigNumber(selectedBot.value!.makerFees).multipliedBy("10").toFixed(),
+      "0",
+      new BigNumber(selectedBot.value!.upperBound)
+        .multipliedBy(multiplicator)
+        .toFixed(),
+      new BigNumber(selectedBot.value!.lowerBound)
+        .multipliedBy(multiplicator)
+        .toFixed(),
+      selectedBot.value!.botHash,
+      selectedBot.value!.baseToken,
+      selectedBot.value!.quoteToken,
+      selectedBot.value!.address,
+      selectedBot.value!.expiry.toString(),
+      selectedBot.value!.chainId.toString(),
+      1,
+      true,
+    ]);
     const tx = await Client.dexContract.cancelOrders([
       [
-        new BigNumber(selectedBot.value!.amount).multipliedBy(multiplicator).toFixed(),
+        new BigNumber(selectedBot.value!.amount)
+          .multipliedBy(multiplicator)
+          .toFixed(),
         "0",
-        new BigNumber(selectedBot.value!.price).multipliedBy(multiplicator).toFixed(),
-        new BigNumber(selectedBot.value!.step).multipliedBy(multiplicator).toFixed(),
-        new BigNumber(selectedBot.value!.makerFees).multipliedBy("10").toFixed(),
+        new BigNumber(selectedBot.value!.price)
+          .multipliedBy(multiplicator)
+          .toFixed(),
+        new BigNumber(selectedBot.value!.step)
+          .multipliedBy(multiplicator)
+          .toFixed(),
+        new BigNumber(selectedBot.value!.makerFees)
+          .multipliedBy("10")
+          .toFixed(),
         "0",
-        new BigNumber(selectedBot.value!.upperBound).multipliedBy(multiplicator).toFixed(),
-        new BigNumber(selectedBot.value!.lowerBound).multipliedBy(multiplicator).toFixed(),
+        new BigNumber(selectedBot.value!.upperBound)
+          .multipliedBy(multiplicator)
+          .toFixed(),
+        new BigNumber(selectedBot.value!.lowerBound)
+          .multipliedBy(multiplicator)
+          .toFixed(),
         selectedBot.value!.botHash,
         selectedBot.value!.baseToken,
         selectedBot.value!.quoteToken,
@@ -1113,12 +1142,15 @@ async function deleteBot() {
         selectedBot.value!.expiry.toString(),
         selectedBot.value!.chainId.toString(),
         1,
-        true
-      ]
+        true,
+      ],
     ]);
     const receipt = await tx.wait(1);
-    console.log(receipt)
-    Client.botStore[BotActions.DeleteBot](selectedBot.value!.botHash);
+    console.log(receipt);
+    Client.botStore[BotActions.DeleteBot](
+      selectedBot.value!.botHash,
+      `${selectedBot.value!.baseToken.toLowerCase()}${selectedBot.value!.quoteToken.toLowerCase()}`
+    );
     router.push({ name: RouteNames.NewBot });
     notify({
       type: "success",

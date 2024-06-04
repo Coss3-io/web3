@@ -177,6 +177,39 @@ export function deleteOrder(
 }
 
 /**
+ * @notice - used to delete all the orders of a specified bot
+ * @param this - The order store
+ * @param botHashes - The bot hashes to delete the orders from
+ * @param pair - The pair on which to delete the orders
+ */
+export function deleteBotOrders(
+  this: ReturnType<typeof useOrderStore>,
+  botHash: string,
+  pair: string
+): void { 
+  if (!this.$state.makers[pair]) return 
+  this.$state.makers[pair] = this.$state.makers[pair].filter(maker => {
+    if (!maker.bot) return true
+
+    if ('bot_hash' in maker.bot) {
+      return !(botHash == maker.bot.bot_hash)
+    } else {
+      return !(botHash == maker.bot.botHash)
+    }
+  })
+
+  this.$state.user_makers[pair] = this.$state.makers[pair].filter(maker => {
+    if (!maker.bot) return true
+
+    if ('bot_hash' in maker.bot) {
+      return !(botHash == maker.bot.bot_hash)
+    } else {
+      return !(botHash == maker.bot.botHash)
+    }
+  })
+}
+
+/**
  * @notice - Function used to reset the order store
  * @param this - The order store
  */

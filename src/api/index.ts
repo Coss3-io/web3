@@ -473,8 +473,10 @@ export class Client {
         );
       }
       if (data[message.DEL_BOTS]) {
-        const deleteBotHashes = data[message.DEL_BOTS];
-        this.botStore[BotActions.DeleteBot](deleteBotHashes);
+        const deleteBotHashes: string[] = data[message.DEL_BOTS];
+        deleteBotHashes.forEach((hash) => {
+          this.botStore[BotActions.DeleteBot](hash, pair);
+        });
       }
       if (data[message.NEW_TAKERS]) {
         data[message.NEW_TAKERS].forEach(

@@ -4,6 +4,7 @@ import { OrderActions, OrderGetters, OrderState } from "../../types/order";
 import {
   addOrder,
   addTaker,
+  deleteBotOrders,
   deleteOrder,
   loadOrders,
   reset,
@@ -25,6 +26,7 @@ export const useOrderStore = defineStore("Order", {
     [OrderActions.AddOrder]: addOrder,
     [OrderActions.AddTaker]: addTaker,
     [OrderActions.DeleteOrder]: deleteOrder,
+    [OrderActions.DeleteBotOrders]: deleteBotOrders,
     [OrderActions.UpdateMaker]: updateMaker,
     [OrderActions.Reset]: reset,
   },

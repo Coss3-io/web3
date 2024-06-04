@@ -48,6 +48,7 @@ export const OrderActions = {
   AddOrder: "AddOrder",
   AddTaker: "AddTaker",
   DeleteOrder: "DeleteOrder",
+  DeleteBotOrders: "DeleteBotOrders",
   UpdateMaker: "UpdateMaker",
   LoadOrders: "LoadOrders",
   UpdateLoaded: "UpdateLoaded",
