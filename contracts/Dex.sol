@@ -252,7 +252,7 @@ contract Dex {
             assembly {
                 chainId := chainid()
             }
-            require(chainId == chainId);
+            require(chainId == orders[i].chainId);
             require(orders[i].owner == msg.sender);
             require(!cancelledOrders[orderHash]);
             cancelledOrders[orderHash] = true;

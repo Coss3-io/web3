@@ -546,7 +546,7 @@
           class="stat-value"
           :class="cryptoGraph[<keyof typeof cryptoTicker>baseTokenName].text"
         >
-          {{ nFormatter(selectedBot!.baseTokenAmount, 1) }}
+          {{ nFormatter(baseBalance!, 1) }}
         </div>
         <div
           class="stat-desc relative"
@@ -606,7 +606,7 @@
           class="stat-value"
           :class="cryptoGraph[<keyof typeof cryptoTicker>quoteTokenName].text"
         >
-          {{ nFormatter(selectedBot!.quoteTokenAmount, 1) }}
+          {{ nFormatter(quoteBalance!, 1) }}
         </div>
         <div
           class="stat-desc relative"
@@ -1077,6 +1077,24 @@ async function getPriceUpdatePromise(
 
 async function deleteBot() {
   try {
+    console.log([
+        new BigNumber(selectedBot.value!.amount).multipliedBy("10e18").toFixed(),
+        "0",
+        new BigNumber(selectedBot.value!.price).multipliedBy("10e18").toFixed(),
+        new BigNumber(selectedBot.value!.step).multipliedBy("10e18").toFixed(),
+        new BigNumber(selectedBot.value!.makerFees).multipliedBy("10").toFixed(),
+        "0",
+        new BigNumber(selectedBot.value!.upperBound).multipliedBy("10e18").toFixed(),
+        new BigNumber(selectedBot.value!.lowerBound).multipliedBy("10e18").toFixed(),
+        selectedBot.value!.botHash,
+        selectedBot.value!.baseToken,
+        selectedBot.value!.quoteToken,
+        selectedBot.value!.address,
+        selectedBot.value!.expiry.toString(),
+        selectedBot.value!.chainId.toString(),
+        1,
+        true
+      ])
     const tx = await Client.dexContract.cancelOrders([
       [
         new BigNumber(selectedBot.value!.amount).multipliedBy("10e18").toFixed(),
@@ -1093,11 +1111,12 @@ async function deleteBot() {
         selectedBot.value!.address,
         selectedBot.value!.expiry.toString(),
         selectedBot.value!.chainId.toString(),
-        "1",
+        1,
         true
       ]
     ]);
-    await tx.wait(3);
+    const receipt = await tx.wait(1);
+    console.log(receipt)
     Client.botStore[BotActions.DeleteBot](selectedBot.value!.botHash);
     router.push({ name: RouteNames.NewBot });
     notify({

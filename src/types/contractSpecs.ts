@@ -1,7 +1,7 @@
 
 export const chainRPC = {
     "56": "https://binance.llamarpc.com",
-    "1337": "http://localhost:8545",
+    "1337": "http://127.0.0.1:8545/",
   };
   
   export const dexContract: { [key in keyof typeof chainRPC]: string } = {
