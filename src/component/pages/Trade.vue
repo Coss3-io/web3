@@ -222,6 +222,6 @@ async function loadWallet(
   const balances = await loadBalances([baseToken, quoteToken]);
 
   if (balances[baseToken]) baseWallet.value = balances[baseToken];
-  if (balances[quoteToken]) baseWallet.value = balances[quoteToken];
+  if (balances[quoteToken]) quoteWallet.value = balances[quoteToken];
 }
 </script>
