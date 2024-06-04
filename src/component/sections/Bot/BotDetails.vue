@@ -763,6 +763,7 @@ import {
   getUsdValue,
   loadBalances,
   unBigNumberify,
+  multiplicator
 } from "../../../utils";
 import SpinnerButton from "../../buttons/SpinnerButton.vue";
 import { useNotification } from "@kyvg/vue3-notification";
@@ -1078,14 +1079,14 @@ async function getPriceUpdatePromise(
 async function deleteBot() {
   try {
     console.log([
-        new BigNumber(selectedBot.value!.amount).multipliedBy("10e18").toFixed(),
+        new BigNumber(selectedBot.value!.amount).multipliedBy(multiplicator).toFixed(),
         "0",
-        new BigNumber(selectedBot.value!.price).multipliedBy("10e18").toFixed(),
-        new BigNumber(selectedBot.value!.step).multipliedBy("10e18").toFixed(),
+        new BigNumber(selectedBot.value!.price).multipliedBy(multiplicator).toFixed(),
+        new BigNumber(selectedBot.value!.step).multipliedBy(multiplicator).toFixed(),
         new BigNumber(selectedBot.value!.makerFees).multipliedBy("10").toFixed(),
         "0",
-        new BigNumber(selectedBot.value!.upperBound).multipliedBy("10e18").toFixed(),
-        new BigNumber(selectedBot.value!.lowerBound).multipliedBy("10e18").toFixed(),
+        new BigNumber(selectedBot.value!.upperBound).multipliedBy(multiplicator).toFixed(),
+        new BigNumber(selectedBot.value!.lowerBound).multipliedBy(multiplicator).toFixed(),
         selectedBot.value!.botHash,
         selectedBot.value!.baseToken,
         selectedBot.value!.quoteToken,
@@ -1097,14 +1098,14 @@ async function deleteBot() {
       ])
     const tx = await Client.dexContract.cancelOrders([
       [
-        new BigNumber(selectedBot.value!.amount).multipliedBy("10e18").toFixed(),
+        new BigNumber(selectedBot.value!.amount).multipliedBy(multiplicator).toFixed(),
         "0",
-        new BigNumber(selectedBot.value!.price).multipliedBy("10e18").toFixed(),
-        new BigNumber(selectedBot.value!.step).multipliedBy("10e18").toFixed(),
+        new BigNumber(selectedBot.value!.price).multipliedBy(multiplicator).toFixed(),
+        new BigNumber(selectedBot.value!.step).multipliedBy(multiplicator).toFixed(),
         new BigNumber(selectedBot.value!.makerFees).multipliedBy("10").toFixed(),
         "0",
-        new BigNumber(selectedBot.value!.upperBound).multipliedBy("10e18").toFixed(),
-        new BigNumber(selectedBot.value!.lowerBound).multipliedBy("10e18").toFixed(),
+        new BigNumber(selectedBot.value!.upperBound).multipliedBy(multiplicator).toFixed(),
+        new BigNumber(selectedBot.value!.lowerBound).multipliedBy(multiplicator).toFixed(),
         selectedBot.value!.botHash,
         selectedBot.value!.baseToken,
         selectedBot.value!.quoteToken,

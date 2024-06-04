@@ -19,6 +19,7 @@ import { orderStatus } from "./types/orderSpecs";
 import { Client } from "./api";
 import { useNotification } from "@kyvg/vue3-notification";
 
+export const multiplicator = new BigNumber("1e18");
 const { notify } = useNotification();
 /**
  * @notice - used to display the beginning and the end of an address

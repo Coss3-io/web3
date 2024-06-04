@@ -116,7 +116,7 @@ import { TakerEvent } from "../../../types/orderSpecs";
 import { watch } from "vue";
 import BigNumber from "bignumber.js";
 import { notify } from "@kyvg/vue3-notification";
-import { nameToToken } from "../../../utils";
+import { nameToToken, multiplicator } from "../../../utils";
 import { erc20ABI } from "@wagmi/core";
 import { ethers } from "ethers";
 import axios from "axios";
@@ -253,7 +253,7 @@ const buyOrders = computed(() => {
 
 async function takeSellOrders(): Promise<void> {
   const takers: any[] = [];
-  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy("10e18");
+  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy(multiplicator);
 
   await sellOrders.value.every(
     async (entry: { price: number; total: number; makers: Array<Maker> }) => {
@@ -263,7 +263,7 @@ async function takeSellOrders(): Promise<void> {
       await entry.makers.every(async (maker) => {
         const remainingAmount = new BigNumber(maker.amount)
           .minus(maker.filled)
-          .multipliedBy("10e18");
+          .multipliedBy(multiplicator);
         const tradeAmount = remainingAmount.gte(takerAmount)
           ? takerAmount
           : remainingAmount;
@@ -273,7 +273,7 @@ async function takeSellOrders(): Promise<void> {
             takers.push(
               takeBotOrder(
                 tradeAmount,
-                new BigNumber(props.newOrder!.price).multipliedBy("10e18"),
+                new BigNumber(props.newOrder!.price).multipliedBy(multiplicator),
                 maker
               )
             );
@@ -326,7 +326,7 @@ async function takeSellOrders(): Promise<void> {
 
 async function takeBuyOrders(): Promise<void> {
   const takers: any[] = [];
-  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy("10e18");
+  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy(multiplicator);
 
   await buyOrders.value.every(
     async (entry: { price: number; total: number; makers: Array<Maker> }) => {
@@ -336,7 +336,7 @@ async function takeBuyOrders(): Promise<void> {
       await entry.makers.every(async (maker) => {
         const remainingAmount = new BigNumber(maker.amount)
           .minus(maker.filled)
-          .multipliedBy("10e18");
+          .multipliedBy(multiplicator);
         const tradeAmount = remainingAmount.gte(takerAmount)
           ? takerAmount
           : remainingAmount;
@@ -410,10 +410,10 @@ async function takeBuyOrders(): Promise<void> {
 
 function takeOrder(amount: BigNumber, maker: Maker): Object {
   return {
-    amount: new BigNumber(maker.amount).multipliedBy("10e18").toFixed(),
-    takerAmount: new BigNumber(amount).multipliedBy("10e18").toFixed(),
-    price: new BigNumber(maker.price).multipliedBy("10e18").toFixed(),
-    step: new BigNumber(maker.price).multipliedBy("10e18").toFixed(),
+    amount: new BigNumber(maker.amount).multipliedBy(multiplicator).toFixed(),
+    takerAmount: new BigNumber(amount).multipliedBy(multiplicator).toFixed(),
+    price: new BigNumber(maker.price).multipliedBy(multiplicator).toFixed(),
+    step: new BigNumber(maker.price).multipliedBy(multiplicator).toFixed(),
     makerFees: "0",
     mult: "0",
     upperBound: "0",
@@ -435,8 +435,8 @@ function takeBotOrder(
   maker: Maker
 ): Object {
   if (!("makerFees" in maker.bot!) || !maker.initialPrice) return {};
-  const lowerBound = new BigNumber(maker.bot!.lowerBound).multipliedBy("10e18");
-  const step = new BigNumber(maker.bot!.step).multipliedBy("10e18");
+  const lowerBound = new BigNumber(maker.bot!.lowerBound).multipliedBy(multiplicator);
+  const step = new BigNumber(maker.bot!.step).multipliedBy(multiplicator);
   const mult = maker.initialPrice.minus(lowerBound).dividedBy(step);
   if (!mult.isInteger()) {
     console.log("An error occured during order calculation");
@@ -448,16 +448,16 @@ function takeBotOrder(
     return {};
   }
   return {
-    amount: new BigNumber(maker.amount).multipliedBy("10e18").toFixed(),
-    takerAmount: new BigNumber(amount).multipliedBy("10e18").toFixed(),
-    price: new BigNumber(maker.price).multipliedBy("10e18").toFixed(),
+    amount: new BigNumber(maker.amount).multipliedBy(multiplicator).toFixed(),
+    takerAmount: new BigNumber(amount).multipliedBy(multiplicator).toFixed(),
+    price: new BigNumber(maker.price).multipliedBy(multiplicator).toFixed(),
     step: step.toFixed(),
     makerFees: new BigNumber(maker.bot!.makerFees)
-      .multipliedBy("10e18")
+      .multipliedBy(multiplicator)
       .toFixed(),
     mult: mult,
     upperBound: new BigNumber(maker.bot!.upperBound)
-      .multipliedBy("10e18")
+      .multipliedBy(multiplicator)
       .toFixed(),
     lowerBound: lowerBound.toFixed(),
     signature: maker.signature,

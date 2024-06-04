@@ -406,6 +406,7 @@ import { Client } from "../../../api";
 import { Ref } from "vue";
 import BigNumber from "bignumber.js";
 import { useNotification } from "@kyvg/vue3-notification";
+import { multiplicator } from "../../../utils";
 
 interface extendedMaker extends Maker {
   type: (typeof orderType)["MAKER"];
@@ -515,8 +516,8 @@ async function cancelOrders(): Promise<void> {
     if (order.selected && order.type == orderType.MAKER) {
       cancelOrder.push({
         owner: order.address,
-        amount: new BigNumber(order.amount).multipliedBy("10e18").toFixed(),
-        price: new BigNumber(order.price).multipliedBy("10e18").toFixed(),
+        amount: new BigNumber(order.amount).multipliedBy(multiplicator).toFixed(),
+        price: new BigNumber(order.price).multipliedBy(multiplicator).toFixed(),
         step: "0",
         makerFees: "0",
         upperBound: "0",

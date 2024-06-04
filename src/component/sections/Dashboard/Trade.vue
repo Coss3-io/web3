@@ -327,7 +327,7 @@ import { ref } from "vue";
 import { cryptoLogo, cryptoTicker } from "../../../types/cryptoSpecs";
 import { useOrderStore } from "../../../store/order";
 import { OrderGetters } from "../../../types/order";
-import { displayNumber, loadBalances } from "../../../utils";
+import { displayNumber, loadBalances, multiplicator } from "../../../utils";
 import { useAccountStore } from "../../../store/account";
 import { computed } from "vue";
 import { watch } from "vue";
@@ -377,7 +377,7 @@ async function computeRebalance(): Promise<void> {
   }
   for (let t in orderBalance) {
     const onChain = tokenBalances[t]
-      ? new BigNumber(tokenBalances[t]).dividedBy("10e18").toNumber()
+      ? new BigNumber(tokenBalances[t]).dividedBy(multiplicator).toNumber()
       : 0;
     if (orderBalance[t] > onChain) {
       balanceLoaded.value = true;
