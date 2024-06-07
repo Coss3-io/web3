@@ -400,7 +400,7 @@ import {
   unknownPrimaryTokenLogo,
   unknownSecondaryTokenLogo,
 } from "../../../asset/images/images";
-import SpinnerButton from "../../buttons/SpinnerButton.vue"
+import SpinnerButton from "../../buttons/SpinnerButton.vue";
 import { Maker, Taker } from "../../../types/order";
 import { Client } from "../../../api";
 import { Ref } from "vue";
@@ -516,7 +516,9 @@ async function cancelOrders(): Promise<void> {
     if (order.selected && order.type == orderType.MAKER) {
       cancelOrder.push({
         owner: order.address,
-        amount: new BigNumber(order.amount).multipliedBy(multiplicator).toFixed(),
+        amount: new BigNumber(order.amount)
+          .multipliedBy(multiplicator)
+          .toFixed(),
         price: new BigNumber(order.price).multipliedBy(multiplicator).toFixed(),
         step: "0",
         makerFees: "0",

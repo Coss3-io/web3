@@ -187,7 +187,7 @@
 </template>
 <script setup lang="ts">
 import {
-Values,
+  Values,
   cryptoLogo,
   cryptoTicker,
 } from "../../../types/cryptoSpecs";

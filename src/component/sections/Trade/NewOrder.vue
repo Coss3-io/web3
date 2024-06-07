@@ -357,7 +357,7 @@ import {
   cryptoBg,
   cryptoBorder,
   cryptoTicker,
-Values,
+  Values,
 } from "../../../types/cryptoSpecs";
 import type { TakerEvent } from "../../../types/orderSpecs"; 
 import { dollars, unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
