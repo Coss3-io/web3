@@ -455,26 +455,112 @@
             <div
               class="col-span-12 p-3 xl:p-0 2xl:p-3 flex flex-col sm:flex-row justify-center items-center gap-3"
             >
-              <button
-                class="btn btn-primary btn-wide shadow-md shadow-black/50"
-                @click="createBot"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Create
-              </button>
+              <div class="btn relative btn-wide">
+                <Transition name="fadeNav">
+                  <button
+                    v-if="
+                      baseAllowance == 'loading' || quoteAllowance == 'loading'
+                    "
+                    class="btn btn-primary btn-wide shadow-md shadow-black/50"
+                    :disabled="!selectedAmount || !selectedStep"
+                    @click="createBot"
+                  >
+                    <span class="loading loading-infinity"></span>
+                  </button>
+                  <button
+                    v-else-if="
+                      (baseAllowance == undefined && selectedBase) ||
+                      (quoteAllowance == undefined && selectedQuote)
+                    "
+                    class="btn btn-primary btn-wide shadow-md shadow-black/50"
+                    :disabled="!selectedAmount || !selectedStep"
+                    @click="createBot"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+                      />
+                    </svg>
+
+                    Approval error
+                  </button>
+                  <button
+                    v-else-if="baseAllowance! < Number(baseNeeded)"
+                    class="btn btn-primary btn-wide shadow-md shadow-black/50"
+                    :disabled="!selectedAmount || !selectedStep"
+                    @click="addAllowance('base')"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Approve Base
+                  </button>
+                  <button
+                    v-else-if="quoteAllowance! < Number(quoteNeeded)"
+                    class="btn btn-primary btn-wide shadow-md shadow-black/50"
+                    :disabled="!selectedAmount || !selectedStep"
+                    @click="addAllowance('quote')"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Approve Quote
+                  </button>
+                  <button
+                    v-else
+                    class="btn btn-primary btn-wide shadow-md shadow-black/50"
+                    :disabled="!selectedAmount || !selectedStep"
+                    @click="createBot"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Create
+                  </button>
+                </Transition>
+              </div>
               <button
                 class="btn btn-ghost btn-wide hover:shadow-sm shadow-black/50"
               >
@@ -517,19 +603,73 @@ import {
 import CryptoDropdown from "./CryptoDropdown.vue";
 import CryptoRange from "./CryptoRange.vue";
 import { computed, ref, watch } from "vue";
-import { encodeBot, nameToToken, round } from "../../../utils";
+import {
+  encodeBot,
+  loadAllowance,
+  loadBalances,
+  multiplicator,
+  nameToToken,
+  round,
+  increaseAllowance,
+} from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
 import { notify } from "@kyvg/vue3-notification";
 import { h } from "vue";
+import { ethers } from "ethers";
 
 let selectedBase = ref<Values<typeof cryptoTicker>>();
 let selectedQuote = ref<Values<typeof cryptoTicker>>();
+let baseAllowance = ref<undefined | "loading" | number>(undefined);
+let quoteAllowance = ref<undefined | "loading" | number>(undefined);
 
 let lowerBoundValue = ref<number>(0);
 let upperBoundValue = ref<number>(0);
 let displayUpperBound = ref<number>(0);
 let priceValue = ref<number | undefined>();
+
+watch(selectedBase, async (newValue) => {
+  console.log(newValue);
+  if (!newValue) return;
+  const base = nameToToken(
+    newValue?.toLowerCase(),
+    Client.accountStore.networkId!
+  );
+  console.log(base);
+
+  try {
+    const baseAddress = ethers.getAddress(base);
+    baseAllowance.value = "loading";
+    const allowance = await loadAllowance([baseAddress]);
+    baseAllowance.value = new BigNumber(allowance[baseAddress])
+      .dividedBy(multiplicator)
+      .toNumber();
+  } catch (e: any) {
+    console.log(e);
+    baseAllowance.value = undefined;
+    return false;
+  }
+});
+
+watch(selectedQuote, async (newValue) => {
+  if (!newValue) return;
+  const quote = nameToToken(
+    newValue?.toLowerCase(),
+    Client.accountStore.networkId!
+  );
+
+  try {
+    const quoteAddress = ethers.getAddress(quote);
+    quoteAllowance.value = "loading";
+    const allowance = await loadAllowance([quoteAddress]);
+    quoteAllowance.value = new BigNumber(allowance[quoteAddress])
+      .dividedBy(multiplicator)
+      .toNumber();
+  } catch (e: any) {
+    quoteAllowance.value = undefined;
+    return false;
+  }
+});
 
 watch(lowerBoundValue, (newValue) => {
   if (!priceValue.value && newValue) lowerBoundValue.value = 0;
@@ -608,11 +748,48 @@ const quoteNeeded = computed(() => {
 async function createBot() {
   if (numOrders.value > 5000) {
     notify({
-      text: "Can't create more than 5000 at once, increase order size",
+      text: "Can't create more than 5000 at once, increase order amount",
+      type: "warn",
+    });
+    return;
+  }
+  const base = nameToToken(selectedBase.value!, Client.accountStore.networkId!);
+  const quote = nameToToken(
+    selectedQuote.value!,
+    Client.accountStore.networkId!
+  );
+  const multiplicator = new BigNumber("1e18");
+  const balances = await loadBalances([base, quote]);
+  let balanceOk = true;
+
+  if (
+    new BigNumber(quoteNeeded.value).gt(
+      new BigNumber(balances[quote]).dividedBy("1e18")
+    )
+  ) {
+    balanceOk = false;
+    notify({
+      text: `Need ${new BigNumber(quoteNeeded.value)
+        .minus(new BigNumber(balances[quote]).dividedBy("1e18"))
+        .toFixed()} additional quote tokens to create the bot`,
       type: "warn",
     });
   }
-  const multiplicator = new BigNumber("1e18");
+  if (
+    new BigNumber(baseNeeded.value).gt(
+      new BigNumber(balances[base]).dividedBy("1e18")
+    )
+  ) {
+    balanceOk = false;
+    notify({
+      text: `Need ${new BigNumber(baseNeeded.value)
+        .minus(new BigNumber(balances[base]).dividedBy("1e18"))
+        .toFixed()} additional base tokens to create the bot`,
+      type: "warn",
+    });
+  }
+  if (!balanceOk) return false;
+
   const data = {
     address: Client.accountStore.$state.address,
     amount: new BigNumber(selectedAmount.value)
@@ -671,6 +848,48 @@ async function createBot() {
     notify({
       text: "Bot created successfully",
       type: "success",
+    });
+  }
+}
+
+async function addAllowance(token: "base" | "quote"): Promise<void> {
+  const tokenAddress =
+    token == "base"
+      ? nameToToken(selectedBase.value!, Client.accountStore.networkId!)
+      : nameToToken(selectedQuote.value!, Client.accountStore.networkId!);
+
+  if (token == "base") {
+    baseAllowance.value = "loading";
+  } else {
+    quoteAllowance.value = "loading";
+  }
+
+  const result = await increaseAllowance(tokenAddress);
+
+  if (!result) {
+    if (token == "base") {
+      baseAllowance.value = 0;
+    } else {
+      quoteAllowance.value = 0;
+    }
+    return;
+  }
+  if (token == "base") {
+    baseAllowance.value = new BigNumber(ethers.MaxUint256.toString())
+      .dividedBy(multiplicator)
+      .toNumber();
+    notify({
+      type: "success",
+      text: "Base allowance increased",
+    });
+  }
+  if (token == "quote") {
+    quoteAllowance.value = new BigNumber(ethers.MaxUint256.toString())
+      .dividedBy(multiplicator)
+      .toNumber();
+    notify({
+      type: "success",
+      text: "Quote allowance increased",
     });
   }
 }
