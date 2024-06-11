@@ -98,7 +98,6 @@ const modal = createWeb3Modal({
 
 watchAccount(async (account) => {
   Client.reset();
-  console.log(account);
   if (accountStore.$state.blockchainConnected && !account.isConnected) {
     await Client.logout();
   }

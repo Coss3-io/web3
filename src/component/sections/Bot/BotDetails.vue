@@ -1146,7 +1146,6 @@ async function deleteBot() {
       ],
     ]);
     const receipt = await tx.wait(1);
-    console.log(receipt);
     Client.botStore[BotActions.DeleteBot](
       selectedBot.value!.botHash,
       `${selectedBot.value!.baseToken.toLowerCase()}${selectedBot.value!.quoteToken.toLowerCase()}`
