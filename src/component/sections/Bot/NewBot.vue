@@ -462,7 +462,6 @@
                       baseAllowance == 'loading' || quoteAllowance == 'loading'
                     "
                     class="btn btn-primary btn-wide shadow-md shadow-black/50"
-                    :disabled="!selectedAmount || !selectedStep"
                     @click="createBot"
                   >
                     <span class="loading loading-infinity"></span>
@@ -473,7 +472,6 @@
                       (quoteAllowance == undefined && selectedQuote)
                     "
                     class="btn btn-primary btn-wide shadow-md shadow-black/50"
-                    :disabled="!selectedAmount || !selectedStep"
                     @click="createBot"
                   >
                     <svg
@@ -496,8 +494,7 @@
                   <button
                     v-else-if="baseAllowance! < Number(baseNeeded)"
                     class="btn btn-primary btn-wide shadow-md shadow-black/50"
-                    :disabled="!selectedAmount || !selectedStep"
-                    @click="addAllowance('base')"
+                    @click="_addRefAllowance('base')"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -518,8 +515,7 @@
                   <button
                     v-else-if="quoteAllowance! < Number(quoteNeeded)"
                     class="btn btn-primary btn-wide shadow-md shadow-black/50"
-                    :disabled="!selectedAmount || !selectedStep"
-                    @click="addAllowance('quote')"
+                    @click="_addRefAllowance('quote')"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -540,7 +536,6 @@
                   <button
                     v-else
                     class="btn btn-primary btn-wide shadow-md shadow-black/50"
-                    :disabled="!selectedAmount || !selectedStep"
                     @click="createBot"
                   >
                     <svg
@@ -610,7 +605,7 @@ import {
   multiplicator,
   nameToToken,
   round,
-  increaseAllowance,
+  addRefAllowance,
 } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
@@ -629,13 +624,11 @@ let displayUpperBound = ref<number>(0);
 let priceValue = ref<number | undefined>();
 
 watch(selectedBase, async (newValue) => {
-  console.log(newValue);
   if (!newValue) return;
   const base = nameToToken(
     newValue?.toLowerCase(),
     Client.accountStore.networkId!
   );
-  console.log(base);
 
   try {
     const baseAddress = ethers.getAddress(base);
@@ -753,6 +746,20 @@ async function createBot() {
     });
     return;
   }
+  if (!selectedStep.value){
+    notify({
+      text: "Please enter a step",
+      type: "warn",
+    });
+    return;
+  }
+  if (!selectedAmount.value){
+    notify({
+      text: "Please enter an amount",
+      type: "warn",
+    });
+    return;
+  }
   const base = nameToToken(selectedBase.value!, Client.accountStore.networkId!);
   const quote = nameToToken(
     selectedQuote.value!,
@@ -852,45 +859,8 @@ async function createBot() {
   }
 }
 
-async function addAllowance(token: "base" | "quote"): Promise<void> {
-  const tokenAddress =
-    token == "base"
-      ? nameToToken(selectedBase.value!, Client.accountStore.networkId!)
-      : nameToToken(selectedQuote.value!, Client.accountStore.networkId!);
-
-  if (token == "base") {
-    baseAllowance.value = "loading";
-  } else {
-    quoteAllowance.value = "loading";
-  }
-
-  const result = await increaseAllowance(tokenAddress);
-
-  if (!result) {
-    if (token == "base") {
-      baseAllowance.value = 0;
-    } else {
-      quoteAllowance.value = 0;
-    }
-    return;
-  }
-  if (token == "base") {
-    baseAllowance.value = new BigNumber(ethers.MaxUint256.toString())
-      .dividedBy(multiplicator)
-      .toNumber();
-    notify({
-      type: "success",
-      text: "Base allowance increased",
-    });
-  }
-  if (token == "quote") {
-    quoteAllowance.value = new BigNumber(ethers.MaxUint256.toString())
-      .dividedBy(multiplicator)
-      .toNumber();
-    notify({
-      type: "success",
-      text: "Quote allowance increased",
-    });
-  }
+function _addRefAllowance(type: "base" | "quote"): void {
+  if (type == "base") addRefAllowance("base", selectedBase.value, baseAllowance)
+  else addRefAllowance("quote", selectedQuote.value, quoteAllowance)
 }
 </script>

@@ -19,6 +19,7 @@ import { orderStatus } from "./types/orderSpecs";
 import { Client } from "./api";
 import { useNotification } from "@kyvg/vue3-notification";
 import { dexContract } from "./types/contractSpecs";
+import { Ref } from "vue";
 
 export const multiplicator = new BigNumber("1e18");
 const { notify } = useNotification();
@@ -549,11 +550,44 @@ export async function increaseAllowance(token: string): Promise<boolean> {
     await tx.wait();
     return true;
   } catch (e: any) {
-    console.log(e)
+    console.log(e);
     notify({
       type: "warn",
       text: "An error occured during the token approval",
     });
     return false;
   }
+}
+
+/**
+ * @notice - Increases the allowance for a given token
+ * @param type - the type of the token being approver : base | quote
+ * @param token - The tocker ticker or address to be approved
+ * @param allowance - The allowance ref to be updated on success
+ * @returns 
+ */
+export async function addRefAllowance(
+  type: "base" | "quote",
+  token: Values<typeof cryptoTicker> | undefined | string,
+  allowance: Ref<undefined | "loading" | number>
+): Promise<void> {
+  if (!token) return 
+  const tokenAddress = nameToToken(
+    token,
+    Client.accountStore.networkId!
+  );
+  allowance.value = "loading";
+  const result = await increaseAllowance(tokenAddress);
+
+  if (!result) {
+    allowance.value = 0;
+    return;
+  }
+  allowance.value = new BigNumber(ethers.MaxUint256.toString())
+    .dividedBy(multiplicator)
+    .toNumber();
+  notify({
+    type: "success",
+    text: `${type.toUpperCase()} allowance increased`,
+  });
 }

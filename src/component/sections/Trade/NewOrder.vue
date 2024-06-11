@@ -325,20 +325,106 @@
     <div
       class="col-span-full relative w-full h-full flex items-end justify-center min-h-12"
     >
-      <transition name="fadeNav">
+      <transition name="fadeNav" v-if="isBuyOrder">
         <button
+          v-if="quoteAllowance === 'loading'"
+          class="btn btn-wide btn-primary shadow-lg shadow-black/50 absolute"
+          > <span class="loading loading-infinity"></span>
+        </button>
+        <button
+          v-else-if="quoteAllowance === undefined"
+          class="btn btn-wide btn-primary shadow-lg shadow-black/50 absolute"
+          ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+              />
+            </svg>Approval error
+        </button>
+        <button
+          v-else-if="quoteAllowance < (price || 0) * (amount || 0)"
+          class="btn btn-wide btn-primary shadow-lg shadow-black/50 absolute"
+          @click="_addRefAllowance('quote')"
+          ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+              />
+            </svg>Approve quote
+        </button>
+        <button
+          v-else
           @click="createOrder"
-          v-if="isBuyOrder"
-          class="btn btn-wide bg-green-700 text-white/70 hover:bg-green-800 shadow-lg shadow-black/50"
+          class="btn btn-wide absolute bg-green-700 text-white/70 hover:bg-green-800 shadow-lg shadow-black/50"
         >
         <transition name="fadeNav">
             <span v-if="!props.tradeLoad">Buy</span>
             <span v-else class="loading loading-ring"></span>
           </transition>
         </button>
+        </transition>
+        <transition name ="fadeNav" v-else>
+          <button
+          v-if="baseAllowance === 'loading'"
+          class="btn btn-wide btn-primary shadow-lg shadow-black/50 absolute"
+          > <span class="loading loading-infinity"></span>
+        </button>
         <button
-          @click="createOrder"
+          v-else-if="baseAllowance === undefined"
+          class="btn btn-wide btn-primary shadow-lg shadow-black/50 absolute"
+          ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+              />
+            </svg>Approval error
+        </button>
+        <button
+          v-else-if="baseAllowance < (amount || 0)"
+          class="btn btn-wide btn-primary shadow-lg shadow-black/50 absolute"
+          @click="_addRefAllowance('base')"
+          ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+              />
+            </svg>Approve base
+        </button>
+        <button
           v-else
+          @click="createOrder"
           class="btn btn-wide bg-red-700 text-white/70 hover:bg-red-800 shadow-lg shadow-black/50"
         >
           <transition name="fadeNav">
@@ -346,12 +432,12 @@
             <span v-else class="loading loading-ring"></span>
           </transition>
         </button>
-      </transition>
+      </transition> 
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import {
   cryptoLogo,
   cryptoBg,
@@ -361,10 +447,11 @@ import {
 } from "../../../types/cryptoSpecs";
 import type { TakerEvent } from "../../../types/orderSpecs"; 
 import { dollars, unknownPrimaryTokenLogo, unknownSecondaryTokenLogo } from "../../../asset/images/images";
-import { displayAddress, encodeOrder, nameToToken } from "../../../utils";
+import { addRefAllowance, displayAddress, encodeOrder, loadAllowance, loadBalances, multiplicator, nameToToken } from "../../../utils";
 import { Client } from "../../../api";
 import BigNumber from "bignumber.js";
 import { notify } from "@kyvg/vue3-notification";
+import { ethers } from "ethers";
 
 const props = defineProps<{
   base: string | Values<typeof cryptoTicker>;
@@ -376,11 +463,65 @@ const emits = defineEmits<{
   (e: "newOrder", order: TakerEvent): void;
 }>()
 
+let baseAllowance = ref<undefined | "loading" | number>(undefined);
+let quoteAllowance = ref<undefined | "loading" | number>(undefined);
+let baseBalance = ref<undefined | number>(undefined);
+let quoteBalance = ref<undefined | number>(undefined);
+
 const isBuyOrder = ref(true);
 const isMakerOrder = ref(true);
 const isQuoteFeesOrder = ref(true);
 const price = ref<undefined | number>();
 const amount = ref<undefined | number>();
+
+watch(() => props.base, async (newValue) => {
+  if (!newValue) return;
+  const base = nameToToken(
+    newValue?.toLowerCase(),
+    Client.accountStore.networkId!
+  );
+
+  try {
+    const baseAddress = ethers.getAddress(base);
+    baseAllowance.value = "loading";
+    const [allowance, balance] = await Promise.all([loadAllowance([baseAddress]), loadBalances([baseAddress])]);
+    baseAllowance.value = new BigNumber(allowance[baseAddress])
+      .dividedBy(multiplicator)
+      .toNumber();
+      baseBalance.value = new BigNumber(balance[baseAddress])
+      .dividedBy(multiplicator)
+      .toNumber();
+  } catch (e: any) {
+    console.log(e);
+    baseAllowance.value = undefined;
+    baseBalance.value = undefined;
+    return false;
+  }
+});
+
+watch(() => props.quote, async (newValue) => {
+  if (!newValue) return;
+  const quote = nameToToken(
+    newValue?.toLowerCase(),
+    Client.accountStore.networkId!
+  );
+
+  try {
+    const quoteAddress = ethers.getAddress(quote);
+    quoteAllowance.value = "loading";
+    const [allowance, balance] = await Promise.all([loadAllowance([quoteAddress]), loadBalances([quoteAddress])]);
+    quoteAllowance.value = new BigNumber(allowance[quoteAddress])
+      .dividedBy(multiplicator)
+      .toNumber();
+    quoteBalance.value = new BigNumber(balance[quoteAddress])
+      .dividedBy(multiplicator)
+      .toNumber();
+  } catch (e: any) {
+    quoteAllowance.value = undefined;
+    quoteBalance.value = undefined;
+    return false;
+  }
+});
 
 async function createOrder() {
   if (!amount.value) return
@@ -445,5 +586,11 @@ async function createOrder() {
       type: "success",
     });
   }
+}
+
+function _addRefAllowance(type: "base" | "quote"): void {
+  if (type == "base") addRefAllowance("base", props.base, baseAllowance)
+  else addRefAllowance("quote", props.quote, quoteAllowance) 
+  return
 }
 </script>
