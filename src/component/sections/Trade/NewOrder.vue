@@ -527,6 +527,25 @@ async function createOrder() {
   if (!amount.value) return
   if (!price.value) return
   if (props.tradeLoad) return
+
+  if (isBuyOrder.value) {
+    if (price.value*amount.value > (quoteBalance.value || 0)){
+      notify({
+        type:"warn",
+        text:"Not enough quote token available for this buy order"
+      })
+      return
+    }
+  } else {
+    if (amount.value > (baseBalance.value || 0)){
+      notify({
+        type:"warn",
+        text:"Not enough base token available for this sell order"
+      })
+      return
+    }
+  }
+
   if (!isMakerOrder.value) {
     emits("newOrder", {isBuyer: isBuyOrder.value, baseFees: !isQuoteFeesOrder.value, price: price.value, amount: amount.value})
     return
