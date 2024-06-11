@@ -18,6 +18,7 @@ import { BotAPI, BotFormatted } from "./types/bot";
 import { orderStatus } from "./types/orderSpecs";
 import { Client } from "./api";
 import { useNotification } from "@kyvg/vue3-notification";
+import { dexContract } from "./types/contractSpecs";
 
 export const multiplicator = new BigNumber("1e18");
 const { notify } = useNotification();
@@ -207,7 +208,9 @@ export function nameToToken(
   chainId: string | number
 ): string {
   const token =
-    namesToToken[chainIdToName(chainId)][<Values<typeof cryptoTicker>>name];
+    namesToToken[chainIdToName(chainId)][
+      <Values<typeof cryptoTicker>>name.toUpperCase()
+    ];
   return token || name;
 }
 
@@ -483,8 +486,74 @@ export async function loadBalances(
     console.log(e);
     notify({
       type: "warn",
-      text: "An error occured during your on chain data retrieval check console.",
+      text: "An error occured during your on chain balance retrieval check console.",
     });
     return {};
+  }
+}
+
+/**
+ *
+ * @param tokens - The tokens to load the allowance
+ * @returns - The tokens list with the associated allowance
+ */
+export async function loadAllowance(
+  tokens: string[]
+): Promise<{ [key in string]: string }> {
+  const promises: Promise<any>[] = [];
+
+  for (let token of tokens) {
+    promises.push(
+      new ethers.Contract(token, erc20ABI, Client.provider).allowance(
+        Client.accountStore.address,
+        dexContract[
+          String(Client.accountStore.networkId!) as keyof typeof dexContract
+        ]
+      )
+    );
+  }
+  try {
+    const allowances = await Promise.all(promises);
+    const tokensObject: { [key in string]: string } = {};
+    return tokens.reduce((acc, key, index) => {
+      acc[key] = allowances[index];
+      return acc;
+    }, tokensObject);
+  } catch (e: any) {
+    console.log(e);
+    notify({
+      type: "warn",
+      text: "An error occured during your on chain alllowance retrieval check console.",
+    });
+    return {};
+  }
+}
+
+/**
+ * @notice - Function used to approve the trading contract
+ * @param token - the token to approve
+ * @returns - Weather or not the operation succeeded
+ */
+export async function increaseAllowance(token: string): Promise<boolean> {
+  try {
+    const tx = await new ethers.Contract(
+      token,
+      erc20ABI,
+      Client.signer
+    ).approve(
+      dexContract[
+        String(Client.accountStore.networkId!) as keyof typeof dexContract
+      ],
+      ethers.MaxUint256
+    );
+    await tx.wait();
+    return true;
+  } catch (e: any) {
+    console.log(e)
+    notify({
+      type: "warn",
+      text: "An error occured during the token approval",
+    });
+    return false;
   }
 }
