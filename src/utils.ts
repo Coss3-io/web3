@@ -401,37 +401,10 @@ export function round(n: number): number {
 export function computeBotOrders(bot: BotAPI): Array<Maker> {
   let result: Array<Maker> = [];
 
-  let price = new BigNumber(bot.price);
+  let price = new BigNumber(bot.lower_bound);
   const step = new BigNumber(bot.step);
-  const lowerBound = new BigNumber(bot.lower_bound);
   const upperBound = new BigNumber(bot.upper_bound);
 
-  while (price.gte(lowerBound)) {
-    let maker: Maker = {
-      bot: bot,
-      base_token: bot.base_token,
-      quote_token: bot.quote_token,
-      amount: bot.amount,
-      price: price.toFixed(),
-      is_buyer: true,
-      expiry: bot.expiry,
-      chain_id: bot.chain_id,
-      order_hash: "",
-      status: orderStatus.OPEN,
-      filled: 0,
-      signature: bot["signature"],
-      address: bot.address,
-      quote_fees: 0,
-      base_fees: 0,
-      timestamp: bot.timestamp,
-    };
-    const [_, orderHash] = encodeOrder(maker, true);
-    maker.order_hash = orderHash;
-    price = price.minus(step);
-    result.push(maker);
-  }
-
-  price = new BigNumber(bot.price).plus(step);
   while (price.lte(upperBound)) {
     let maker: Maker = {
       bot: bot,
@@ -439,7 +412,7 @@ export function computeBotOrders(bot: BotAPI): Array<Maker> {
       quote_token: bot.quote_token,
       amount: bot.amount,
       price: price.toFixed(),
-      is_buyer: false,
+      is_buyer: price.lte(new BigNumber(bot.price)),
       expiry: bot.expiry,
       chain_id: bot.chain_id,
       order_hash: "",
