@@ -120,6 +120,7 @@ import { nameToToken, multiplicator } from "../../../utils";
 import { erc20ABI } from "@wagmi/core";
 import { ethers } from "ethers";
 import axios from "axios";
+import { dexContract } from "../../../types/contractSpecs";
 
 const props = defineProps<{
   newOrder: TakerEvent | undefined;
@@ -159,6 +160,7 @@ watch(
 );
 
 let makerBalances: { [key in string]: BigNumber } = {};
+let makerAllowance: { [key in string]: BigNumber } = {};
 let faultyMakers: { [key in string]: string } = {};
 const lastTrade = computed<{
   price?: number;
@@ -253,60 +255,51 @@ const buyOrders = computed(() => {
 
 async function takeSellOrders(): Promise<void> {
   const takers: any[] = [];
-  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy(multiplicator);
-
-  await sellOrders.value.every(
-    async (entry: { price: number; total: number; makers: Array<Maker> }) => {
-      if (entry.price > props.newOrder!.price) {
-        return false;
-      }
-      await entry.makers.every(async (maker) => {
-        const remainingAmount = new BigNumber(maker.amount)
-          .minus(maker.filled)
-          .multipliedBy(multiplicator);
-        const tradeAmount = remainingAmount.gte(takerAmount)
-          ? takerAmount
-          : remainingAmount;
-
-        if (await checkOrder(baseContract, maker.address, tradeAmount)) {
-          if (maker.bot) {
-            takers.push(
-              takeBotOrder(
-                tradeAmount,
-                new BigNumber(props.newOrder!.price).multipliedBy(multiplicator),
-                maker
-              )
-            );
-          } else {
-            takers.push(takeOrder(tradeAmount, maker));
-          }
-
-          if (tradeAmount.isEqualTo(takerAmount)) return false;
-          takerAmount = takerAmount.minus(tradeAmount);
-          return true;
-        } else {
-          return true;
-        }
-      });
-      return true;
-    }
+  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy(
+    multiplicator
   );
+  for (let i = sellOrders.value.length - 1; i >= 0; --i) {
+    const entry: { price: number; total: number; makers: Array<Maker> } =
+      sellOrders.value[i];
+    if (entry.price > props.newOrder!.price) {
+      break;
+    }
+    for (let j = 0; j < entry.makers.length; ++j) {
+      const maker = entry.makers[j];
+      const remainingAmount = new BigNumber(maker.amount)
+        .minus(maker.filled)
+        .multipliedBy(multiplicator);
+      const tradeAmount = remainingAmount.gte(takerAmount)
+        ? takerAmount
+        : remainingAmount;
+
+      if (await checkOrder(baseContract, maker.address, tradeAmount)) {
+        if (maker.bot) {
+          takers.push(
+            takeBotOrder(
+              tradeAmount,
+              new BigNumber(props.newOrder!.price).multipliedBy(multiplicator),
+              maker
+            )
+          );
+        } else {
+          takers.push(takeOrder(tradeAmount, maker));
+        }
+
+        if (tradeAmount.isEqualTo(takerAmount)) break;
+        takerAmount = takerAmount.minus(tradeAmount);
+      }
+    }
+  }
 
   try {
     const tx = await Client.dexContract.trade(takers, {
       baseToken: nameToToken(props.base, Client.accountStore.networkId!),
       quoteToken: nameToToken(props.quote, Client.accountStore.networkId!),
-      side: 1,
-      baseFees: props.newOrder?.baseFees,
+      side: 0,
+      baseFee: props.newOrder?.baseFees,
     });
-    await tx.wait(3);
-    axios.post("", {
-      orders: Object.entries(faultyMakers).map((entry) => {
-        return { address: entry[0], amount: entry[1] };
-      }),
-      token: await baseContract.getAddress(),
-      chainId: Client.accountStore.networkId!,
-    });
+    await tx.wait(1);
     notify({
       type: "success",
       text: "Trade successfull",
@@ -319,6 +312,16 @@ async function takeSellOrders(): Promise<void> {
       text: "An error occured during the order transmition",
     });
   } finally {
+    const orders = Object.entries(faultyMakers)
+    if (orders.length == 0) return 
+
+    axios.post(Client.watchTowerURL, {
+      orders: orders.map((entry) => {
+        return { address: entry[0], amount: entry[1] };
+      }),
+      token: await baseContract.getAddress(),
+      chainId: Client.accountStore.networkId!,
+    });
     makerBalances = {};
     faultyMakers = {};
   }
@@ -326,7 +329,9 @@ async function takeSellOrders(): Promise<void> {
 
 async function takeBuyOrders(): Promise<void> {
   const takers: any[] = [];
-  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy(multiplicator);
+  let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy(
+    multiplicator
+  );
 
   await buyOrders.value.every(
     async (entry: { price: number; total: number; makers: Array<Maker> }) => {
@@ -380,17 +385,10 @@ async function takeBuyOrders(): Promise<void> {
     const tx = await Client.dexContract.trade(takers, {
       baseToken: nameToToken(props.base, Client.accountStore.networkId!),
       quoteToken: nameToToken(props.quote, Client.accountStore.networkId!),
-      side: 0,
-      baseFees: props.newOrder?.baseFees,
+      side: 1,
+      baseFee: props.newOrder?.baseFees,
     });
-    await tx.wait(3);
-    await axios.post(Client.watchTowerURL, {
-      orders: Object.entries(faultyMakers).map((entry) => {
-        return { address: entry[0], amount: entry[1] };
-      }),
-      token: await quoteContract.getAddress(),
-      chainId: Client.accountStore.networkId!,
-    });
+    await tx.wait(1);
     notify({
       type: "success",
       text: "Trade successfull",
@@ -403,6 +401,15 @@ async function takeBuyOrders(): Promise<void> {
       text: "An error occured during the order transmition",
     });
   } finally {
+    const orders = Object.entries(faultyMakers)
+    if (orders.length == 0) return 
+    await axios.post(Client.watchTowerURL, {
+      orders: Object.entries(faultyMakers).map((entry) => {
+        return { address: entry[0], amount: entry[1] };
+      }),
+      token: await quoteContract.getAddress(),
+      chainId: Client.accountStore.networkId!,
+    });
     makerBalances = {};
     faultyMakers = {};
   }
@@ -411,7 +418,7 @@ async function takeBuyOrders(): Promise<void> {
 function takeOrder(amount: BigNumber, maker: Maker): Object {
   return {
     amount: new BigNumber(maker.amount).multipliedBy(multiplicator).toFixed(),
-    takerAmount: new BigNumber(amount).multipliedBy(multiplicator).toFixed(),
+    takerAmount: new BigNumber(amount).toFixed(),
     price: new BigNumber(maker.price).multipliedBy(multiplicator).toFixed(),
     step: new BigNumber(maker.price).multipliedBy(multiplicator).toFixed(),
     makerFees: "0",
@@ -424,7 +431,7 @@ function takeOrder(amount: BigNumber, maker: Maker): Object {
     owner: maker.address,
     expiry: maker.expiry,
     chainId: maker.chain_id,
-    side: !maker.is_buyer,
+    side: maker.is_buyer ? 0 : 1,
     replaceOrder: false,
   };
 }
@@ -435,12 +442,13 @@ function takeBotOrder(
   maker: Maker
 ): Object {
   if (!("makerFees" in maker.bot!) || !maker.initialPrice) return {};
-  const lowerBound = new BigNumber(maker.bot!.lowerBound).multipliedBy(multiplicator);
+  const lowerBound = new BigNumber(maker.bot!.lowerBound).multipliedBy(
+    multiplicator
+  );
   const step = new BigNumber(maker.bot!.step).multipliedBy(multiplicator);
   const mult = maker.initialPrice.minus(lowerBound).dividedBy(step);
   if (!mult.isInteger()) {
     console.log("An error occured during order calculation");
-    console.log(maker);
     notify({
       type: "warn",
       text: "An error occured during the order calculation",
@@ -449,13 +457,12 @@ function takeBotOrder(
   }
   return {
     amount: new BigNumber(maker.amount).multipliedBy(multiplicator).toFixed(),
-    takerAmount: new BigNumber(amount).multipliedBy(multiplicator).toFixed(),
-    price: new BigNumber(maker.price).multipliedBy(multiplicator).toFixed(),
+    takerAmount: new BigNumber(amount).toFixed(),
+    price: new BigNumber(maker.bot.price).multipliedBy(multiplicator).toFixed(),
     step: step.toFixed(),
     makerFees: new BigNumber(maker.bot!.makerFees)
-      .multipliedBy(multiplicator)
       .toFixed(),
-    mult: mult,
+    mult: mult.toFixed(),
     upperBound: new BigNumber(maker.bot!.upperBound)
       .multipliedBy(multiplicator)
       .toFixed(),
@@ -466,7 +473,7 @@ function takeBotOrder(
     owner: maker.address,
     expiry: maker.expiry,
     chainId: maker.chain_id,
-    side: !maker.is_buyer,
+    side: 1,
     replaceOrder: true,
   };
 }
@@ -476,6 +483,7 @@ async function checkOrder(
   address: string,
   amount: BigNumber
 ): Promise<boolean> {
+  let success = false;
   try {
     if (!makerBalances[address]) {
       makerBalances[address] = new BigNumber(await contract.balanceOf(address));
@@ -488,13 +496,40 @@ async function checkOrder(
       } else {
         faultyMakers[address] = amount.toFixed();
       }
-      return false;
     } else {
       makerBalances[address] = makerBalances[address].minus(amount);
-      return true;
+      success = true;
     }
   } catch (e: any) {
     console.log("An error occured during the address balances retrieval");
+    return false;
+  }
+  try {
+    if (!makerAllowance[address]) {
+      makerAllowance[address] = new BigNumber(
+        await contract.allowance(
+          Client.accountStore.address,
+          dexContract[
+            String(Client.accountStore.networkId!) as keyof typeof dexContract
+          ]
+        )
+      );
+    }
+    if (amount.gte(makerAllowance[address])) {
+      if (faultyMakers[address]) {
+        if (new BigNumber(faultyMakers[address]).lt(amount)) {
+          faultyMakers[address] = amount.toFixed();
+        }
+      } else {
+        faultyMakers[address] = amount.toFixed();
+      }
+    } else {
+      makerAllowance[address] = makerAllowance[address].minus(amount);
+      success = true;
+    }
+    return success;
+  } catch (e: any) {
+    console.log("An error occured during the address allowance retrieval");
     return false;
   }
 }
