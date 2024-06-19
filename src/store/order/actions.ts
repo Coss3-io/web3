@@ -108,7 +108,6 @@ export function addTaker(
   const taker_address = order.address;
   delete order.address;
   order = unBigNumberifyTaker(order);
-  order.price = Math.round(order.fees * 10**5 / order.amount / MAKER_FEES )/10**5
   this.$state.takers[pair].unshift(order);
   if (address == taker_address) {
     this.$state.user_takers[pair].unshift(order);
