@@ -1,3 +1,4 @@
+export const MAKER_FEES = 0.0005
 
 export const chainRPC = {
     "56": "https://binance.llamarpc.com",
