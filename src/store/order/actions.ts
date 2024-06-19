@@ -109,9 +109,9 @@ export function addTaker(
   delete order.address;
   order = unBigNumberifyTaker(order);
   order.price = Math.round(order.fees * 10**5 / order.amount / MAKER_FEES )/10**5
-  this.$state.takers[pair].push(order);
+  this.$state.takers[pair].unshift(order);
   if (address == taker_address) {
-    this.$state.user_takers[pair].push(order);
+    this.$state.user_takers[pair].unshift(order);
   }
 }
 
