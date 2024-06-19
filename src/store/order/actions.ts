@@ -4,6 +4,7 @@ import { Maker, Taker } from "../../types/order";
 import { formatBotFields, unBigNumberify } from "../../utils";
 import { BotAPI } from "../../types/bot";
 import { orderStatus } from "../../types/orderSpecs";
+import { MAKER_FEES } from "../../types/contractSpecs";
 
 /**
  * @notice - Used to add the api takers and makers to the state
@@ -107,6 +108,7 @@ export function addTaker(
   const taker_address = order.address;
   delete order.address;
   order = unBigNumberifyTaker(order);
+  order.price = Math.round(order.fees * 10**5 / order.amount / MAKER_FEES )/10**5
   this.$state.takers[pair].push(order);
   if (address == taker_address) {
     this.$state.user_takers[pair].push(order);
@@ -119,14 +121,18 @@ export function updateMaker(
   pair: string,
   address: string
 ): void {
-  const maker = this.$state.makers[pair].find(
+  const makerIndex = this.$state.makers[pair].findIndex(
     (maker) => maker.order_hash == order.order_hash
   );
-  if (maker) {
-    maker.filled = unBigNumberify(String(order.filled));
-    maker.base_fees += unBigNumberify(String(order.base_fees));
-    maker.quote_fees += unBigNumberify(String(order.quote_fees));
-    maker.status = order.status;
+  if (makerIndex != -1) {
+    this.$state.makers[pair][makerIndex].filled = unBigNumberify(String(order.filled));
+    this.$state.makers[pair][makerIndex].base_fees += unBigNumberify(String(order.base_fees));
+    this.$state.makers[pair][makerIndex].quote_fees += unBigNumberify(String(order.quote_fees));
+    this.$state.makers[pair][makerIndex].status = order.status;
+
+    if (order.status == orderStatus.FILLED) {
+      this.$state.makers[pair].splice(makerIndex, 1)
+    }
   }
 
   if (address == order.address) {
