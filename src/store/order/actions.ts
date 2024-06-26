@@ -1,10 +1,12 @@
-import BigNumber from "bignumber.js";
 import { useOrderStore } from ".";
 import { Maker, Taker } from "../../types/order";
-import { formatBotFields, unBigNumberify } from "../../utils";
-import { BotAPI } from "../../types/bot";
+import {
+  unBigNumberify,
+  computeMakerPrice,
+  unBigNumberifyMaker,
+  unBigNumberifyTaker,
+} from "../../utils";
 import { orderStatus } from "../../types/orderSpecs";
-import { MAKER_FEES } from "../../types/contractSpecs";
 
 /**
  * @notice - Used to add the api takers and makers to the state
@@ -124,13 +126,22 @@ export function updateMaker(
     (maker) => maker.order_hash == order.order_hash
   );
   if (makerIndex != -1) {
-    this.$state.makers[pair][makerIndex].filled = unBigNumberify(String(order.filled));
-    this.$state.makers[pair][makerIndex].base_fees += unBigNumberify(String(order.base_fees));
-    this.$state.makers[pair][makerIndex].quote_fees += unBigNumberify(String(order.quote_fees));
+    this.$state.makers[pair][makerIndex].filled = unBigNumberify(
+      String(order.filled)
+    );
+    this.$state.makers[pair][makerIndex].base_fees += unBigNumberify(
+      String(order.base_fees)
+    );
+    this.$state.makers[pair][makerIndex].quote_fees += unBigNumberify(
+      String(order.quote_fees)
+    );
     this.$state.makers[pair][makerIndex].status = order.status;
 
-    if (order.status == orderStatus.FILLED) {
-      this.$state.makers[pair].splice(makerIndex, 1)
+    if (
+      order.status == orderStatus.FILLED &&
+      !this.$state.makers[pair][makerIndex].bot
+    ) {
+      this.$state.makers[pair].splice(makerIndex, 1);
     }
   }
 
@@ -191,27 +202,27 @@ export function deleteBotOrders(
   this: ReturnType<typeof useOrderStore>,
   botHash: string,
   pair: string
-): void { 
-  if (!this.$state.makers[pair]) return 
-  this.$state.makers[pair] = this.$state.makers[pair].filter(maker => {
-    if (!maker.bot) return true
+): void {
+  if (!this.$state.makers[pair]) return;
+  this.$state.makers[pair] = this.$state.makers[pair].filter((maker) => {
+    if (!maker.bot) return true;
 
-    if ('bot_hash' in maker.bot) {
-      return !(botHash == maker.bot.bot_hash)
+    if ("bot_hash" in maker.bot) {
+      return !(botHash == maker.bot.bot_hash);
     } else {
-      return !(botHash == maker.bot.botHash)
+      return !(botHash == maker.bot.botHash);
     }
-  })
+  });
 
-  this.$state.user_makers[pair] = this.$state.makers[pair].filter(maker => {
-    if (!maker.bot) return true
+  this.$state.user_makers[pair] = this.$state.makers[pair].filter((maker) => {
+    if (!maker.bot) return true;
 
-    if ('bot_hash' in maker.bot) {
-      return !(botHash == maker.bot.bot_hash)
+    if ("bot_hash" in maker.bot) {
+      return !(botHash == maker.bot.bot_hash);
     } else {
-      return !(botHash == maker.bot.botHash)
+      return !(botHash == maker.bot.botHash);
     }
-  })
+  });
 }
 
 /**
@@ -226,64 +237,4 @@ export function reset(this: ReturnType<typeof useOrderStore>): void {
   this.$state.makersLoaded = {};
   this.$state.takersLoaded = {};
   this.$state.userOrdersLoaded = false;
-}
-
-/**
- * @notice - Function used to compute the right maker order price
- * @param maker - The maker order to compute the price w/fees
- * @returns - The make order with the price adjusted to take the fees in acount
- */
-function computeMakerPrice(maker: Maker): Maker {
-  if (maker.bot) {
-    maker.initialPrice = new BigNumber(maker.price);
-    maker.bot = formatBotFields(
-      <BotAPI>(<unknown>maker.bot),
-      String(maker.amount)
-    );
-    let makerFees = Number(maker.bot.makerFees);
-    if (makerFees <= 2000) {
-      if (maker.is_buyer) {
-        maker.price = new BigNumber(maker.price)
-          .multipliedBy(1000)
-          .dividedToIntegerBy(makerFees + 1000)
-          .toNumber();
-      } else {
-        maker.price = new BigNumber(maker.price)
-          .multipliedBy(makerFees + 1000)
-          .dividedToIntegerBy(1000)
-          .toNumber();
-      }
-    } else {
-      if (maker.is_buyer) {
-        maker.price = new BigNumber(maker.price).minus(makerFees).toNumber();
-      } else {
-        maker.price = new BigNumber(maker.price).plus(makerFees).toNumber();
-      }
-    }
-  }
-  return maker;
-}
-
-/**
- * @param maker - The maker order to unbignumrify
- * @returns - The unbignumberified maker order
- */
-function unBigNumberifyMaker(maker: Maker): Maker {
-  maker.amount = unBigNumberify(String(maker.amount));
-  maker.filled = unBigNumberify(String(maker.filled));
-  maker.base_fees = unBigNumberify(String(maker.base_fees));
-  maker.quote_fees = unBigNumberify(String(maker.quote_fees));
-  maker.price = unBigNumberify(String(maker.price));
-  return maker;
-}
-
-/**
- * @param taker - The taker order to unbignumrify
- * @returns - The unbignumberified taker order
- */
-function unBigNumberifyTaker(taker: Taker): Taker {
-  taker.amount = unBigNumberify(String(taker.amount));
-  taker.price = unBigNumberify(String(taker.price));
-  taker.fees = unBigNumberify(String(taker.fees));
-  return taker;
 }

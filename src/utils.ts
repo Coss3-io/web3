@@ -13,7 +13,7 @@ import {
 } from "./types/cryptoSpecs";
 import axios, { AxiosResponse } from "axios";
 import { useAccountStore } from "./store/account";
-import { Maker } from "./types/order";
+import { Maker, Taker } from "./types/order";
 import { BotAPI, BotFormatted } from "./types/bot";
 import { orderStatus } from "./types/orderSpecs";
 import { Client } from "./api";
@@ -537,18 +537,15 @@ export async function increaseAllowance(token: string): Promise<boolean> {
  * @param type - the type of the token being approver : base | quote
  * @param token - The tocker ticker or address to be approved
  * @param allowance - The allowance ref to be updated on success
- * @returns 
+ * @returns
  */
 export async function addRefAllowance(
   type: "base" | "quote",
   token: Values<typeof cryptoTicker> | undefined | string,
   allowance: Ref<undefined | "loading" | number>
 ): Promise<void> {
-  if (!token) return 
-  const tokenAddress = nameToToken(
-    token,
-    Client.accountStore.networkId!
-  );
+  if (!token) return;
+  const tokenAddress = nameToToken(token, Client.accountStore.networkId!);
   allowance.value = "loading";
   const result = await increaseAllowance(tokenAddress);
 
@@ -563,4 +560,66 @@ export async function addRefAllowance(
     type: "success",
     text: `${type.toUpperCase()} allowance increased`,
   });
+}
+
+/**
+ * @notice - Function used to compute the right maker order price
+ * @param maker - The maker order to compute the price w/fees
+ * @returns - The make order with the price adjusted to take the fees in acount
+ */
+export function computeMakerPrice(maker: Maker): Maker {
+  if (maker.bot) {
+    maker.initialPrice = new BigNumber(maker.price);
+    if (!("botHash" in maker.bot)) {
+      maker.bot = formatBotFields(
+        <BotAPI>(<unknown>maker.bot),
+        String(maker.amount)
+      );
+    }
+    let makerFees = Number(maker.bot.makerFees);
+    if (makerFees <= 2000) {
+      if (maker.is_buyer) {
+        maker.price = new BigNumber(maker.price)
+          .multipliedBy(1000)
+          .dividedToIntegerBy(makerFees + 1000)
+          .toNumber();
+      } else {
+        maker.price = new BigNumber(maker.price)
+          .multipliedBy(makerFees + 1000)
+          .dividedToIntegerBy(1000)
+          .toNumber();
+      }
+    } else {
+      if (maker.is_buyer) {
+        maker.price = new BigNumber(maker.price).minus(makerFees).toNumber();
+      } else {
+        maker.price = new BigNumber(maker.price).plus(makerFees).toNumber();
+      }
+    }
+  }
+  return maker;
+}
+
+/**
+ * @param maker - The maker order to unbignumrify
+ * @returns - The unbignumberified maker order
+ */
+export function unBigNumberifyMaker(maker: Maker): Maker {
+  maker.amount = unBigNumberify(String(maker.amount));
+  maker.filled = unBigNumberify(String(maker.filled));
+  maker.base_fees = unBigNumberify(String(maker.base_fees));
+  maker.quote_fees = unBigNumberify(String(maker.quote_fees));
+  maker.price = unBigNumberify(String(maker.price));
+  return maker;
+}
+
+/**
+ * @param taker - The taker order to unbignumrify
+ * @returns - The unbignumberified taker order
+ */
+export function unBigNumberifyTaker(taker: Taker): Taker {
+  taker.amount = unBigNumberify(String(taker.amount));
+  taker.price = unBigNumberify(String(taker.price));
+  taker.fees = unBigNumberify(String(taker.fees));
+  return taker;
 }

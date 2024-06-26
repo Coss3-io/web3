@@ -45,13 +45,13 @@
       <div>total</div>
     </div>
     <div
-      class="h-full flex relative flex-col overflow-y-auto overflow-x-hidden custom-scroll gap-0.5 rounded-lg rounded-t-md"
+      class="h-full flex relative flex-col overflow-y-auto overflow-x-hidden gap-0.5 rounded-lg rounded-t-md"
       ref="tradeContainer"
     >
       <TransitionGroup name="listBuy" tag="div">
         <div
           v-for="(order, index) in tradeHistory"
-          :key="String(index)"
+          :key="String(Number(order.timestamp) * order.price * order.amount)"
           class="relative w-full min-h-6 z-10 group"
         >
           <div
@@ -71,7 +71,7 @@
           </div>
         </div>
         <div
-          class="flex text-center text-[11px] font-bold h-4 -z-10"
+          class="flex text-center text-[11px] font-bold h-4 -z-10 w-full"
           v-for="n in (tradeHistory.length * 24 < tradeContainer?.clientHeight! ? Math.floor((tradeContainer?.clientHeight! - tradeHistory.length * 24 )/16): 0)"
           :key="'trade' + String(n)"
         >
@@ -104,6 +104,7 @@ const tradeHistory = computed(() => {
         amount: Math.round(Math.random() * 10000),
         price: Math.round(Math.random() * 10000),
         is_buyer: Math.random() > 0.5 ? true : false,
+        timestamp: String(Math.floor(Date.now())),
       };
     });
   } else {
