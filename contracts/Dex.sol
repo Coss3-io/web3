@@ -80,7 +80,6 @@ contract Dex {
         uint tradeFees = 0;
         uint quoteAmount = 0;
         uint orderHash = 0;
-        uint length = orders.length - 1;
 
         if (tradeDetails.side == Side.SELL) {
             for (uint i = 0; i < orders.length; ++i) {
@@ -90,6 +89,13 @@ contract Dex {
                 (quoteAmount, orderHash) = _verifyOrder(
                     orders[i],
                     tradeDetails.side
+                );
+
+                _triggerTradeEvent(
+                    orders[i],
+                    tradeDetails,
+                    orderHash,
+                    quoteAmount
                 );
 
                 if (owner != orders[i].owner) {
@@ -106,12 +112,6 @@ contract Dex {
                     owner = orders[i].owner;
                     amountToOwner = 0;
                     amountToSender = 0;
-                    _triggerTradeEvent(
-                        orders[i],
-                        tradeDetails,
-                        orderHash,
-                        tradeFees
-                    );
                 }
                 amountToSender += quoteAmount;
                 amountToOwner += orders[i].takerAmount;
@@ -128,12 +128,6 @@ contract Dex {
                 tradeDetails.baseFee,
                 false
             );
-            _triggerTradeEvent(
-                orders[length],
-                tradeDetails,
-                orderHash,
-                tradeFees
-            );
         } else {
             for (uint i = 0; i < orders.length; ++i) {
                 require(orders[i].baseToken == tradeDetails.baseToken);
@@ -142,6 +136,13 @@ contract Dex {
                 (quoteAmount, orderHash) = _verifyOrder(
                     orders[i],
                     tradeDetails.side
+                );
+
+                _triggerTradeEvent(
+                    orders[i],
+                    tradeDetails,
+                    orderHash,
+                    quoteAmount
                 );
 
                 if (owner != orders[i].owner) {
@@ -158,12 +159,6 @@ contract Dex {
                     owner = orders[i].owner;
                     amountToOwner = 0;
                     amountToSender = 0;
-                    _triggerTradeEvent(
-                        orders[i],
-                        tradeDetails,
-                        orderHash,
-                        tradeFees
-                    );
                 }
                 amountToOwner += quoteAmount;
                 amountToSender += orders[i].takerAmount;
@@ -179,12 +174,6 @@ contract Dex {
                 owner,
                 tradeDetails.baseFee,
                 true
-            );
-            _triggerTradeEvent(
-                orders[length],
-                tradeDetails,
-                orderHash,
-                tradeFees
             );
         }
 
@@ -234,7 +223,7 @@ contract Dex {
                 orders[i],
                 tradeDetails[i],
                 orderHash,
-                tradeFees
+                quoteAmount
             );
             _handleFees(tradeDetails[i], tradeFees);
         }
@@ -484,19 +473,21 @@ contract Dex {
      * @param _order - the maker order of the trade
      * @param _taker - The taker trade details of the trade
      * @param _orderHash - The order hash of the trade
-     * @param _fees - The fees paid by the taker
+     * @param _quoteAmount - The quote amount being exchanged during the trade
      */
     function _triggerTradeEvent(
         Order calldata _order,
         TradeDetails calldata _taker,
         uint _orderHash,
-        uint _fees
+        uint _quoteAmount
     ) private {
         emit NewTrade(
             msg.sender,
             _orderHash,
             _order.takerAmount,
-            _fees,
+            _taker.baseFee
+                ? (_order.takerAmount * fees) / 1e18 / 2
+                : (_quoteAmount * fees) / 1e18 / 2,
             _taker.baseFee,
             _taker.side
         );
