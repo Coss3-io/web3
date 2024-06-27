@@ -3293,7 +3293,7 @@ describe("Testing batch orders behaviour", () => {
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
-      mult: new BigNumber("5").toFixed(),
+      mult: new BigNumber("6").toFixed(),
       takerAmount: new BigNumber("2e18").toFixed(),
       price: new BigNumber("2e18").toFixed(),
       step: new BigNumber("1e17").toFixed(),
@@ -3310,17 +3310,17 @@ describe("Testing batch orders behaviour", () => {
     };
 
     const order1 = JSON.parse(JSON.stringify(order));
-    order1.mult = "6";
+    order1.mult = "7";
 
     const order2 = JSON.parse(JSON.stringify(order));
-    order2.mult = "7";
+    order2.mult = "8";
 
     const order3 = JSON.parse(JSON.stringify(order));
     order3.owner = accounts[2].address;
 
     const order4 = JSON.parse(JSON.stringify(order));
     order4.owner = accounts[2].address;
-    order4.mult = "6";
+    order4.mult = "7";
 
     const encodedParameters = encodeOrder(order);
 
@@ -3495,7 +3495,7 @@ describe("Testing batch orders behaviour", () => {
     const order = {
       signature: "",
       amount: new BigNumber("2e18").toFixed(),
-      mult: new BigNumber("5").toFixed(),
+      mult: new BigNumber("6").toFixed(),
       takerAmount: new BigNumber("2e18").toFixed(),
       price: new BigNumber("2e18").toFixed(),
       step: new BigNumber("1e17").toFixed(),
@@ -3512,10 +3512,10 @@ describe("Testing batch orders behaviour", () => {
     };
 
     const order1 = JSON.parse(JSON.stringify(order));
-    order1.mult = "6";
+    order1.mult = "7";
 
     const order2 = JSON.parse(JSON.stringify(order));
-    order2.mult = "7";
+    order2.mult = "8";
 
     const order3 = JSON.parse(JSON.stringify(order));
     order3.owner = accounts[7].address;
@@ -3523,7 +3523,7 @@ describe("Testing batch orders behaviour", () => {
 
     const order4 = JSON.parse(JSON.stringify(order));
     order4.owner = accounts[7].address;
-    order4.mult = "6";
+    order4.mult = "7";
     order4.expiry = "99999999999999988";
 
     const encodedParameters = encodeOrder(order);
@@ -3687,6 +3687,131 @@ describe("Testing batch orders behaviour", () => {
         .toFixed(),
       stackingDummyBalancesAfter.toString(),
       "The stacking contract should have received the quote fees"
+    );
+  });
+
+  it("Checks order near the replacement order price are handled well", async () => {
+    const { chainId } = await ethers.provider.getNetwork();
+    const order = {
+      signature: "",
+      amount: new BigNumber("2e18").toFixed(),
+      mult: new BigNumber("2").toFixed(),
+      takerAmount: new BigNumber("2e18").toFixed(),
+      price: new BigNumber("200e17").toFixed(),
+      step: new BigNumber("3e17").toFixed(),
+      makerFees: new BigNumber("10").toFixed(),
+      upperBound: new BigNumber("205e17").toFixed(),
+      lowerBound: new BigNumber("195e17").toFixed(),
+      baseToken: coss.target,
+      quoteToken: dummy.target,
+      owner: accounts[1].address,
+      chainId: chainId.toString(),
+      expiry: "99999999999999987",
+      side: side.SELL,
+      replaceOrder: true,
+    };
+
+    const encodedParameters = encodeOrder(order);
+    const tradeDetails = {
+      baseToken: coss,
+      quoteToken: dummy,
+      side: side.BUY,
+      baseFee: false,
+    };
+    const tradeDetails2 = {
+      baseToken: coss,
+      quoteToken: dummy,
+      side: side.SELL,
+      baseFee: false,
+    };
+
+    order.signature = await sign(encodedParameters, accounts[1]);
+
+    let amountToOwner = new BigNumber(order.takerAmount)
+      .multipliedBy(
+        new BigNumber(order.lowerBound)
+          .plus(new BigNumber(order.step).multipliedBy(order.mult))
+          .multipliedBy(Number(order.makerFees) + 1000)
+          .dividedToIntegerBy(1000)
+      )
+      .dividedToIntegerBy("1e18");
+
+    const feesBuy = amountToOwner
+      .multipliedBy("1e15")
+      .dividedToIntegerBy("1e18")
+      .dividedToIntegerBy(2);
+
+    let amountToOwner2 = new BigNumber(order.takerAmount)
+      .multipliedBy(
+        new BigNumber(order.lowerBound)
+          .plus(new BigNumber(order.step).multipliedBy(order.mult))
+          .multipliedBy(1000)
+          .dividedToIntegerBy(Number(order.makerFees) + 1000)
+      )
+      .dividedToIntegerBy("1e18");
+
+    const feesSell = amountToOwner2
+      .multipliedBy("1e15")
+      .dividedToIntegerBy("1e18")
+      .dividedToIntegerBy(2);
+
+    const [
+      senderCossBalancesBefore,
+      senderDummyBalancesBefore,
+      ownerCossBalancesBefore,
+      owner2CossBalancesBefore,
+      ownerDummyBalancesBefore,
+      owner2DummyBalancesBefore,
+      stackingDummyBalancesBefore,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      coss.balanceOf(accounts[7]),
+      dummy.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[7]),
+      dummy.balanceOf(stacking),
+    ]);
+    await dex.trade([order], tradeDetails);
+    await dex.trade([order], tradeDetails2);
+    const [
+      senderCossBalancesAfter,
+      senderDummyBalancesAfter,
+      ownerCossBalancesAfter,
+      owner2CossBalancesAfter,
+      ownerDummyBalancesAfter,
+      stackingDummyBalancesAfter,
+    ] = await Promise.all([
+      coss.balanceOf(accounts[0]),
+      dummy.balanceOf(accounts[0]),
+      coss.balanceOf(accounts[1]),
+      coss.balanceOf(accounts[7]),
+      dummy.balanceOf(accounts[1]),
+      dummy.balanceOf(accounts[7]),
+      dummy.balanceOf(stacking),
+    ]);
+
+    assert.equal(
+      senderCossBalancesBefore.toString(),
+      senderCossBalancesAfter.toString(),
+      "The sender coss balance should remain the same"
+    );
+
+    assert.equal(
+      ownerCossBalancesBefore.toString(),
+      ownerCossBalancesAfter.toString(),
+      "The owner should have the same balance after the two trades"
+    );
+
+    assert.equal(
+      new BigNumber(ownerDummyBalancesBefore.toString())
+        .plus(amountToOwner)
+        .minus(amountToOwner2)
+        .plus(feesBuy)
+        .plus(feesSell)
+        .toFixed(),
+      ownerDummyBalancesAfter.toString(),
+      "The owner should only have received the fees from the two trades"
     );
   });
 });
