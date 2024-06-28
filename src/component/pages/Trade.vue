@@ -83,6 +83,11 @@
             :pair="pair"
             :loading="loading"
             :newOrder="newOrder"
+            @reset-order="
+              () => {
+                newOrder = undefined;
+              }
+            "
             @update-balance="
               async () => {
                 newOrder = undefined;
