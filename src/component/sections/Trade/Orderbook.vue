@@ -116,7 +116,7 @@ import { TakerEvent } from "../../../types/orderSpecs";
 import { watch } from "vue";
 import BigNumber from "bignumber.js";
 import { notify } from "@kyvg/vue3-notification";
-import { nameToToken, multiplicator } from "../../../utils";
+import { nameToToken, multiplicator, computeMakerPrice } from "../../../utils";
 import { erc20ABI } from "@wagmi/core";
 import { ethers } from "ethers";
 import axios from "axios";
@@ -132,6 +132,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: "updateBalance"): void;
+  (e: "resetOrder"): void;
 }>();
 
 let baseContract: ethers.Contract;
@@ -194,9 +195,30 @@ const sellOrders = computed(() => {
       };
     });
   }
-  const sells = Client.orderStore.$state.makers[props.pair].filter((maker) => {
-    return !maker.is_buyer;
+
+  const tempSells: Maker[] = [];
+  let sells = Client.orderStore.$state.makers[props.pair].filter((maker) => {
+    if (maker.filled != 0 && maker.is_buyer && maker.bot) {
+      const tempMaker = computeReverseMaker(maker);
+      if ("upperBound" in maker.bot) {
+        if (
+          Number(tempMaker.price) >= maker.bot.lowerBound &&
+          Number(tempMaker.price) <= maker.bot.upperBound
+        ) {
+          tempSells.push(tempMaker);
+        }
+      } else if ("upper_Bound" in maker.bot) {
+        if (
+          Number(tempMaker.price) >= Number(maker.bot.lower_bound) &&
+          Number(tempMaker.price) <= Number(maker.bot.upper_bound)
+        ) {
+          tempSells.push(tempMaker);
+        }
+      }
+    }
+    return !maker.is_buyer && maker.amount != maker.filled;
   });
+  tempSells.forEach((maker) => sells.push(maker));
   sells.sort((first, second) => {
     return Number(second.price) - Number(first.price);
   });
@@ -229,9 +251,29 @@ const buyOrders = computed(() => {
       };
     });
   }
-  const buys = Client.orderStore.$state.makers[props.pair].filter((maker) => {
-    return maker.is_buyer;
+  const tempBuys: Maker[] = [];
+  let buys = Client.orderStore.$state.makers[props.pair].filter((maker) => {
+    if (maker.filled != 0 && !maker.is_buyer && maker.bot) {
+      const tempMaker = computeReverseMaker(maker);
+      if ("upperBound" in maker.bot) {
+        if (
+          Number(tempMaker.price) >= maker.bot.lowerBound &&
+          Number(tempMaker.price) <= maker.bot.upperBound
+        ) {
+          tempBuys.push(tempMaker);
+        }
+      } else if ("upper_Bound" in maker.bot) {
+        if (
+          Number(tempMaker.price) >= Number(maker.bot.lower_bound) &&
+          Number(tempMaker.price) <= Number(maker.bot.upper_bound)
+        ) {
+          tempBuys.push(tempMaker);
+        }
+      }
+    }
+    return maker.is_buyer && maker.amount != maker.filled;
   });
+  tempBuys.forEach((maker) => buys.push(maker));
   buys.sort((first, second) => {
     return Number(second.price) - Number(first.price);
   });
@@ -261,7 +303,7 @@ async function takeSellOrders(): Promise<void> {
   for (let i = sellOrders.value.length - 1; i >= 0; --i) {
     const entry: { price: number; total: number; makers: Array<Maker> } =
       sellOrders.value[i];
-    if (entry.price > props.newOrder!.price) {
+    if (entry.price > props.newOrder!.price || takerAmount.isEqualTo(0)) {
       break;
     }
     for (let j = 0; j < entry.makers.length; ++j) {
@@ -286,25 +328,32 @@ async function takeSellOrders(): Promise<void> {
           takers.push(takeOrder(tradeAmount, maker));
         }
 
-        if (tradeAmount.isEqualTo(takerAmount)) break;
         takerAmount = takerAmount.minus(tradeAmount);
+        if (tradeAmount.isEqualTo(0)) break;
       }
     }
   }
 
   try {
-    const tx = await Client.dexContract.trade(takers, {
-      baseToken: nameToToken(props.base, Client.accountStore.networkId!),
-      quoteToken: nameToToken(props.quote, Client.accountStore.networkId!),
-      side: 0,
-      baseFee: props.newOrder?.baseFees,
-    });
-    await tx.wait(1);
-    notify({
-      type: "success",
-      text: "Trade successfull",
-    });
-    emits("updateBalance");
+    if (takers.length != 0) {
+      const tx = await Client.dexContract.trade(takers, {
+        baseToken: nameToToken(props.base, Client.accountStore.networkId!),
+        quoteToken: nameToToken(props.quote, Client.accountStore.networkId!),
+        side: 0,
+        baseFee: props.newOrder?.baseFees,
+      });
+      await tx.wait(1);
+      notify({
+        type: "success",
+        text: "Trade successfull",
+      });
+      emits("updateBalance");
+    } else {
+      notify({
+        type: "warn",
+        text: "No matching maker found",
+      });
+    }
   } catch (e: any) {
     console.log(e);
     notify({
@@ -312,8 +361,9 @@ async function takeSellOrders(): Promise<void> {
       text: "An error occured during the order transmition",
     });
   } finally {
-    const orders = Object.entries(faultyMakers)
-    if (orders.length == 0) return 
+    emits("resetOrder");
+    const orders = Object.entries(faultyMakers);
+    if (orders.length == 0) return;
 
     axios.post(Client.watchTowerURL, {
       orders: orders.map((entry) => {
@@ -332,68 +382,58 @@ async function takeBuyOrders(): Promise<void> {
   let takerAmount = new BigNumber(props.newOrder!.amount).multipliedBy(
     multiplicator
   );
-
-  await buyOrders.value.every(
-    async (entry: { price: number; total: number; makers: Array<Maker> }) => {
-      if (entry.price < props.newOrder!.price || !takerAmount.toNumber()) {
-        return false;
-      }
-      await entry.makers.every(async (maker) => {
-        const remainingAmount = new BigNumber(maker.amount)
-          .minus(maker.filled)
-          .multipliedBy(multiplicator);
-        const tradeAmount = remainingAmount.gte(takerAmount)
-          ? takerAmount
-          : remainingAmount;
-
-        if (
-          await checkOrder(
-            quoteContract,
-            maker.address,
-            new BigNumber(maker.price).multipliedBy(tradeAmount)
-          )
-        ) {
-          if (maker.bot) {
-            takers.push(
-              takeBotOrder(
-                tradeAmount,
-                new BigNumber(props.newOrder!.price),
-                maker
-              )
-            );
-          } else {
-            console.log("push");
-            takers.push(takeOrder(tradeAmount, maker));
-          }
-
-          if (tradeAmount.isEqualTo(takerAmount)) {
-            takerAmount = new BigNumber("0");
-            return false;
-          } else {
-            takerAmount = takerAmount.minus(tradeAmount);
-            return true;
-          }
-        } else {
-          return true;
-        }
-      });
-      return true;
+  for (let i = 0; i < buyOrders.value.length; ++i) {
+    const entry: { price: number; total: number; makers: Array<Maker> } =
+      buyOrders.value[i];
+    if (entry.price < props.newOrder!.price || takerAmount.isEqualTo(0)) {
+      break;
     }
-  );
+    for (let j = 0; j < entry.makers.length; ++j) {
+      const maker = entry.makers[j];
+      const remainingAmount = new BigNumber(maker.amount)
+        .minus(maker.filled)
+        .multipliedBy(multiplicator);
+      const tradeAmount = remainingAmount.gte(takerAmount)
+        ? takerAmount
+        : remainingAmount;
+      if (await checkOrder(baseContract, maker.address, tradeAmount)) {
+        if (maker.bot) {
+          takers.push(
+            takeBotOrder(
+              tradeAmount,
+              new BigNumber(props.newOrder!.price).multipliedBy(multiplicator),
+              maker
+            )
+          );
+        } else {
+          takers.push(takeOrder(tradeAmount, maker));
+        }
+        takerAmount = takerAmount.minus(tradeAmount);
+        if (takerAmount.isEqualTo(0)) break;
+      }
+    }
+  }
 
   try {
-    const tx = await Client.dexContract.trade(takers, {
-      baseToken: nameToToken(props.base, Client.accountStore.networkId!),
-      quoteToken: nameToToken(props.quote, Client.accountStore.networkId!),
-      side: 1,
-      baseFee: props.newOrder?.baseFees,
-    });
-    await tx.wait(1);
-    notify({
-      type: "success",
-      text: "Trade successfull",
-    });
-    emits("updateBalance");
+    if (takers.length != 0) {
+      const tx = await Client.dexContract.trade(takers, {
+        baseToken: nameToToken(props.base, Client.accountStore.networkId!),
+        quoteToken: nameToToken(props.quote, Client.accountStore.networkId!),
+        side: 1,
+        baseFee: props.newOrder?.baseFees,
+      });
+      await tx.wait(1);
+      notify({
+        type: "success",
+        text: "Trade successfull",
+      });
+      emits("updateBalance");
+    } else {
+      notify({
+        type: "warn",
+        text: "No matching maker found",
+      });
+    }
   } catch (e: any) {
     console.log(e);
     notify({
@@ -401,8 +441,9 @@ async function takeBuyOrders(): Promise<void> {
       text: "An error occured during the order transmition",
     });
   } finally {
-    const orders = Object.entries(faultyMakers)
-    if (orders.length == 0) return 
+    emits("resetOrder");
+    const orders = Object.entries(faultyMakers);
+    if (orders.length == 0) return;
     await axios.post(Client.watchTowerURL, {
       orders: Object.entries(faultyMakers).map((entry) => {
         return { address: entry[0], amount: entry[1] };
@@ -460,8 +501,7 @@ function takeBotOrder(
     takerAmount: new BigNumber(amount).toFixed(),
     price: new BigNumber(maker.bot.price).multipliedBy(multiplicator).toFixed(),
     step: step.toFixed(),
-    makerFees: new BigNumber(maker.bot!.makerFees)
-      .toFixed(),
+    makerFees: new BigNumber(maker.bot!.makerFees).toFixed(),
     mult: mult.toFixed(),
     upperBound: new BigNumber(maker.bot!.upperBound)
       .multipliedBy(multiplicator)
@@ -532,5 +572,19 @@ async function checkOrder(
     console.log("An error occured during the address allowance retrieval");
     return false;
   }
+}
+
+function computeReverseMaker(maker: Maker): Maker {
+  let tempMaker = Object.assign({}, maker);
+  tempMaker.is_buyer = !tempMaker.is_buyer;
+  tempMaker.price = maker.initialPrice!.toFixed();
+  tempMaker.filled = new BigNumber(tempMaker.amount)
+    .minus(tempMaker.filled)
+    .toNumber();
+  tempMaker = computeMakerPrice(tempMaker);
+  tempMaker.price = new BigNumber(tempMaker.price)
+    .dividedBy(multiplicator)
+    .toNumber();
+  return tempMaker;
 }
 </script>
