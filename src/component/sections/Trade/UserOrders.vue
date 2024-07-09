@@ -490,7 +490,7 @@ const orders = computed(() => {
   ].filter((order) => {
     return !("bot" in order && !!order.bot);
   });
-
+  
   response.forEach((order) => {
     order.selected = ref(false);
     if ("order_hash" in order) {
@@ -521,21 +521,28 @@ async function cancelOrders(): Promise<void> {
           .toFixed(),
         price: new BigNumber(order.price).multipliedBy(multiplicator).toFixed(),
         step: "0",
+        takerAmount: "0",
+        mult: "0",
         makerFees: "0",
         upperBound: "0",
+        signature: order.signature,
         lowerBound: "0",
         baseToken: order.base_token,
         quoteToken: order.quote_token,
         expiry: order.expiry.toFixed(),
         chainId: order.chain_id,
-        side: !order.is_buyer,
+        side: order.is_buyer ? 0 : 1,
         replaceOrder: false,
       });
     }
   });
   try {
-    const tx = await Client.dexContract.cancelOrders(cancelOrders);
+    const tx = await Client.dexContract.cancelOrders(cancelOrder);
     await tx.wait(3);
+    notify({
+      type: "success",
+      text: "You successfully deleted this order",
+    });
   } catch (e: any) {
     console.log(e);
     notify({
