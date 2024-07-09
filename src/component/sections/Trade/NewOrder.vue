@@ -324,7 +324,7 @@
     </div>
     <div
       class="col-span-full relative w-full h-full flex items-end justify-center min-h-12"
-    >
+    ><Transition name="fadeNav">
       <transition name="fadeNav" v-if="isBuyOrder">
         <button
           v-if="quoteAllowance === 'loading'"
@@ -433,6 +433,7 @@
           </transition>
         </button>
       </transition> 
+    </Transition>
     </div>
   </div>
 </template>
