@@ -112,7 +112,7 @@ import { computed, ref } from "vue";
 import { Values, cryptoTicker } from "../../../types/cryptoSpecs";
 import { Client } from "../../../api";
 import { Maker } from "../../../types/order";
-import { TakerEvent } from "../../../types/orderSpecs";
+import { TakerEvent, orderStatus } from "../../../types/orderSpecs";
 import { watch } from "vue";
 import BigNumber from "bignumber.js";
 import { notify } from "@kyvg/vue3-notification";
@@ -216,7 +216,7 @@ const sellOrders = computed(() => {
         }
       }
     }
-    return !maker.is_buyer && maker.amount != maker.filled;
+    return !maker.is_buyer && maker.amount != maker.filled && maker.status == orderStatus.OPEN;
   });
   tempSells.forEach((maker) => sells.push(maker));
   sells.sort((first, second) => {
@@ -271,7 +271,7 @@ const buyOrders = computed(() => {
         }
       }
     }
-    return maker.is_buyer && maker.amount != maker.filled;
+    return maker.is_buyer && maker.amount != maker.filled && maker.status == orderStatus.OPEN;
   });
   tempBuys.forEach((maker) => buys.push(maker));
   buys.sort((first, second) => {
