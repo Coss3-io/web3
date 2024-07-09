@@ -1085,65 +1085,35 @@ async function getPriceUpdatePromise(
 
 async function deleteBot() {
   try {
-    console.log([
-      new BigNumber(selectedBot.value!.amount)
-        .multipliedBy(multiplicator)
-        .toFixed(),
-      "0",
-      new BigNumber(selectedBot.value!.price)
-        .multipliedBy(multiplicator)
-        .toFixed(),
-      new BigNumber(selectedBot.value!.step)
-        .multipliedBy(multiplicator)
-        .toFixed(),
-      new BigNumber(selectedBot.value!.makerFees).multipliedBy("10").toFixed(),
-      "0",
-      new BigNumber(selectedBot.value!.upperBound)
-        .multipliedBy(multiplicator)
-        .toFixed(),
-      new BigNumber(selectedBot.value!.lowerBound)
-        .multipliedBy(multiplicator)
-        .toFixed(),
-      selectedBot.value!.botHash,
-      selectedBot.value!.baseToken,
-      selectedBot.value!.quoteToken,
-      selectedBot.value!.address,
-      selectedBot.value!.expiry.toString(),
-      selectedBot.value!.chainId.toString(),
-      1,
-      true,
-    ]);
     const tx = await Client.dexContract.cancelOrders([
-      [
-        new BigNumber(selectedBot.value!.amount)
+      {
+        owner: selectedBot.value!.address,
+        amount: new BigNumber(selectedBot.value!.amount)
           .multipliedBy(multiplicator)
           .toFixed(),
-        "0",
-        new BigNumber(selectedBot.value!.price)
+        price: new BigNumber(selectedBot.value!.price)
           .multipliedBy(multiplicator)
           .toFixed(),
-        new BigNumber(selectedBot.value!.step)
+        step: new BigNumber(selectedBot.value!.step)
           .multipliedBy(multiplicator)
           .toFixed(),
-        new BigNumber(selectedBot.value!.makerFees)
-          .multipliedBy("10")
-          .toFixed(),
-        "0",
-        new BigNumber(selectedBot.value!.upperBound)
+        takerAmount: "0",
+        mult: "0",
+        makerFees: selectedBot.value!.makerFees * 10,
+        upperBound: new BigNumber(selectedBot.value!.upperBound)
           .multipliedBy(multiplicator)
           .toFixed(),
-        new BigNumber(selectedBot.value!.lowerBound)
+        signature: selectedBot.value!.botHash,
+        lowerBound: new BigNumber(selectedBot.value!.lowerBound)
           .multipliedBy(multiplicator)
           .toFixed(),
-        selectedBot.value!.botHash,
-        selectedBot.value!.baseToken,
-        selectedBot.value!.quoteToken,
-        selectedBot.value!.address,
-        selectedBot.value!.expiry.toString(),
-        selectedBot.value!.chainId.toString(),
-        1,
-        true,
-      ],
+        baseToken: selectedBot.value!.baseToken,
+        quoteToken: selectedBot.value!.quoteToken,
+        expiry: selectedBot.value!.expiry.toFixed(),
+        chainId: selectedBot.value!.chainId,
+        side: 1,
+        replaceOrder: true,
+      },
     ]);
     const receipt = await tx.wait(1);
     Client.botStore[BotActions.DeleteBot](
